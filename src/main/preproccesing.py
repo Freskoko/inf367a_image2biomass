@@ -1,71 +1,57 @@
-from pathlib import Path
+from __future__ import annotations
+
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Iterable
+
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import GroupKFold
 
 
-TARGETS = [
-    "Dry_Clover_g",
-    "Dry_Dead_g",
-    "Dry_Green_g",
-    "Dry_Total_g",
-    "GDM_g",
-]
+TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "Dry_Total_g", "GDM_g"]
 
 
 @dataclass(frozen=True)
-class PreprocessConfig:
-    train_csv: str
-    test_csv: str
-    out_dir: str = "data/interim"
-    n_folds: int = 5
+class DatasetPaths:
+    root: Path = Path(__file__).parent.parent.parent / "data"
+
+    @property
+    def train_csv(self) -> Path:
+        return self.root / "train.csv"
+
+    @property
+    def test_csv(self) -> Path:
+        return self.root / "test.csv"
 
 
-def _make_image_id(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    df["image_id"] = (
-        df["image_path"]
-        .str.split("/")
-        .str[-1]
-        .str.replace(".jpg", "", regex=False)
-    )
-    return df
+def read_csv(path: Path) -> pd.DataFrame:
+    return pd.read_csv(path)
 
 
-def _date_features(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    if "Sampling_Date" not in df.columns:
-        return df
-    
-    dt = pd.to_datetime(df["Sampling_Date"], errors="coerce")
+def _add_date_features(df: pd.DataFrame, col: str = "Sampling_Date") -> pd.DataFrame:
+    out = df.copy()
+    dt = pd.to_datetime(out[col], errors="coerce")
+    if dt.isna().any():
+        dt = pd.to_datetime(out[col], format="%Y/%m/%d", errors="coerce")
 
-    df["year"] = dt.dt.year
-    df["month"] = dt.dt.month
-
-    angle = 2 * np.pi * df["month"] / 12.0
-    df["month_sin"] = np.sin(angle)
-    df["month_cos"] = np.cos(angle)
-
-    return df
+    out["year"] = dt.dt.year.astype("Int64")
+    out["month"] = dt.dt.month.astype("Int64")
+    out["day"] = dt.dt.day.astype("Int64")
+    out["dayofyear"] = dt.dt.dayofyear.astype("Int64")
+    return out
 
 
-def _pivot_wide(df: pd.DataFrame) -> pd.DataFrame:
-    potential_id_cols = [
-        "image_id",
+def pivot_train_long_to_wide(df_long: pd.DataFrame, targets: Iterable[str] = TARGETS) -> pd.DataFrame:
+    id_cols = [
         "image_path",
         "Sampling_Date",
         "State",
         "Species",
         "Pre_GSHH_NDVI",
         "Height_Ave_cm",
-        "year",
-        "month",
-        "month_sin",
-        "month_cos",
     ]
-    
-    id_cols = [col for col in potential_id_cols if col in df.columns]
+
+    df = df_long[id_cols + ["target_name", "target"]].copy()
 
     wide = (
         df.pivot_table(
@@ -77,70 +63,53 @@ def _pivot_wide(df: pd.DataFrame) -> pd.DataFrame:
         .reset_index()
     )
 
+    for t in targets:
+        if t not in wide.columns:
+            wide[t] = np.nan
+
     return wide
 
 
-def make_wide_tables(cfg: PreprocessConfig) -> tuple[Path, Path]:
-    out_dir = Path(cfg.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+def make_features_train(df_wide: pd.DataFrame, targets: Iterable[str] = TARGETS):
+    df = _add_date_features(df_wide)
 
-    train = pd.read_csv(cfg.train_csv)
-    test = pd.read_csv(cfg.test_csv)
+    feature_cols = [
+        "Pre_GSHH_NDVI",
+        "Height_Ave_cm",
+        "State",
+        "Species",
+        "year",
+        "month",
+        "day",
+        "dayofyear",
+    ]
 
-    train = _make_image_id(train)
-    test = _make_image_id(test)
-
-    train = _date_features(train)
-    test = _date_features(test)
-
-    train_wide = _pivot_wide(train)
-    test_wide = test.drop_duplicates("image_id").reset_index(drop=True)
-
-    train_path = out_dir / "train_wide.parquet"
-    test_path = out_dir / "test_wide.parquet"
-
-    train_wide.to_parquet(train_path, index=False)
-    test_wide.to_parquet(test_path, index=False)
-
-    return train_path, test_path
+    X = df[feature_cols].copy()
+    y = df[list(targets)].copy()
+    groups = df["image_path"].to_numpy()
+    meta = df[["image_path"]].copy()
+    return X, y, groups, meta
 
 
-def make_folds(train_wide_path: Path, cfg: PreprocessConfig) -> Path:
-    df = pd.read_parquet(train_wide_path)
+def make_features_test(df_test: pd.DataFrame):
+    if "Sampling_Date" in df_test.columns:
+        df = _add_date_features(df_test)
+    else:
+        df = df_test.copy()
 
-    gkf = GroupKFold(n_splits=cfg.n_folds)
-    df["fold"] = -1
+    feature_cols = [
+        "Pre_GSHH_NDVI",
+        "Height_Ave_cm",
+        "State",
+        "Species",
+        "year",
+        "month",
+        "day",
+        "dayofyear",
+    ]
 
-    for fold, (_, val_idx) in enumerate(
-        gkf.split(df, groups=df["image_id"])
-    ):
-        df.loc[val_idx, "fold"] = fold
-
-    folds_path = Path(cfg.out_dir) / "folds.parquet"
-    df[["image_id", "fold"]].to_parquet(folds_path, index=False)
-
-    return folds_path
-
-
-
-
-if __name__ == "__main__":
-    cfg = PreprocessConfig(
-        train_csv="data/train.csv",
-        test_csv="data/test.csv",
-        out_dir="data/interim",
-        n_folds=5,
-    )
-
-    train_wide_path, test_wide_path = make_wide_tables(cfg)
-    folds_path = make_folds(train_wide_path, cfg)
-
-    train = pd.read_parquet(train_wide_path)
-    folds = pd.read_parquet(folds_path)
-
-    print("Train wide shape:", train.shape)
-    print("Unique images:", train["image_id"].nunique())
-    print("Target columns present:",
-          all(t in train.columns for t in TARGETS))
-    print("Fold distribution:")
-    print(folds["fold"].value_counts().sort_index())
+    available_cols = [col for col in feature_cols if col in df.columns]
+    X = df[available_cols].copy() if available_cols else pd.DataFrame()
+    groups = df["image_path"].to_numpy()
+    meta = df[["image_path"]].copy()
+    return X, groups, meta
