@@ -113,3 +113,11 @@ def make_features_test(df_test: pd.DataFrame):
     groups = df["image_path"].to_numpy()
     meta = df[["image_path"]].copy()
     return X, groups, meta
+
+
+
+
+def make_features_train_with_id(df_wide: pd.DataFrame, targets: Iterable[str] = TARGETS):
+    X, y, groups, meta = make_features_train(df_wide, targets=targets)
+    X = pd.concat([meta, X], axis=1)
+    return X, y, groups

@@ -2,23 +2,26 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from preproccesing import DatasetPaths, read_csv
-from resnet import ResnetConfig, extract_features
+from preproccesing import DatasetPaths, read_csv, pivot_train_long_to_wide, make_features_train_with_id
+from rf_regressor import RFConfig, load_feature_store, merge_features, cv_mean_r2
 
 
 def main():
     paths = DatasetPaths()
-    df_train = read_csv(paths.train_csv)
 
-    images_root = paths.root
-    out_dir = Path(__file__).parent / "model_data"
-    out_npy = out_dir / "features_train.npy"
+    df_long = read_csv(paths.train_csv)
+    df_wide = pivot_train_long_to_wide(df_long)
 
-    cfg = ResnetConfig(batch_size=32, device="auto")
-    feats = extract_features(df_train, images_root=images_root, out_npy=out_npy, cfg=cfg)
+    X_meta, y, groups = make_features_train_with_id(df_wide)
 
-    print("features:", feats.shape)
-    print("saved:", out_npy)
+    feature_df = load_feature_store(Path(__file__).parent / "model_data" / "features_train.npy")
+    X = merge_features(X_meta, feature_df)
+
+    cfg = RFConfig(n_splits=5, random_state=42)
+    res = cv_mean_r2(cfg, X, y, groups)
+
+    print("\nCV mean R2:", res["mean_r2"])
+    print("Per-target R2:", res["per_target_r2"])
 
 
 if __name__ == "__main__":
