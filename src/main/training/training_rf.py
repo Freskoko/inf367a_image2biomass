@@ -5,6 +5,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
+from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
@@ -18,9 +19,9 @@ TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "Dry_Total_g", "GDM_g"]
 
 @dataclass(frozen=True)
 class RFConfig:
-    train_wide_path: str = "data/interim/train_wide.parquet"
-    folds_path: str = "data/interim/folds.parquet"
-    out_dir: str = "data/interim/rf_models"
+    train_wide_path: str = "../data/interim/train_wide.parquet"
+    folds_path: str = "../data/interim/folds.parquet"
+    out_dir: str = "../data/interim/rf_models"
     n_estimators: int = 800
     max_depth: int | None = None
     min_samples_leaf: int = 1
@@ -76,7 +77,7 @@ def train_rf(cfg: RFConfig) -> Path:
         tr = fold_ids != fold
         va = fold_ids == fold
 
-        model_fold = joblib.loads(joblib.dumps(model))
+        model_fold = clone(model)
         model_fold.fit(X.iloc[tr], Y[tr])
 
         pred = model_fold.predict(X.iloc[va])
