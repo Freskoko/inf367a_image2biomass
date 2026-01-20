@@ -1,0 +1,9 @@
+[project]
+name = "inf367a-image2biomass"
+version = "0.1.0"
+description = "Project for V2025"
+readme = "README.md"
+requires-python = ">=3.12.0"
+dependencies = [
+    "scikit-learn>=1.8.0",
+]
