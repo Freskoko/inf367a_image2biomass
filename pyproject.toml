@@ -5,8 +5,10 @@ description = "Project for V2025"
 readme = "README.md"
 requires-python = ">=3.12.0"
 dependencies = [
+    "fastparquet>=2025.12.0",
     "jupyter>=1.1.1",
     "matplotlib>=3.10.8",
     "pandas>=2.3.3",
+    "pyarrow>=23.0.0",
     "scikit-learn>=1.8.0",
 ]
