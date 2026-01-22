@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from main.scaling import apply_scaling_train_test
 from preproccesing import (
     DatasetPaths,
     read_csv,
@@ -105,7 +106,6 @@ def main():
     Xt_meta, _, mt = make_features_test(test_df)
     Xt_meta = pd.concat([mt, Xt_meta], axis=1)
 
-
     images_root = paths.root
 
     f_train = model_dir / "features_train.npy"
@@ -120,6 +120,7 @@ def main():
     X_train = merge_features(X_meta, feat_train)
     X_test = merge_features(Xt_meta, feat_test)
 
+    X_train, X_test = apply_scaling_train_test(X_train, X_test)
     X_train, X_test = apply_pca_train_test(X_train, X_test, n_components=cfg.pca_components)
 
     common_cols = [c for c in X_train.columns if c in X_test.columns]

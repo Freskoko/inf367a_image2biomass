@@ -104,7 +104,7 @@ def fit_full(cfg: RFConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeline:
     pipe = build_model(cfg, X)
     pipe.fit(X, y)
     return pipe
-
+    
 
 def predict(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
     return np.asarray(pipe.predict(X))

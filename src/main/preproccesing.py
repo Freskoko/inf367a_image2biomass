@@ -6,6 +6,7 @@ from typing import Iterable
 
 import numpy as np
 import pandas as pd
+import os
 
 
 TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "Dry_Total_g", "GDM_g"]
@@ -22,6 +23,13 @@ class DatasetPaths:
     @property
     def test_csv(self) -> Path:
         return self.root / "test.csv"
+    
+if __name__ == "__main__":
+    ds = DatasetPaths()
+    # ROOT_DIR = os.path.abspath(os.curdir)
+    # print(pd.read_csv(ds.train_csv))
+    # print(ROOT_DIR)
+    print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def read_csv(path: Path) -> pd.DataFrame:
