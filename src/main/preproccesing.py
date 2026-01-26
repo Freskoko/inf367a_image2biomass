@@ -41,7 +41,9 @@ def _add_date_features(df: pd.DataFrame, col: str = "Sampling_Date") -> pd.DataF
     return out
 
 
-def pivot_train_long_to_wide(df_long: pd.DataFrame, targets: Iterable[str] = TARGETS) -> pd.DataFrame:
+def pivot_train_long_to_wide(
+    df_long: pd.DataFrame, targets: Iterable[str] = TARGETS
+) -> pd.DataFrame:
     id_cols = [
         "image_path",
         "Sampling_Date",
@@ -53,15 +55,12 @@ def pivot_train_long_to_wide(df_long: pd.DataFrame, targets: Iterable[str] = TAR
 
     df = df_long[id_cols + ["target_name", "target"]].copy()
 
-    wide = (
-        df.pivot_table(
-            index=id_cols,
-            columns="target_name",
-            values="target",
-            aggfunc="first",
-        )
-        .reset_index()
-    )
+    wide = df.pivot_table(
+        index=id_cols,
+        columns="target_name",
+        values="target",
+        aggfunc="first",
+    ).reset_index()
 
     for t in targets:
         if t not in wide.columns:
@@ -115,9 +114,9 @@ def make_features_test(df_test: pd.DataFrame):
     return X, groups, meta
 
 
-
-
-def make_features_train_with_id(df_wide: pd.DataFrame, targets: Iterable[str] = TARGETS):
+def make_features_train_with_id(
+    df_wide: pd.DataFrame, targets: Iterable[str] = TARGETS
+):
     X, y, groups, meta = make_features_train(df_wide, targets=targets)
     X = pd.concat([meta, X], axis=1)
     return X, y, groups
