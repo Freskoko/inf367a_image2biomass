@@ -6,6 +6,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from scaling import apply_scaling_train_test
+from utils import DataType
 from preproccesing import (
     DatasetPaths,
     read_csv,
@@ -43,11 +45,19 @@ def _ensure_features(
     out_npy: Path,
     resnet_cfg: ResnetConfig,
     image_col: str = "image_path",
+    mode: DataType = DataType.VAL,
 ) -> None:
     paths_txt = out_npy.with_suffix(".paths.txt")
     if out_npy.exists() and paths_txt.exists():
         return
-    extract_features(df, images_root=images_root, out_npy=out_npy, cfg=resnet_cfg, image_col=image_col)
+    extract_features(
+        df,
+        images_root=images_root,
+        out_npy=out_npy,
+        cfg=resnet_cfg,
+        image_col=image_col,
+        mode=mode,
+    )
 
 
 def apply_pca_train_test(
@@ -111,8 +121,22 @@ def main():
     f_train = model_dir / "features_train.npy"
     f_test = model_dir / "features_test.npy"
 
-    _ensure_features(train_long, images_root=images_root, out_npy=f_train, resnet_cfg=cfg.resnet, image_col="image_path")
-    _ensure_features(test_df, images_root=images_root, out_npy=f_test, resnet_cfg=cfg.resnet, image_col="image_path")
+    _ensure_features(
+        train_long,
+        images_root=images_root,
+        out_npy=f_train,
+        resnet_cfg=cfg.resnet,
+        image_col="image_path",
+        mode=DataType.TRAIN,
+    )
+    _ensure_features(
+        test_df,
+        images_root=images_root,
+        out_npy=f_test,
+        resnet_cfg=cfg.resnet,
+        image_col="image_path",
+        mode=DataType.VAL,
+    )
 
     feat_train = load_feature_store(f_train)
     feat_test = load_feature_store(f_test)
@@ -120,11 +144,14 @@ def main():
     X_train = merge_features(X_meta, feat_train)
     X_test = merge_features(Xt_meta, feat_test)
 
-    X_train, X_test = apply_pca_train_test(X_train, X_test, n_components=cfg.pca_components)
-
     common_cols = [c for c in X_train.columns if c in X_test.columns]
     X_train = X_train[common_cols]
     X_test = X_test[common_cols]
+
+    X_train, X_test = apply_scaling_train_test(X_train, X_test)
+    X_train, X_test = apply_pca_train_test(
+        X_train, X_test, n_components=cfg.pca_components
+    )
 
     pipe = fit_full(cfg.rf, X_train, y)
     preds = predict(pipe, X_test)
