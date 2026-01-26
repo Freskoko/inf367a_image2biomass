@@ -21,7 +21,7 @@ from rf_regressor import RFConfig, load_feature_store, merge_features, fit_full,
 from pca import PCAConfig, fit_pca, transform_pca
 
 
-#helper functnss
+# helper functnss
 def dedupe_test(df_test: pd.DataFrame) -> pd.DataFrame:
     if "image_path" not in df_test.columns:
         raise ValueError("test.csv must contain image_path")
@@ -87,7 +87,9 @@ def apply_pca_train_test(
     return Xtr_final, Xte_final
 
 
-def wide_to_long_predictions(image_paths: np.ndarray, preds: np.ndarray) -> pd.DataFrame:
+def wide_to_long_predictions(
+    image_paths: np.ndarray, preds: np.ndarray
+) -> pd.DataFrame:
     out = []
     for i, img in enumerate(image_paths):
         img_id = Path(img).stem
@@ -114,7 +116,6 @@ def main():
 
     Xt_meta, _, mt = make_features_test(test_df)
     Xt_meta = pd.concat([mt, Xt_meta], axis=1)
-
 
     images_root = paths.root
 
