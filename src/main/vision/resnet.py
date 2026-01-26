@@ -10,7 +10,7 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
 
-from utils import DataType
+from main.utils.utils import DataType
 
 
 @dataclass(frozen=True)

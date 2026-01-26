@@ -5,9 +5,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from preproccesing import DatasetPaths, read_csv, pivot_train_long_to_wide, make_features_train_with_id
-from rf_regressor import RFConfig, load_feature_store, merge_features, cv_mean_r2
-from pca import PCAConfig, fit_pca, transform_pca
+from main.preprocessing.preproccesing import DatasetPaths, read_csv, pivot_train_long_to_wide, make_features_train_with_id
+from main.regression.rf_regressor import RFConfig, load_feature_store, merge_features, cv_mean_r2
+from main.preprocessing.pca import PCAConfig, fit_pca, transform_pca
 from sklearn.preprocessing import MinMaxScaler
 
 
