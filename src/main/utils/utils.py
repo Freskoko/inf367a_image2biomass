@@ -7,6 +7,7 @@ class DataType(Enum):
     TRAIN = auto()
     VAL = auto()
 
+
 @dataclass(frozen=True)
 class TrainConfig:
     n_splits: int = 5

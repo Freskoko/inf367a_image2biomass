@@ -17,10 +17,10 @@ class RFConfig:
     n_jobs: int = -1
     random_state: int = 42
 
-def build_baseline_models(random_state):
 
+def build_baseline_models(random_state):
     rf_config = RFConfig()
-        
+
     return [
         DummyRegressor(),
         RandomForestRegressor(random_state=random_state, n_estimators=50),
@@ -32,5 +32,5 @@ def build_baseline_models(random_state):
             max_depth=rf_config.max_depth,
             n_jobs=rf_config.n_jobs,
             random_state=rf_config.random_state,
-        )
+        ),
     ]
