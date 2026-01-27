@@ -9,3 +9,9 @@ dependencies = [
     "scikit-learn>=1.8.0",
     "torchvision>=0.25.0",
 ]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
