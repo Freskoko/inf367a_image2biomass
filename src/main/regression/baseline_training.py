@@ -59,7 +59,11 @@ def model_wrapper_creator(cfg, X_example, base):
 
 
 def cv_mean_r2(
-    cfg: TrainConfig, model ,X: pd.DataFrame, y: pd.DataFrame, groups: np.ndarray,
+    cfg: TrainConfig,
+    model,
+    X: pd.DataFrame,
+    y: pd.DataFrame,
+    groups: np.ndarray,
 ) -> dict:
     gkf = GroupKFold(n_splits=cfg.n_splits)
 

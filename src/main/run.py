@@ -17,7 +17,7 @@ from main.preprocessing.preproccesing import (
     TARGETS,
 )
 from main.vision.resnet import ResnetConfig, extract_features
-from main.regression.rf_regressor import (
+from main.regression.baseline_training import (
     RFConfig,
     load_feature_store,
     merge_features,

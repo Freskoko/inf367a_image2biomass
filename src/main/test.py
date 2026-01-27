@@ -13,7 +13,7 @@ from main.preprocessing.preproccesing import (
     make_features_train_with_id,
 )
 from main.regression.baselines import build_baseline_models
-from main.regression.rf_regressor import (
+from main.regression.baseline_training import (
     load_feature_store,
     merge_features,
     cv_mean_r2,
@@ -85,7 +85,6 @@ def main():
         print(f"\n\nMODEL NAME : {name}")
         print("CV mean R2:", score["mean_r2"])
         print("Per-target R2:", score["per_target_r2"])
-
 
 
 if __name__ == "__main__":
