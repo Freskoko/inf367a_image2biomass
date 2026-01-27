@@ -6,7 +6,6 @@ def apply_scaling_train_test(
     X_train: pd.DataFrame,
     X_test: pd.DataFrame,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-
     num_cols = X_train.select_dtypes(include=["number"]).columns.tolist()
 
     scaler = StandardScaler()

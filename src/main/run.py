@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from scaling import apply_scaling_train_test
-from utils import DataType
-from preproccesing import (
+from main.preprocessing.scaling import apply_scaling_train_test
+from main.utils.utils import DataType
+from main.preprocessing.preproccesing import (
     DatasetPaths,
     read_csv,
     pivot_train_long_to_wide,
@@ -16,9 +16,15 @@ from preproccesing import (
     make_features_test,
     TARGETS,
 )
-from resnet import ResnetConfig, extract_features
-from rf_regressor import RFConfig, load_feature_store, merge_features, fit_full, predict
-from pca import PCAConfig, fit_pca, transform_pca
+from main.vision.resnet import ResnetConfig, extract_features
+from main.regression.rf_regressor import (
+    RFConfig,
+    load_feature_store,
+    merge_features,
+    fit_full,
+    predict,
+)
+from main.preprocessing.pca import PCAConfig, fit_pca, transform_pca
 
 
 # helper functnss
