@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -13,15 +12,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-
-@dataclass(frozen=True)
-class RFConfig:
-    n_splits: int = 5
-    n_estimators: int = 1200
-    min_samples_leaf: int = 2
-    max_depth: int | None = None
-    n_jobs: int = -1
-    random_state: int = 42
+from main.utils.utils import TrainConfig
 
 
 def load_feature_store(npy_path: Path) -> pd.DataFrame:
@@ -61,23 +52,14 @@ def _build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
     )
 
 
-def build_model(cfg: RFConfig, X_example: pd.DataFrame) -> Pipeline:
+def model_wrapper_creator(cfg, X_example, base):
     pre = _build_preprocessor(X_example)
-
-    base = ExtraTreesRegressor(
-        n_estimators=cfg.n_estimators,
-        min_samples_leaf=cfg.min_samples_leaf,
-        max_depth=cfg.max_depth,
-        n_jobs=cfg.n_jobs,
-        random_state=cfg.random_state,
-    )
-
     model = MultiOutputRegressor(base, n_jobs=cfg.n_jobs)
     return Pipeline([("pre", pre), ("model", model)])
 
 
 def cv_mean_r2(
-    cfg: RFConfig, X: pd.DataFrame, y: pd.DataFrame, groups: np.ndarray
+    cfg: TrainConfig, model ,X: pd.DataFrame, y: pd.DataFrame, groups: np.ndarray,
 ) -> dict:
     gkf = GroupKFold(n_splits=cfg.n_splits)
 
@@ -88,7 +70,7 @@ def cv_mean_r2(
         Xtr, Xva = X.iloc[tr], X.iloc[va]
         ytr, yva = y.iloc[tr], y.iloc[va]
 
-        pipe = build_model(cfg, Xtr)
+        pipe = model_wrapper_creator(cfg, Xtr, model)
         pipe.fit(Xtr, ytr)
 
         pred = np.asarray(pipe.predict(Xva))
@@ -107,8 +89,8 @@ def cv_mean_r2(
     return {"mean_r2": float(np.mean(fold_scores)), "per_target_r2": per_target_mean}
 
 
-def fit_full(cfg: RFConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeline:
-    pipe = build_model(cfg, X)
+def fit_full(cfg: TrainConfig, X: pd.DataFrame, y: pd.DataFrame, model) -> Pipeline:
+    pipe = model_wrapper_creator(cfg, X, model)
     pipe.fit(X, y)
     return pipe
 
