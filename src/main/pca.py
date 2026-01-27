@@ -14,7 +14,9 @@ class PCAConfig:
 
 
 def fit_pca(X: np.ndarray, cfg: PCAConfig) -> PCA:
-    pca = PCA(n_components=cfg.n_components, whiten=cfg.whiten, random_state=cfg.random_state)
+    pca = PCA(
+        n_components=cfg.n_components, whiten=cfg.whiten, random_state=cfg.random_state
+    )
     pca.fit(X)
     return pca
 

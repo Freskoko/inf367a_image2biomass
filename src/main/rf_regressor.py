@@ -40,7 +40,9 @@ def merge_features(X_meta: pd.DataFrame, feature_df: pd.DataFrame) -> pd.DataFra
 
     missing = X.isna().any(axis=1).sum()
     if missing:
-        raise ValueError(f"Missing ResNet features for {missing} rows. Check paths alignment.")
+        raise ValueError(
+            f"Missing ResNet features for {missing} rows. Check paths alignment."
+        )
 
     X.columns = X.columns.astype(str)
     return X
@@ -74,7 +76,9 @@ def build_model(cfg: RFConfig, X_example: pd.DataFrame) -> Pipeline:
     return Pipeline([("pre", pre), ("model", model)])
 
 
-def cv_mean_r2(cfg: RFConfig, X: pd.DataFrame, y: pd.DataFrame, groups: np.ndarray) -> dict:
+def cv_mean_r2(
+    cfg: RFConfig, X: pd.DataFrame, y: pd.DataFrame, groups: np.ndarray
+) -> dict:
     gkf = GroupKFold(n_splits=cfg.n_splits)
 
     fold_scores: list[float] = []
@@ -88,7 +92,10 @@ def cv_mean_r2(cfg: RFConfig, X: pd.DataFrame, y: pd.DataFrame, groups: np.ndarr
         pipe.fit(Xtr, ytr)
 
         pred = np.asarray(pipe.predict(Xva))
-        target_r2 = np.array([r2_score(yva.iloc[:, j], pred[:, j]) for j in range(y.shape[1])], dtype=float)
+        target_r2 = np.array(
+            [r2_score(yva.iloc[:, j], pred[:, j]) for j in range(y.shape[1])],
+            dtype=float,
+        )
         mean_r2 = float(np.mean(target_r2))
 
         fold_scores.append(mean_r2)

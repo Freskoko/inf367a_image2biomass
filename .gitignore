@@ -18,3 +18,6 @@ data/
 # Submissions
 submissions/
 *.zip
+
+**/__pycache__/
+.ruff_cache

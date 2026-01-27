@@ -1,9 +1,11 @@
 [project]
 name = "inf367a-image2biomass"
 version = "0.1.0"
-description = "Project for V2025"
+description = "Project for V2026"
 readme = "README.md"
 requires-python = ">=3.12.0"
 dependencies = [
+    "opencv-python>=4.13.0.90",
     "scikit-learn>=1.8.0",
+    "torchvision>=0.25.0",
 ]

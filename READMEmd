@@ -1,3 +1,19 @@
 # INF367A
 
-[Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
+Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
+
+## Requirements
+
+See pyproject.toml. The environment manager [uv](https://docs.astral.sh/uv/getting-started/installation/) is ready to use in this repo.
+
+## Formatting
+
+Henrik likes to use [ruff](https://docs.astral.sh/ruff/) to format code
+
+## How to run
+
+Run [predict.py](/src/main/predict.py)
+
+## Code setup:
+
+TODO

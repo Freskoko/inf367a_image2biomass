@@ -6,6 +6,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from scaling import apply_scaling_train_test
+from utils import DataType
 from preproccesing import (
     DatasetPaths,
     read_csv,
@@ -19,7 +21,7 @@ from rf_regressor import RFConfig, load_feature_store, merge_features, fit_full,
 from pca import PCAConfig, fit_pca, transform_pca
 
 
-#helper functnss
+# helper functnss
 def dedupe_test(df_test: pd.DataFrame) -> pd.DataFrame:
     if "image_path" not in df_test.columns:
         raise ValueError("test.csv must contain image_path")
@@ -43,11 +45,19 @@ def _ensure_features(
     out_npy: Path,
     resnet_cfg: ResnetConfig,
     image_col: str = "image_path",
+    mode: DataType = DataType.VAL,
 ) -> None:
     paths_txt = out_npy.with_suffix(".paths.txt")
     if out_npy.exists() and paths_txt.exists():
         return
-    extract_features(df, images_root=images_root, out_npy=out_npy, cfg=resnet_cfg, image_col=image_col)
+    extract_features(
+        df,
+        images_root=images_root,
+        out_npy=out_npy,
+        cfg=resnet_cfg,
+        image_col=image_col,
+        mode=mode,
+    )
 
 
 def apply_pca_train_test(
@@ -77,7 +87,9 @@ def apply_pca_train_test(
     return Xtr_final, Xte_final
 
 
-def wide_to_long_predictions(image_paths: np.ndarray, preds: np.ndarray) -> pd.DataFrame:
+def wide_to_long_predictions(
+    image_paths: np.ndarray, preds: np.ndarray
+) -> pd.DataFrame:
     out = []
     for i, img in enumerate(image_paths):
         img_id = Path(img).stem
@@ -105,14 +117,27 @@ def main():
     Xt_meta, _, mt = make_features_test(test_df)
     Xt_meta = pd.concat([mt, Xt_meta], axis=1)
 
-
     images_root = paths.root
 
     f_train = model_dir / "features_train.npy"
     f_test = model_dir / "features_test.npy"
 
-    _ensure_features(train_long, images_root=images_root, out_npy=f_train, resnet_cfg=cfg.resnet, image_col="image_path")
-    _ensure_features(test_df, images_root=images_root, out_npy=f_test, resnet_cfg=cfg.resnet, image_col="image_path")
+    _ensure_features(
+        train_long,
+        images_root=images_root,
+        out_npy=f_train,
+        resnet_cfg=cfg.resnet,
+        image_col="image_path",
+        mode=DataType.TRAIN,
+    )
+    _ensure_features(
+        test_df,
+        images_root=images_root,
+        out_npy=f_test,
+        resnet_cfg=cfg.resnet,
+        image_col="image_path",
+        mode=DataType.VAL,
+    )
 
     feat_train = load_feature_store(f_train)
     feat_test = load_feature_store(f_test)
@@ -120,11 +145,14 @@ def main():
     X_train = merge_features(X_meta, feat_train)
     X_test = merge_features(Xt_meta, feat_test)
 
-    X_train, X_test = apply_pca_train_test(X_train, X_test, n_components=cfg.pca_components)
-
     common_cols = [c for c in X_train.columns if c in X_test.columns]
     X_train = X_train[common_cols]
     X_test = X_test[common_cols]
+
+    X_train, X_test = apply_scaling_train_test(X_train, X_test)
+    X_train, X_test = apply_pca_train_test(
+        X_train, X_test, n_components=cfg.pca_components
+    )
 
     pipe = fit_full(cfg.rf, X_train, y)
     preds = predict(pipe, X_test)

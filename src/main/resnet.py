@@ -10,6 +10,8 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
 
+from utils import DataType
+
 
 @dataclass(frozen=True)
 class ResnetConfig:
@@ -20,19 +22,61 @@ class ResnetConfig:
 
 
 class ImagePathDataset(Dataset):
-    def __init__(self, root: Path, image_paths: list[str], tfm: transforms.Compose):
+    def __init__(
+        self,
+        root: Path,
+        image_paths: list[str],
+        cfg: ResnetConfig,
+        mode: DataType = DataType.VAL,
+    ):
         self.root = root
         self.image_paths = image_paths
-        self.tfm = tfm
+        self.mode = mode
+        self.cfg = cfg
+
+        # imagenet mean and std
+        self.mean = [0.485, 0.456, 0.406]
+        self.std = [0.229, 0.224, 0.225]
+
+        if self.mode == DataType.TRAIN:
+            self.transform = self._get_train_transform()
+        else:
+            self.transform = self._get_val_transform()
 
     def __len__(self) -> int:
         return len(self.image_paths)
+
+    def _get_train_transform(self):
+        """
+        When training across epochs,
+        images are randomly flipped, either vertically, horizontally, or both
+        Source: https://link.springer.com/article/10.1186/s40537-019-0197-0?
+        """
+        return transforms.Compose(
+            [
+                transforms.Resize((self.cfg.image_size, self.cfg.image_size * 2)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.RandomVerticalFlip(p=0.5),
+                # transforms.v2.GaussianNoise(mean = 1, std = 0.1), can hurt predictions
+                transforms.ToTensor(),
+                transforms.Normalize(self.mean, self.std),
+            ]
+        )
+
+    def _get_val_transform(self):
+        return transforms.Compose(
+            [
+                transforms.Resize((self.cfg.image_size, self.cfg.image_size * 2)),
+                transforms.ToTensor(),
+                transforms.Normalize(self.mean, self.std),
+            ]
+        )
 
     def __getitem__(self, idx: int):
         rel = self.image_paths[idx]
         path = self.root / rel
         img = Image.open(path).convert("RGB")
-        x = self.tfm(img)
+        x = self.transform(img)
         return x, rel
 
 
@@ -54,18 +98,6 @@ def build_feature_extractor(device: torch.device) -> torch.nn.Module:
     return m
 
 
-def build_transform(image_size: int) -> transforms.Compose:
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
-    return transforms.Compose(
-        [
-            transforms.Resize((image_size, image_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=mean, std=std),
-        ]
-    )
-
-
 @torch.inference_mode()
 def extract_features(
     df: pd.DataFrame,
@@ -73,14 +105,14 @@ def extract_features(
     out_npy: Path,
     cfg: ResnetConfig,
     image_col: str = "image_path",
+    mode: DataType = DataType.VAL,
 ) -> np.ndarray:
     out_npy.parent.mkdir(parents=True, exist_ok=True)
 
     image_paths = df[image_col].astype(str).unique().tolist()
 
     device = _get_device(cfg.device)
-    tfm = build_transform(cfg.image_size)
-    ds = ImagePathDataset(images_root, image_paths, tfm)
+    ds = ImagePathDataset(images_root, image_paths, cfg=cfg, mode=mode)
     dl = DataLoader(
         ds,
         batch_size=cfg.batch_size,
