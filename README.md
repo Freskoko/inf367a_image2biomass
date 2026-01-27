@@ -13,7 +13,3 @@ Henrik likes to use [ruff](https://docs.astral.sh/ruff/) to format code
 ## How to run
 
 Run [predict.py](/src/main/predict.py)
-
-## Code setup:
-
-TODO
