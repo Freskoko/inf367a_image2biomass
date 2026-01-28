@@ -8,22 +8,6 @@ import numpy as np
 import pandas as pd
 
 
-TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "Dry_Total_g", "GDM_g"]
-
-
-@dataclass(frozen=True)
-class DatasetPaths:
-    root: Path = Path(__file__).parent.parent.parent / "data"
-
-    @property
-    def train_csv(self) -> Path:
-        return self.root / "train.csv"
-
-    @property
-    def test_csv(self) -> Path:
-        return self.root / "test.csv"
-
-
 def read_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
@@ -42,7 +26,7 @@ def _add_date_features(df: pd.DataFrame, col: str = "Sampling_Date") -> pd.DataF
 
 
 def pivot_train_long_to_wide(
-    df_long: pd.DataFrame, targets: Iterable[str] = TARGETS
+    df_long: pd.DataFrame, targets: Iterable[str]
 ) -> pd.DataFrame:
     id_cols = [
         "image_path",
@@ -69,7 +53,7 @@ def pivot_train_long_to_wide(
     return wide
 
 
-def make_features_train(df_wide: pd.DataFrame, targets: Iterable[str] = TARGETS):
+def make_features_train(df_wide: pd.DataFrame, targets: Iterable[str]):
     df = _add_date_features(df_wide)
 
     feature_cols = [
@@ -112,11 +96,3 @@ def make_features_test(df_test: pd.DataFrame):
     groups = df["image_path"].to_numpy()
     meta = df[["image_path"]].copy()
     return X, groups, meta
-
-
-def make_features_train_with_id(
-    df_wide: pd.DataFrame, targets: Iterable[str] = TARGETS
-):
-    X, y, groups, meta = make_features_train(df_wide, targets=targets)
-    X = pd.concat([meta, X], axis=1)
-    return X, y, groups

@@ -1,24 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import models, transforms
 
-from main.utils.utils import DataType
-
-
-@dataclass(frozen=True)
-class ResnetConfig:
-    image_size: int = 224
-    batch_size: int = 64
-    num_workers: int = 0
-    device: str = "auto"
+from main.utils.utils import DataType, VisionModelConfig
 
 
 class ImagePathDataset(Dataset):
@@ -26,17 +16,13 @@ class ImagePathDataset(Dataset):
         self,
         root: Path,
         image_paths: list[str],
-        cfg: ResnetConfig,
+        vision_cfg: VisionModelConfig,
         mode: DataType = DataType.VAL,
     ):
         self.root = root
         self.image_paths = image_paths
         self.mode = mode
-        self.cfg = cfg
-
-        # imagenet mean and std
-        self.mean = [0.485, 0.456, 0.406]
-        self.std = [0.229, 0.224, 0.225]
+        self.cfg = vision_cfg
 
         if self.mode == DataType.TRAIN:
             self.transform = self._get_train_transform()
@@ -47,6 +33,7 @@ class ImagePathDataset(Dataset):
         return len(self.image_paths)
 
     def _get_train_transform(self):
+        # TODO MOVE ME SOMEWHERE ELSE!
         """
         When training across epochs,
         images are randomly flipped, either vertically, horizontally, or both
@@ -59,7 +46,7 @@ class ImagePathDataset(Dataset):
                 transforms.RandomVerticalFlip(p=0.5),
                 # transforms.v2.GaussianNoise(mean = 1, std = 0.1), can hurt predictions
                 transforms.ToTensor(),
-                transforms.Normalize(self.mean, self.std),
+                transforms.Normalize(self.cfg.mean, self.cfg.std),
             ]
         )
 
@@ -68,7 +55,7 @@ class ImagePathDataset(Dataset):
             [
                 transforms.Resize((self.cfg.image_size, self.cfg.image_size * 2)),
                 transforms.ToTensor(),
-                transforms.Normalize(self.mean, self.std),
+                transforms.Normalize(self.cfg.mean, self.cfg.std),
             ]
         )
 
@@ -100,24 +87,18 @@ def build_feature_extractor(device: torch.device) -> torch.nn.Module:
 
 @torch.inference_mode()
 def extract_features(
-    df: pd.DataFrame,
-    images_root: Path,
     out_npy: Path,
-    cfg: ResnetConfig,
-    image_col: str = "image_path",
-    mode: DataType = DataType.VAL,
+    vision_cfg: VisionModelConfig,
+    ds,
 ) -> np.ndarray:
     out_npy.parent.mkdir(parents=True, exist_ok=True)
 
-    image_paths = df[image_col].astype(str).unique().tolist()
-
-    device = _get_device(cfg.device)
-    ds = ImagePathDataset(images_root, image_paths, cfg=cfg, mode=mode)
+    device = _get_device(vision_cfg.device)
     dl = DataLoader(
         ds,
-        batch_size=cfg.batch_size,
+        batch_size=vision_cfg.batch_size,
         shuffle=False,
-        num_workers=cfg.num_workers,
+        num_workers=vision_cfg.num_workers,
         pin_memory=(device.type == "cuda"),
     )
 

@@ -1,10 +1,7 @@
 from dataclasses import dataclass
-import pandas as pd
 from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
-from sklearn.multioutput import MultiOutputRegressor
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.pipeline import Pipeline
 from sklearn.svm import SVR
 
 
