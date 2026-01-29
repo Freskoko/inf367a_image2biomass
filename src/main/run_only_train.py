@@ -1,27 +1,22 @@
 from __future__ import annotations
-from pathlib import Path
-import time
 
 import numpy as np
-import pandas as pd
 from main.preprocessing.pca import apply_pca_train_test
-from main.preprocessing.scaling import apply_scaling_train_test
-from main.utils.save_file import save_predictions
+from main.preprocessing.scaling import apply_scaling_train
 from main.utils.utils import DatasetPaths, TrainConfig
 from main.vision.resnet import VisionModelConfig
 from main.regression.baseline_training import (
     cv_mean_r2,
     load_feature_store,
-    fit_full,
-    predict,
 )
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
-from main.wrangling.tabular_data import load_data, wide_to_long_predictions
+from main.wrangling.tabular_data import load_data
 
 from loguru import logger
 
 
+# drops test data
 def main():
     # 0. configs
     path_cfg = DatasetPaths()
@@ -30,7 +25,7 @@ def main():
     logger.info("0. Configs loaded")
 
     # 1. load data
-    train_wide, test_df, Xtr_meta, Xte_meta, y = load_data(
+    train_wide, test_df, Xtr_meta, _, y = load_data(
         path_cfg=path_cfg, train_cfg=train_cfg
     )
     logger.info("1. Data loaded")
@@ -54,40 +49,44 @@ def main():
     logger.info("2.2 Vision data loaded from file")
 
     # 3 apply PCA on vision output data
-    X_vision_train, X_vision_test = apply_pca_train_test(
+    X_vision_train, _ = apply_pca_train_test(
         img_feat_train, img_feat_test, train_cfg=train_cfg
     )
     logger.info("3. PCA on vision data complete")
 
     # 4 combine data
     X_train = merge_features(Xtr_meta, X_vision_train)
-    X_test = merge_features(Xte_meta, X_vision_test)
     logger.info("4.1 Vision and tabular data combined")
 
-    # TODO: this seems weird, should they not be the same?
-    # aha.... test is not the same
-    common_cols = [c for c in X_train.columns if c in X_test.columns]
-    X_train = X_train[common_cols]
-    X_test = X_test[common_cols]
+    logger.info("Dropped test data, only doing train")
+    X_train = apply_scaling_train(X_train)
 
     # 4.1 scale data
-    X_train, X_test = apply_scaling_train_test(X_train, X_test)
-    logger.info("4.2 Train and test data scaled")
+    logger.info("4.2 Train scaled")
 
-    # 5. Multivariate regression
-    start_time = time.time()
-    pipe = fit_full(train_cfg, X_train, y)
-    logger.info(
-        f"5.1 Model fitted to data, time taken = {round(time.time() - start_time)} seconds"
-    )
+    logger.info("6. Calculating R2 CV score")
+    if train_cfg.lower_resources:
+        rng = np.random.default_rng(train_cfg.random_state)
+        keep_groups = rng.choice(
+            X_train["image_path"].unique(), size=train_cfg.max_cv_groups, replace=False
+        )
 
-    test_preds = predict(pipe, X_test)
-    long_pred = wide_to_long_predictions(
-        image_paths=X_test["image_path"], preds=test_preds, train_cfg=train_cfg
-    )
+        mask = X_train["image_path"].isin(keep_groups)
+        X_train_cv = X_train.loc[mask].reset_index(drop=True)
+        y_cv = y.loc[mask].reset_index(drop=True)
 
-    save_predictions(path_cfg, long_pred)
-    logger.info("5.2 Test prediction complete, saving to csv")
+        groups = X_train_cv["image_path"].to_numpy()
+        train_r2_score = cv_mean_r2(
+            train_cfg=train_cfg, X=X_train_cv, y=y_cv, groups=groups
+        )
+    else:
+        groups = X_train["image_path"].to_numpy()
+        train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
+
+    print("R2 Score on training data:")
+    print("CV mean R2:", train_r2_score["mean_r2"])
+    print("Per-target R2:", train_r2_score["per_target_r2"])
+    logger.info("End of file")
 
 
 if __name__ == "__main__":
