@@ -12,19 +12,6 @@ def read_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def _add_date_features(df: pd.DataFrame, col: str = "Sampling_Date") -> pd.DataFrame:
-    out = df.copy()
-    dt = pd.to_datetime(out[col], errors="coerce")
-    if dt.isna().any():
-        dt = pd.to_datetime(out[col], format="%Y/%m/%d", errors="coerce")
-
-    out["year"] = dt.dt.year.astype("Int64")
-    out["month"] = dt.dt.month.astype("Int64")
-    out["day"] = dt.dt.day.astype("Int64")
-    out["dayofyear"] = dt.dt.dayofyear.astype("Int64")
-    return out
-
-
 def pivot_train_long_to_wide(
     df_long: pd.DataFrame, targets: Iterable[str]
 ) -> pd.DataFrame:
@@ -51,27 +38,6 @@ def pivot_train_long_to_wide(
             wide[t] = np.nan
 
     return wide
-
-
-def make_features_train(df_wide: pd.DataFrame, targets: Iterable[str]):
-    df = _add_date_features(df_wide)
-
-    feature_cols = [
-        "Pre_GSHH_NDVI",
-        "Height_Ave_cm",
-        "State",
-        "Species",
-        "year",
-        "month",
-        "day",
-        "dayofyear",
-    ]
-
-    X = df[feature_cols].copy()
-    y = df[list(targets)].copy()
-    groups = df["image_path"].to_numpy()
-    meta = df[["image_path"]].copy()
-    return X, y, groups, meta
 
 
 def make_features_test(df_test: pd.DataFrame):

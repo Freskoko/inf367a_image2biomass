@@ -3,8 +3,6 @@ import numpy as np
 import pandas as pd
 
 from main.preprocessing.preproccesing import (
-    make_features_test,
-    make_features_train,
     pivot_train_long_to_wide,
 )
 from main.utils.utils import DatasetPaths, TrainConfig
@@ -49,15 +47,9 @@ def load_data(path_cfg: DatasetPaths, train_cfg: TrainConfig):
     train_long = pd.read_csv(path_cfg.train_csv)
     train_wide = pivot_train_long_to_wide(train_long, targets=train_cfg.TARGETS)
 
-    Xtr_meta, y, groups, meta = make_features_train(
-        train_wide, targets=train_cfg.TARGETS
-    )
-    Xtr_meta = pd.concat([meta, Xtr_meta], axis=1)
+    y = train_wide[list(train_cfg.TARGETS)].copy()
 
     test_df_raw = pd.read_csv(path_cfg.test_csv)
     test_df = dedupe_test(test_df_raw)
 
-    Xte_meta, _, mt = make_features_test(test_df)
-    Xte_meta = pd.concat([mt, Xte_meta], axis=1)
-
-    return train_wide, test_df, Xtr_meta, Xte_meta, y
+    return train_wide, test_df, y
