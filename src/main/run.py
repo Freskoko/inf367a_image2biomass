@@ -1,5 +1,6 @@
 from __future__ import annotations
 from pathlib import Path
+import warnings
 import time
 
 import numpy as np
@@ -10,16 +11,20 @@ from main.utils.save_file import save_predictions
 from main.utils.utils import DatasetPaths, TrainConfig
 from main.vision.resnet import VisionModelConfig
 from main.regression.baseline_training import (
-    cv_mean_r2,
     load_feature_store,
-    fit_full,
-    predict,
+    fit_full_per_target,
+    predict_per_target,
 )
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data, wide_to_long_predictions
 
 from loguru import logger
+
+warnings.filterwarnings(
+    "ignore",
+    message="`sklearn.utils.parallel.delayed` should be used with",
+)
 
 
 def main():
@@ -76,14 +81,25 @@ def main():
 
     # 5. Multivariate regression
     start_time = time.time()
-    pipe = fit_full(train_cfg, X_train, y)
+    
+    # preserve metadata
+    test_image_paths = X_test["image_path"].copy()
+    groups = X_train["image_path"].to_numpy()
+
+    # drop non-numeric features
+    X_train = X_train.drop(columns=["image_path"])
+    X_test  = X_test.drop(columns=["image_path"])
+    
+    models = fit_full_per_target(train_cfg, X_train, y, groups=groups)
     logger.info(
         f"5.1 Model fitted to data, time taken = {round(time.time() - start_time)} seconds"
     )
 
-    test_preds = predict(pipe, X_test)
+    test_preds = predict_per_target(models, X_test, train_cfg.TARGETS)
     long_pred = wide_to_long_predictions(
-        image_paths=X_test["image_path"], preds=test_preds, train_cfg=train_cfg
+        image_paths=test_image_paths,
+        preds=test_preds,
+        train_cfg=train_cfg,
     )
 
     save_predictions(path_cfg, long_pred)

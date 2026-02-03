@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-import numpy as np
+import warnings
+
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train
 from main.utils.utils import DatasetPaths, TrainConfig
 from main.vision.resnet import VisionModelConfig
 from main.regression.baseline_training import (
-    cv_mean_r2,
     load_feature_store,
+    cv_search_per_target,
 )
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data
 
 from loguru import logger
+
+warnings.filterwarnings(
+    "ignore",
+    message="`sklearn.utils.parallel.delayed` should be used with",
+)
 
 
 # drops test data
@@ -30,7 +36,7 @@ def main():
     )
     logger.info("1. Data loaded")
 
-    # 2. run vision extraction on images (if required)
+    # 2. vision extraction
     if (
         not path_cfg.vision_feats_train.with_suffix(".paths.txt").exists()
         or not path_cfg.vision_feats_test.with_suffix(".paths.txt").exists()
@@ -43,49 +49,42 @@ def main():
         )
     logger.info("2.1 Vision data created (or existed beforehand)")
 
-    # 2. load vision extraction data from file
     img_feat_train = load_feature_store(path_cfg.vision_feats_train)
     img_feat_test = load_feature_store(path_cfg.vision_feats_test)
     logger.info("2.2 Vision data loaded from file")
 
-    # 3 apply PCA on vision output data
+    # 3. PCA
     X_vision_train, _ = apply_pca_train_test(
         img_feat_train, img_feat_test, train_cfg=train_cfg
     )
     logger.info("3. PCA on vision data complete")
 
-    # 4 combine data
+    # 4. combine data
     X_train = merge_features(Xtr_meta, X_vision_train)
     logger.info("4.1 Vision and tabular data combined")
 
-    logger.info("Dropped test data, only doing train")
-    X_train = apply_scaling_train(X_train)
+    # preserve grouping variable
+    groups = X_train["image_path"].to_numpy()
 
-    # 4.1 scale data
+    # drop non-features
+    X_train = X_train.drop(columns=["image_path"])
+
+    # scale numeric columns
+    X_train = apply_scaling_train(X_train)
     logger.info("4.2 Train scaled")
 
-    logger.info("6. Calculating R2 CV score")
-    if train_cfg.lower_resources:
-        rng = np.random.default_rng(train_cfg.random_state)
-        keep_groups = rng.choice(
-            X_train["image_path"].unique(), size=train_cfg.max_cv_groups, replace=False
-        )
+    logger.info("6. Calculating per-target GridSearchCV R2 scores")
+    train_r2_score = cv_search_per_target(
+        train_cfg=train_cfg,
+        X=X_train,
+        y=y,
+        groups=groups,
+    )
 
-        mask = X_train["image_path"].isin(keep_groups)
-        X_train_cv = X_train.loc[mask].reset_index(drop=True)
-        y_cv = y.loc[mask].reset_index(drop=True)
-
-        groups = X_train_cv["image_path"].to_numpy()
-        train_r2_score = cv_mean_r2(
-            train_cfg=train_cfg, X=X_train_cv, y=y_cv, groups=groups
-        )
-    else:
-        groups = X_train["image_path"].to_numpy()
-        train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
-
-    print("R2 Score on training data:")
+    print("R2 Score on training data (per-target GridSearchCV):")
     print("CV mean R2:", train_r2_score["mean_r2"])
     print("Per-target R2:", train_r2_score["per_target_r2"])
+    print("Best params:", train_r2_score["best_params"])
     logger.info("End of file")
 
 
