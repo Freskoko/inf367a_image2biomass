@@ -57,7 +57,9 @@ def cv_mean_r2(
     for fold, (tr, va) in enumerate(gkf.split(X, y, groups=groups), start=1):
         Xtr, Xva = X.iloc[tr], X.iloc[va]
         ytr, yva = y.iloc[tr], y.iloc[va]
-
+        Xtr = Xtr.drop(columns=["image_path", 'State', 'Species'], errors="ignore")
+        Xva = Xva.drop(columns=["image_path", 'State', 'Species'], errors="ignore")
+        
         pipe = model_wrapper_creator(train_cfg, Xtr)
         pipe.fit(Xtr, ytr)
 
@@ -79,8 +81,10 @@ def cv_mean_r2(
 
 
 def fit_full(train_cfg: TrainConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeline:
+    X = X.drop(columns=["image_path"], errors="ignore")
     return model_wrapper_creator(train_cfg, X).fit(X, y)
 
 
 def predict(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
+    X = X.drop(columns=["image_path"], errors="ignore")
     return np.asarray(pipe.predict(X))
