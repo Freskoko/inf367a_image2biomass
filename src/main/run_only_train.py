@@ -9,6 +9,7 @@ from main.regression.baseline_training import (
     cv_mean_r2,
     load_feature_store,
 )
+from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data
 
@@ -24,7 +25,9 @@ def main():
     logger.info("0. Configs loaded")
 
     # 1. load data
-    train_wide, test_df, y = load_data(path_cfg=path_cfg, train_cfg=train_cfg)
+    train_wide, test_df, Xtr_meta, _, y = load_data(
+        path_cfg=path_cfg, train_cfg=train_cfg
+    )
     logger.info("1. Data loaded")
 
     # 2. run vision extraction on images (if required)
@@ -46,12 +49,13 @@ def main():
     logger.info("2.2 Vision data loaded from file")
 
     # 3 apply PCA on vision output data
-    X_train, _ = apply_pca_train_test(
+    X_vision_train, _ = apply_pca_train_test(
         img_feat_train, img_feat_test, train_cfg=train_cfg
     )
     logger.info("3. PCA on vision data complete")
 
     # 4 combine data
+    X_train = merge_features(Xtr_meta, X_vision_train)
     logger.info("4.1 Vision and tabular data combined")
 
     logger.info("Dropped test data, only doing train")
