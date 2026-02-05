@@ -65,23 +65,39 @@ def main():
     logger.info("4.2 Train scaled")
 
     logger.info("6. Calculating R2 CV score")
+
+    groups = X_train["image_path"].to_numpy()
+
+    X_train = X_train.drop(columns=["image_path"])
+
     if train_cfg.lower_resources:
         rng = np.random.default_rng(train_cfg.random_state)
         keep_groups = rng.choice(
-            X_train["image_path"].unique(), size=train_cfg.max_cv_groups, replace=False
+            np.unique(groups),
+            size=train_cfg.max_cv_groups,
+            replace=False,
         )
 
-        mask = X_train["image_path"].isin(keep_groups)
+        mask = np.isin(groups, keep_groups)
+
         X_train_cv = X_train.loc[mask].reset_index(drop=True)
         y_cv = y.loc[mask].reset_index(drop=True)
+        groups_cv = groups[mask]
 
-        groups = X_train_cv["image_path"].to_numpy()
         train_r2_score = cv_mean_r2(
-            train_cfg=train_cfg, X=X_train_cv, y=y_cv, groups=groups
+            train_cfg=train_cfg,
+            X=X_train_cv,
+            y=y_cv,
+            groups=groups_cv,
         )
     else:
-        groups = X_train["image_path"].to_numpy()
-        train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
+        train_r2_score = cv_mean_r2(
+            train_cfg=train_cfg,
+            X=X_train,
+            y=y,
+            groups=groups,
+        )
+
 
     print("R2 Score on training data:")
     print("CV mean R2:", train_r2_score["mean_r2"])
