@@ -5,8 +5,10 @@ description = "Project for V2026"
 readme = "README.md"
 requires-python = ">=3.12.0"
 dependencies = [
+    "attrs>=25.4.0",
     "loguru>=0.7.3",
     "opencv-python>=4.13.0.90",
+    "pandas>=3.0.0",
     "scikit-learn>=1.8.0",
     "torchvision>=0.25.0",
 ]
