@@ -7,9 +7,13 @@ Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
 See pyproject.toml. The environment manager [uv](https://docs.astral.sh/uv/getting-started/installation/) is ready to use in this repo.
 
 pip install uv
+
 uv --version
+
 uv venv .venv ### Create a venv  
+
 uv sync ### Install exactly what’s in uv.lock
+
 . venv\Scripts\activate       
 
 
