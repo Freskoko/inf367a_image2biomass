@@ -23,7 +23,7 @@ class TrainConfig:
 
     # resources
     lower_resources = True
-    max_cv_groups = 160
+    max_cv_groups = 80
 
     # targets
     TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g"]
