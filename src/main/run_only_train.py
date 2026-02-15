@@ -84,7 +84,7 @@ def main():
         train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
 
     print("R2 Score on training data:")
-    print("CV mean R2:", train_r2_score["mean_r2"])
+    print("CV mean R2:", train_r2_score["global_weighted_r2"])
     print("Per-target R2:", train_r2_score["per_target_r2"])
     logger.info("End of file")
 
