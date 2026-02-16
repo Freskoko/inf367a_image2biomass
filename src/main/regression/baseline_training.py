@@ -43,6 +43,39 @@ def model_wrapper_creator(train_cfg: TrainConfig, X_example):
     return Pipeline([("pre", pre), ("model", model)])
 
 
+TARGET_WEIGHTS = {
+    "Dry_Green_g": 0.1,
+    "Dry_Dead_g": 0.1,
+    "Dry_Clover_g": 0.1,
+    "GDM_g": 0.2,
+    "Dry_Total_g": 0.5,
+}
+
+def weighted_r2_global(y_true_df: pd.DataFrame, y_pred_df: pd.DataFrame, target_cols: list[str]) -> float:
+    # stack to long vectors
+    y_true = np.concatenate([y_true_df[c].to_numpy() for c in target_cols], axis=0)
+    y_pred = np.concatenate([y_pred_df[c].to_numpy() for c in target_cols], axis=0)
+
+    # per-row weights (repeat weight for each row of that target)
+    w = np.concatenate(
+        [np.full(len(y_true_df), TARGET_WEIGHTS[c], dtype=float) for c in target_cols],
+        axis=0,
+    )
+
+    # weighted mean of y_true
+    y_bar = np.sum(w * y_true) / np.sum(w)
+
+    # weighted R^2
+    ss_res = np.sum(w * (y_true - y_pred) ** 2)
+    ss_tot = np.sum(w * (y_true - y_bar) ** 2)
+
+    # safe guard (rare)
+    if ss_tot == 0:
+        return 0.0
+
+    return float(1.0 - ss_res / ss_tot)
+
+
 def cv_mean_r2(
     train_cfg: TrainConfig,
     X: pd.DataFrame,
@@ -54,30 +87,59 @@ def cv_mean_r2(
     fold_scores: list[float] = []
     per_target_scores: list[np.ndarray] = []
 
+    print("y columns:", y.columns.tolist())
+    print("y shape:", y.shape)
+
     for fold, (tr, va) in enumerate(gkf.split(X, y, groups=groups), start=1):
-        Xtr, Xva = X.iloc[tr], X.iloc[va]
+        Xtr, Xva = X.iloc[tr].copy(), X.iloc[va].copy()
         ytr, yva = y.iloc[tr], y.iloc[va]
-        Xtr = Xtr.drop(columns=["image_path", 'State', 'Species'], errors="ignore")
-        Xva = Xva.drop(columns=["image_path", 'State', 'Species'], errors="ignore")
-        
+
+        # drop non-features
+        Xtr = Xtr.drop(columns=["image_path", "State", "Species"], errors="ignore")
+        Xva = Xva.drop(columns=["image_path", "State", "Species"], errors="ignore")
+
+        # --- NEW: scaling + PCA INSIDE CV (fit on train fold only) ---
+        # Xtr, scaler = apply_scaling_train(Xtr, return_scaler=True)
+        # Xva = apply_scaling_train(Xva, scaler=scaler)
+        # Xtr, Xva = apply_pca_train_test(Xtr, Xva, train_cfg=train_cfg)
+        # ------------------------------------------------------------
+
         pipe = model_wrapper_creator(train_cfg, Xtr)
         pipe.fit(Xtr, ytr)
 
         pred = np.asarray(pipe.predict(Xva))
-        target_r2 = np.array(
-            [r2_score(yva.iloc[:, j], pred[:, j]) for j in range(y.shape[1])],
-            dtype=float,
-        )
-        mean_r2 = float(np.mean(target_r2))
+        y_pred = pd.DataFrame(pred, columns=y.columns, index=yva.index)
+        y_true = yva.copy()
 
-        fold_scores.append(mean_r2)
+        y_true["GDM_g"] = y_true["Dry_Green_g"] + y_true["Dry_Clover_g"]
+        y_pred["GDM_g"] = y_pred["Dry_Green_g"] + y_pred["Dry_Clover_g"]
+
+        y_true["Dry_Total_g"] = (
+            y_true["Dry_Green_g"] + y_true["Dry_Dead_g"] + y_true["Dry_Clover_g"]
+        )
+        y_pred["Dry_Total_g"] = (
+            y_pred["Dry_Green_g"] + y_pred["Dry_Dead_g"] + y_pred["Dry_Clover_g"]
+        )
+
+        target_cols = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "GDM_g", "Dry_Total_g"]
+
+        target_r2 = np.array([r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float)
+        # mean_r2 = float(np.mean(target_r2))
+        global_weighted_r2 = weighted_r2_global(y_true, y_pred, target_cols)
+
+        fold_scores.append(global_weighted_r2)
         per_target_scores.append(target_r2)
 
-        # debug
-        # print(f"fold {fold}: mean_r2={mean_r2:.4f} targets={np.round(target_r2, 4)}")
+        print(f"fold {fold}: global_weighted_r2={global_weighted_r2:.4f} targets={np.round(target_r2, 4)}")
 
     per_target_mean = np.mean(np.vstack(per_target_scores), axis=0)
-    return {"mean_r2": float(np.mean(fold_scores)), "per_target_r2": per_target_mean}
+    per_target_r2_dict = dict(zip(target_cols, per_target_mean.tolist()))
+    print(per_target_r2_dict)
+
+    return {
+        "global_weighted_r2": float(np.mean(fold_scores)),
+        "per_target_r2": per_target_r2_dict,
+    }
 
 
 def fit_full(train_cfg: TrainConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeline:
