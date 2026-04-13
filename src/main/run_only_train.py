@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train
-from main.utils.utils import DatasetPaths, TrainConfig
+from main.utils.utils import DatasetPaths, ModelType, TrainConfig
 from main.vision.resnet import VisionModelConfig
 from main.regression.baseline_training import (
     cv_mean_r2,
@@ -20,7 +20,7 @@ from loguru import logger
 def main():
     # 0. configs
     path_cfg = DatasetPaths()
-    train_cfg = TrainConfig()
+    train_cfg = TrainConfig(model_type=ModelType.EXTRA_TREES)  # or ModelType.TABPFN
     vision_cfg = VisionModelConfig()
     logger.info("0. Configs loaded")
 

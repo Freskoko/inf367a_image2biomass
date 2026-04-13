@@ -1,13 +1,22 @@
+import os
 from enum import Enum, auto
 from pathlib import Path
 
 from attr import dataclass
 from sklearn.ensemble import ExtraTreesRegressor
 
+TABPFN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYzk1YTBjNGMtNDZjYS00MjhiLTgyNDQtNWRlMWNhNGJkZTdkIiwiZXhwIjoxODA3NjM3MzMyfQ.4V6VuHGT9OEHg1lzLr8lEM411T6IHMCuEg1j1yWfo10"
+os.environ["TABPFN_TOKEN"] = TABPFN_TOKEN
+
 
 class DataType(Enum):
     TRAIN = auto()
     VAL = auto()
+
+
+class ModelType(Enum):
+    EXTRA_TREES = auto()
+    TABPFN = auto()
 
 
 @dataclass(frozen=True)
@@ -20,6 +29,7 @@ class TrainConfig:
 
     # models
     pca_n_components: int = 128
+    model_type: ModelType = ModelType.EXTRA_TREES
 
     # resources
     lower_resources = True
@@ -29,8 +39,11 @@ class TrainConfig:
     TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g"]
     MANUAL_TARGETS = ["Dry_Total_g", "GDM_g"]
 
-    # todo make this search for hyperparams instead
     def get_model(self):
+        if self.model_type == ModelType.TABPFN:
+            from tabpfn import TabPFNRegressor
+            return TabPFNRegressor()
+
         return ExtraTreesRegressor(
             n_estimators=275,
             min_samples_leaf=3,
