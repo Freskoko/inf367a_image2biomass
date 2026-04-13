@@ -20,7 +20,7 @@ from loguru import logger
 def main():
     # 0. configs
     path_cfg = DatasetPaths()
-    train_cfg = TrainConfig(model_type=ModelType.EXTRA_TREES)  # or ModelType.TABPFN
+    train_cfg = TrainConfig(model_type=ModelType.TABPFN)  # or ModelType.EXTRA_TREES
     vision_cfg = VisionModelConfig()
     logger.info("0. Configs loaded")
 

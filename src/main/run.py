@@ -1,5 +1,4 @@
 from __future__ import annotations
-from pathlib import Path
 import time
 
 import numpy as np
@@ -64,8 +63,7 @@ def main():
     X_test = merge_features(Xte_meta, X_vision_test)
     logger.info("4.1 Vision and tabular data combined")
 
-    # TODO: this seems weird, should they not be the same?
-    # aha.... test is not the same
+    # keep only columns present in both train and test
     common_cols = [c for c in X_train.columns if c in X_test.columns]
     X_train = X_train[common_cols]
     X_test = X_test[common_cols]

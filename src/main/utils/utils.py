@@ -1,10 +1,10 @@
 import os
 from enum import Enum, auto
 from pathlib import Path
-
 from attr import dataclass
 from sklearn.ensemble import ExtraTreesRegressor
 
+#No need to hide this token as it's only used for inference and has no write permissions. It is required to use the TabPFN model.
 TABPFN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYzk1YTBjNGMtNDZjYS00MjhiLTgyNDQtNWRlMWNhNGJkZTdkIiwiZXhwIjoxODA3NjM3MzMyfQ.4V6VuHGT9OEHg1lzLr8lEM411T6IHMCuEg1j1yWfo10"
 os.environ["TABPFN_TOKEN"] = TABPFN_TOKEN
 

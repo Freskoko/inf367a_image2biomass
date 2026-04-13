@@ -11,7 +11,7 @@ from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-from main.utils.utils import TrainConfig
+from main.utils.utils import ModelType, TrainConfig
 
 
 def load_feature_store(npy_path: Path) -> pd.DataFrame:
@@ -38,8 +38,14 @@ def _build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
 
 
 def model_wrapper_creator(train_cfg: TrainConfig, X_example):
+    """Build a sklearn Pipeline with preprocessing and multi-output regression.
+
+    For TabPFN, n_jobs is set to 1 because TabPFN models cannot be pickled
+    into spawned worker processes and handle parallelism internally.
+    """
     pre = _build_preprocessor(X_example)
-    model = MultiOutputRegressor(train_cfg.get_model(), n_jobs=train_cfg.n_jobs)
+    n_jobs = 1 if train_cfg.model_type == ModelType.TABPFN else train_cfg.n_jobs
+    model = MultiOutputRegressor(train_cfg.get_model(), n_jobs=n_jobs)
     return Pipeline([("pre", pre), ("model", model)])
 
 
@@ -87,22 +93,12 @@ def cv_mean_r2(
     fold_scores: list[float] = []
     per_target_scores: list[np.ndarray] = []
 
-    print("y columns:", y.columns.tolist())
-    print("y shape:", y.shape)
-
     for fold, (tr, va) in enumerate(gkf.split(X, y, groups=groups), start=1):
         Xtr, Xva = X.iloc[tr].copy(), X.iloc[va].copy()
         ytr, yva = y.iloc[tr], y.iloc[va]
 
-        # drop non-features
         Xtr = Xtr.drop(columns=["image_path", "State", "Species"], errors="ignore")
         Xva = Xva.drop(columns=["image_path", "State", "Species"], errors="ignore")
-
-        # --- NEW: scaling + PCA INSIDE CV (fit on train fold only) ---
-        # Xtr, scaler = apply_scaling_train(Xtr, return_scaler=True)
-        # Xva = apply_scaling_train(Xva, scaler=scaler)
-        # Xtr, Xva = apply_pca_train_test(Xtr, Xva, train_cfg=train_cfg)
-        # ------------------------------------------------------------
 
         pipe = model_wrapper_creator(train_cfg, Xtr)
         pipe.fit(Xtr, ytr)
@@ -124,7 +120,6 @@ def cv_mean_r2(
         target_cols = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "GDM_g", "Dry_Total_g"]
 
         target_r2 = np.array([r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float)
-        # mean_r2 = float(np.mean(target_r2))
         global_weighted_r2 = weighted_r2_global(y_true, y_pred, target_cols)
 
         fold_scores.append(global_weighted_r2)
