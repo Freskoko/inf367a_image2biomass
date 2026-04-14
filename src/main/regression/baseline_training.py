@@ -38,11 +38,8 @@ def _build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
 
 
 def model_wrapper_creator(train_cfg: TrainConfig, X_example):
-    """Build a sklearn Pipeline with preprocessing and multi-output regression.
-
-    For TabPFN, n_jobs is set to 1 because TabPFN models cannot be pickled
-    into spawned worker processes and handle parallelism internally.
-    """
+    # TabPFN can't be pickled into worker processes, so force n_jobs=1 for it.
+    # It does its own parallelism internally anyway.
     pre = _build_preprocessor(X_example)
     n_jobs = 1 if train_cfg.model_type == ModelType.TABPFN else train_cfg.n_jobs
     model = MultiOutputRegressor(train_cfg.get_model(), n_jobs=n_jobs)

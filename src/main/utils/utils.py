@@ -4,7 +4,8 @@ from pathlib import Path
 from attr import dataclass
 from sklearn.ensemble import ExtraTreesRegressor
 
-#No need to hide this token as it's only used for inference and has no write permissions. It is required to use the TabPFN model.
+# TabPFN needs a token for the one-time model download + license check.
+# This one is read-only (inference only), so fine to keep in the repo.
 TABPFN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYzk1YTBjNGMtNDZjYS00MjhiLTgyNDQtNWRlMWNhNGJkZTdkIiwiZXhwIjoxODA3NjM3MzMyfQ.4V6VuHGT9OEHg1lzLr8lEM411T6IHMCuEg1j1yWfo10"
 os.environ["TABPFN_TOKEN"] = TABPFN_TOKEN
 
@@ -17,6 +18,17 @@ class DataType(Enum):
 class ModelType(Enum):
     EXTRA_TREES = auto()
     TABPFN = auto()
+
+    @classmethod
+    def from_string(cls, name: str) -> "ModelType":
+        # Used to map the --model CLI arg to the enum value.
+        mapping = {"tabpfn": cls.TABPFN, "extra_trees": cls.EXTRA_TREES}
+        key = name.lower()
+        if key not in mapping:
+            raise ValueError(
+                f"Unknown model '{name}'. Valid options: {list(mapping.keys())}"
+            )
+        return mapping[key]
 
 
 @dataclass(frozen=True)
@@ -42,7 +54,7 @@ class TrainConfig:
     def get_model(self):
         if self.model_type == ModelType.TABPFN:
             from tabpfn import TabPFNRegressor
-            return TabPFNRegressor()
+            return TabPFNRegressor(random_state=self.random_state)
 
         return ExtraTreesRegressor(
             n_estimators=275,
