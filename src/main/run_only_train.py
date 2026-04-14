@@ -1,36 +1,46 @@
 from __future__ import annotations
-
+import argparse
 import numpy as np
+from loguru import logger
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train
-from main.utils.utils import DatasetPaths, TrainConfig
+from main.utils.utils import DatasetPaths, ModelType, TrainConfig
 from main.vision.resnet import VisionModelConfig
+from main.wrangling.combined_data import merge_features
+from main.wrangling.img_data import extract_vision_data
+from main.wrangling.tabular_data import load_data
 from main.regression.baseline_training import (
     cv_mean_r2,
     load_feature_store,
 )
-from main.wrangling.combined_data import merge_features
-from main.wrangling.img_data import extract_vision_data
-from main.wrangling.tabular_data import load_data
-
-from loguru import logger
 
 
-# drops test data
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run 5-fold GroupKFold CV evaluation.")
+    parser.add_argument(
+        "--model",
+        type=str,
+        choices=["tabpfn", "extra_trees"],
+        default="tabpfn",
+        help="Regression model to use (default: tabpfn).",
+    )
+    return parser.parse_args()
+
+
+# CV-only entry point: fits and evaluates on the train split, ignores test data.
 def main():
-    # 0. configs
+    args = parse_args()
     path_cfg = DatasetPaths()
-    train_cfg = TrainConfig()
+    train_cfg = TrainConfig(model_type=ModelType.from_string(args.model))
     vision_cfg = VisionModelConfig()
-    logger.info("0. Configs loaded")
+    logger.info(f"Configs loaded (model={args.model})")
 
-    # 1. load data
     train_wide, test_df, Xtr_meta, _, y = load_data(
         path_cfg=path_cfg, train_cfg=train_cfg
     )
-    logger.info("1. Data loaded")
+    logger.info("Tabular data loaded")
 
-    # 2. run vision extraction on images (if required)
+    # Run the ResNet feature extractor only if we don't already have cached features.
     if (
         not path_cfg.vision_feats_train.with_suffix(".paths.txt").exists()
         or not path_cfg.vision_feats_test.with_suffix(".paths.txt").exists()
@@ -41,40 +51,27 @@ def main():
             train_df=train_wide,
             test_df=test_df,
         )
-    logger.info("2.1 Vision data created (or existed beforehand)")
-
-    # 2. load vision extraction data from file
     img_feat_train = load_feature_store(path_cfg.vision_feats_train)
     img_feat_test = load_feature_store(path_cfg.vision_feats_test)
-    logger.info("2.2 Vision data loaded from file")
+    logger.info("Vision features ready")
 
-    # 3 apply PCA on vision output data
     X_vision_train, _ = apply_pca_train_test(
         img_feat_train, img_feat_test, train_cfg=train_cfg
     )
-    logger.info("3. PCA on vision data complete")
-
-    # 4 combine data
     X_train = merge_features(Xtr_meta, X_vision_train)
-    logger.info("4.1 Vision and tabular data combined")
-
-    logger.info("Dropped test data, only doing train")
     X_train = apply_scaling_train(X_train)
+    logger.info("Features merged and scaled")
 
-    # 4.1 scale data
-    logger.info("4.2 Train scaled")
-
-    logger.info("6. Calculating R2 CV score")
+    # When lower_resources is on, CV runs on a random subset of image groups
+    #to keep TabPFN runs reasonable in wall clock time.
     if train_cfg.lower_resources:
         rng = np.random.default_rng(train_cfg.random_state)
         keep_groups = rng.choice(
             X_train["image_path"].unique(), size=train_cfg.max_cv_groups, replace=False
         )
-
         mask = X_train["image_path"].isin(keep_groups)
         X_train_cv = X_train.loc[mask].reset_index(drop=True)
         y_cv = y.loc[mask].reset_index(drop=True)
-
         groups = X_train_cv["image_path"].to_numpy()
         train_r2_score = cv_mean_r2(
             train_cfg=train_cfg, X=X_train_cv, y=y_cv, groups=groups
@@ -83,10 +80,8 @@ def main():
         groups = X_train["image_path"].to_numpy()
         train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
 
-    print("R2 Score on training data:")
-    print("CV mean R2:", train_r2_score["global_weighted_r2"])
+    print("CV weighted R2:", train_r2_score["global_weighted_r2"])
     print("Per-target R2:", train_r2_score["per_target_r2"])
-    logger.info("End of file")
 
 
 if __name__ == "__main__":
