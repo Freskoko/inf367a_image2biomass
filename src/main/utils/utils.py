@@ -3,9 +3,10 @@ from enum import Enum, auto
 from pathlib import Path
 from attr import dataclass
 from sklearn.ensemble import ExtraTreesRegressor
+from tabpfn import TabPFNRegressor
 
-# TabPFN needs a token for the one-time model download + license check.
-# This one is read-only (inference only), so fine to keep in the repo.
+# TabPFN needs a token for the one time model download + license check.
+# This one is read only (inference only), so fine to keep in the repo, dont need to hide behind env vars.
 TABPFN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYzk1YTBjNGMtNDZjYS00MjhiLTgyNDQtNWRlMWNhNGJkZTdkIiwiZXhwIjoxODA3NjM3MzMyfQ.4V6VuHGT9OEHg1lzLr8lEM411T6IHMCuEg1j1yWfo10"
 os.environ["TABPFN_TOKEN"] = TABPFN_TOKEN
 
@@ -53,7 +54,6 @@ class TrainConfig:
 
     def get_model(self):
         if self.model_type == ModelType.TABPFN:
-            from tabpfn import TabPFNRegressor
             return TabPFNRegressor(random_state=self.random_state)
 
         return ExtraTreesRegressor(

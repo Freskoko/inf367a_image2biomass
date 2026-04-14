@@ -1,21 +1,18 @@
 from __future__ import annotations
-
 import argparse
-
 import numpy as np
+from loguru import logger
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train
 from main.utils.utils import DatasetPaths, ModelType, TrainConfig
 from main.vision.resnet import VisionModelConfig
+from main.wrangling.combined_data import merge_features
+from main.wrangling.img_data import extract_vision_data
+from main.wrangling.tabular_data import load_data
 from main.regression.baseline_training import (
     cv_mean_r2,
     load_feature_store,
 )
-from main.wrangling.combined_data import merge_features
-from main.wrangling.img_data import extract_vision_data
-from main.wrangling.tabular_data import load_data
-
-from loguru import logger
 
 
 def parse_args() -> argparse.Namespace:
@@ -66,7 +63,7 @@ def main():
     logger.info("Features merged and scaled")
 
     # When lower_resources is on, CV runs on a random subset of image groups
-    # to keep TabPFN runs reasonable in wall-clock time.
+    #to keep TabPFN runs reasonable in wall clock time.
     if train_cfg.lower_resources:
         rng = np.random.default_rng(train_cfg.random_state)
         keep_groups = rng.choice(

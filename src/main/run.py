@@ -1,22 +1,21 @@
 from __future__ import annotations
 import argparse
 import time
-
+from loguru import logger
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train_test
 from main.utils.save_file import save_predictions
 from main.utils.utils import DatasetPaths, ModelType, TrainConfig
 from main.vision.resnet import VisionModelConfig
+from main.wrangling.combined_data import merge_features
+from main.wrangling.img_data import extract_vision_data
+from main.wrangling.tabular_data import load_data, wide_to_long_predictions
 from main.regression.baseline_training import (
     load_feature_store,
     fit_full,
     predict,
 )
-from main.wrangling.combined_data import merge_features
-from main.wrangling.img_data import extract_vision_data
-from main.wrangling.tabular_data import load_data, wide_to_long_predictions
 
-from loguru import logger
 
 
 def parse_args() -> argparse.Namespace:
