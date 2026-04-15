@@ -78,11 +78,11 @@ os.makedirs(save_traincurves_folder, exist_ok=True)
 #######################################################################################
 # data loader
 
-data_filename = args.data_path + "/Cell200_{}x{}.h5".format(IMG_SIZE, IMG_SIZE)
+data_filename = args.data_path + "/BIOMASS_{}x{}.h5".format(IMG_SIZE, IMG_SIZE)
 hf = h5py.File(data_filename, "r")
-counts = hf["CellCounts"][:]
+counts = hf["cell_counts"][:]
 counts = counts.astype(np.float64)  # fixed since np.float was deprecated
-images = hf["IMGs_grey"][:]
+images = hf["imgs_color"][:]
 hf.close()
 
 raw_images = copy.deepcopy(images)
