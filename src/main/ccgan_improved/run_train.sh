@@ -3,7 +3,7 @@ ROOT_PATH="."
 DATA_PATH="src/data"
 
 SEED=2026
-NITERS=1000 # limit
+NITERS=2000 # limit
 BATCH_SIZE_D=32
 BATCH_SIZE_G=512
 START_COUNT=1 # 1.04
@@ -68,7 +68,7 @@ python src/main/ccgan_improved/pretrain/pretrain_CNN_regre.py \
     --seed $SEED \
     --transform
 
-N_CLASS=50 # 100
+N_CLASS=50 # dont have enough images to reliably have more than 50 classes
 echo "-------------------------------------------------------------------------------------------------"
 echo "cGAN $N_CLASS"
 python src/main/ccgan_improved/run.py \
