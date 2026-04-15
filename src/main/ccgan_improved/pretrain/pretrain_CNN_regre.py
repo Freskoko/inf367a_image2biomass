@@ -15,13 +15,13 @@ import random
 import gc
 import h5py
 
-from src.main.ccgan_improved.models.ResNet_regre import (
+from main.ccgan_improved.models.ResNet_regre import (
     ResNet101_regre,
     ResNet18_regre,
     ResNet34_regre,
     ResNet50_regre,
 )
-from src.main.ccgan_improved.utils.utils import IMGs_dataset
+from main.ccgan_improved.utils.utils import IMGs_dataset
 
 
 #############################

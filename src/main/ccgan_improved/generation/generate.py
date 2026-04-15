@@ -1,7 +1,6 @@
 import torch
-import numpy as np
 from torchvision.utils import save_image
-from src.main.ccgan_improved.models import cont_cond_cnn_generator
+from main.ccgan_improved.models import cont_cond_cnn_generator
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

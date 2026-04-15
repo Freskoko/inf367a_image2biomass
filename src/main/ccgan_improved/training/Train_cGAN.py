@@ -5,8 +5,8 @@ import numpy as np
 import os
 import timeit
 
-from src.main.ccgan_improved.utils.utils import *
-from src.main.ccgan_improved.utils.opts import parse_opts
+from main.ccgan_improved.utils.utils import *
+from main.ccgan_improved.utils.opts import parse_opts
 
 """ Settings """
 args = parse_opts()

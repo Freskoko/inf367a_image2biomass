@@ -17,21 +17,21 @@ from torchvision.utils import save_image
 import timeit
 from PIL import Image
 
-from src.main.ccgan_improved.utils.opts import parse_opts
+from main.ccgan_improved.utils.opts import parse_opts
 
 args = parse_opts()
 wd = args.root_path
 os.chdir(wd)
 
-from src.main.ccgan_improved.utils.utils import *
-from src.main.ccgan_improved.models import *
-from src.main.ccgan_improved.training.Train_cGAN import *
-from src.main.ccgan_improved.training.Train_CcGAN import *
-from src.main.ccgan_improved.training.Train_net_for_label_embed import (
+from main.ccgan_improved.utils.utils import *
+from main.ccgan_improved.models import *
+from main.ccgan_improved.training.Train_cGAN import *
+from main.ccgan_improved.training.Train_CcGAN import *
+from main.ccgan_improved.training.Train_net_for_label_embed import (
     train_net_embed,
     train_net_y2h,
 )
-from src.main.ccgan_improved.eval.eval_metrics import cal_FID, cal_labelscore
+from main.ccgan_improved.eval.eval_metrics import cal_FID, cal_labelscore
 
 
 #######################################################################################

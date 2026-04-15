@@ -25,7 +25,7 @@ import torch.nn as nn
 from scipy.stats import entropy
 from torch.nn import functional as F
 
-from src.main.ccgan_improved.utils.utils import SimpleProgressBar
+from main.ccgan_improved.utils.utils import SimpleProgressBar
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 

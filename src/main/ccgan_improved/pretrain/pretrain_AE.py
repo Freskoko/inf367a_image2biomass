@@ -8,8 +8,8 @@ import torch.backends.cudnn as cudnn
 import random
 from torchvision.utils import save_image
 import h5py
-from src.main.ccgan_improved.models.autoencoder import decoder, encoder
-from src.main.ccgan_improved.utils.utils import IMGs_dataset
+from main.ccgan_improved.models.autoencoder import decoder, encoder
+from main.ccgan_improved.utils.utils import IMGs_dataset
 
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
