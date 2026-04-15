@@ -111,12 +111,12 @@ os.makedirs(save_AE_images_in_valid_folder, exist_ok=True)
 ###########################################################################################################
 # data loader
 data_filename = (
-    args.data_path + "/Cell200_" + str(args.img_size) + "x" + str(args.img_size) + ".h5"
+    args.data_path + "/BIOMASS_" + str(args.img_size) + "x" + str(args.img_size) + ".h5"
 )
 hf = h5py.File(data_filename, "r")
-labels = hf["CellCounts"][:]
+labels = hf["cell_counts"][:]
 labels = labels.astype(np.float64)  # fixed since np.float was deprecated
-images = hf["IMGs_grey"][:]
+images = hf["imgs_color"][:]
 hf.close()
 N_all = len(images)
 assert len(images) == len(labels)

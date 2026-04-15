@@ -200,15 +200,15 @@ def valid_CNN(verbose=True):
 ###########################################################################################################
 # data loader
 h5py_file = (
-    args.data_path + "/Cell200_" + str(args.img_size) + "x" + str(args.img_size) + ".h5"
+    args.data_path + "/BIOMASS_" + str(args.img_size) + "x" + str(args.img_size) + ".h5"
 )
 hf = h5py.File(h5py_file, "r")
-counts_train = hf["CellCounts"][:]
+counts_train = hf["cell_counts"][:]
 counts_train = counts_train.astype(np.float64)  # fixed since np.float was deprecated
-images_train = hf["IMGs_grey"][:]
-counts_valid = hf["CellCounts_test"][:]
+images_train = hf["imgs_color"][:]
+counts_valid = hf["cell_counts_test"][:]
 counts_valid = counts_valid.astype(np.float64)  # fixed since np.float was deprecated
-images_valid = hf["IMGs_grey_test"][:]
+images_valid = hf["imgs_color_test"][:]
 hf.close()
 
 selected_cellcounts = np.arange(args.start_count, args.end_count + 1)

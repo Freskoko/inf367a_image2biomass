@@ -6,16 +6,17 @@ from PIL import Image
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
-OUTPUT_NAME = "Cell200_64x64"
+OUTPUT_NAME = "BIOMASS_64x64" # biomass
+DATA_DIR = "src/data"
 
 # --- SETTINGS ---
-CSV_PATH = Path("./.datasets/grass/train.csv")
-IMG_DIR = Path("./.datasets/grass/")
-OUTPUT_H5 = Path(f"./.datasets/grass/{OUTPUT_NAME}.h5")
+CSV_PATH = Path(f"{DATA_DIR}/train.csv")
+IMG_DIR = Path(F"{DATA_DIR}")
+OUTPUT_H5 = Path(f"{DATA_DIR}/{OUTPUT_NAME}.h5")
 IMG_SIZE = 64
 PRIMARY_TARGET = "Dry_Total_g"
 
-# 1. Pivot and Floor
+# 1. pivot and floor
 print("Pivoting and flooring dataset...")
 df_long = pd.read_csv(CSV_PATH)
 df_wide = df_long.pivot_table(
@@ -25,7 +26,7 @@ df_wide = df_long.pivot_table(
 biomass_cols = df_wide.select_dtypes(include=[np.number]).columns
 df_wide[biomass_cols] = np.floor(df_wide[biomass_cols])
 
-# 2. Process Images
+# 2. process
 imgs_list = []
 labels_list = []
 
@@ -61,12 +62,12 @@ with h5py.File(OUTPUT_H5, "w") as f:
     # f.create_dataset('images', data=train_imgs)
     # f.create_dataset('labels', data=train_labels)
 
-    f.create_dataset("IMGs_grey", data=train_imgs)
-    f.create_dataset("CellCounts", data=train_labels)
+    f.create_dataset("imgs_color", data=train_imgs)
+    f.create_dataset("cell_counts", data=train_labels)
     # Validation/Test set
     # f.create_dataset('labels', data=test_labels)
-    f.create_dataset("IMGs_grey_test", data=train_imgs)
-    f.create_dataset("CellCounts_test", data=train_labels)
+    f.create_dataset("imgs_color_test", data=train_imgs)
+    f.create_dataset("cell_counts_test", data=train_labels)
 
 print(f"\nSuccess! Created {OUTPUT_H5}")
 print(f"Train samples: {len(train_labels)}")
