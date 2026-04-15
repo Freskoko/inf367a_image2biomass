@@ -23,3 +23,7 @@ submissions/
 
 **/__pycache__/
 .ruff_cache
+
+# ccgan
+src/main/ccgan_improved/dump_fake_data
+src/main/ccgan_improved/output/saved_models
