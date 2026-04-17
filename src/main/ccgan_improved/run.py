@@ -511,18 +511,18 @@ if args.comp_FID == "True":
     PreNetFID = encoder(dim_bottleneck=512).to(device)
     PreNetFID = nn.DataParallel(PreNetFID)
     Filename_PreCNNForEvalGANs = (
-        save_models_folder + "/ckpt_AE_epoch_50_seed_2020_CVMode_False.pth"
+        save_models_folder + "/ckpt_AE_epoch_50_seed_2026_CVMode_False.pth"
     )
     checkpoint_PreNet = torch.load(Filename_PreCNNForEvalGANs)
     PreNetFID.load_state_dict(checkpoint_PreNet["net_encoder_state_dict"])
 
     # for LS
     PreNetLS = ResNet34_regre(ngpu=NGPU).to(device)
-    # Filename_PreCNNForEvalGANs = save_models_folder + '/ckpt_PreCNNForEvalGANs_ResNet34_regre_epoch_200_seed_2020_Transformation_True_Cell_200.pth'
+    # Filename_PreCNNForEvalGANs = save_models_folder + '/ckpt_PreCNNForEvalGANs_ResNet34_regre_epoch_200_seed_2026_Transformation_True_Cell_200.pth'
 
     Filename_PreCNNForEvalGANs = (
         save_models_folder
-        + "/ckpt_PreCNNForEvalGANs_ResNet34_regre_epoch_200_seed_2020_Transformation_True_Cell_185.pth"
+        + "/ckpt_PreCNNForEvalGANs_ResNet34_regre_epoch_200_seed_2026_Transformation_True_Cell_185.pth"
     )  # 185 for some reasom
 
     checkpoint_PreNet = torch.load(Filename_PreCNNForEvalGANs)
