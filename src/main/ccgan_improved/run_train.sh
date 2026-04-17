@@ -25,7 +25,7 @@ DIM_cGAN=128
 DIM_EMBED=128
 LOSS_TYPE='vanilla'
 
-COMP_FID="False"
+COMP_FID="True"
 
 cd $ROOT_PATH
 
