@@ -4,7 +4,16 @@ Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
 
 ## Task
 
-Predict biomass dry weight (Dry_Green_g, Dry_Dead_g, Dry_Clover_g) from field images and some tabular metadata. Two extra targets are derived from these three: GDM_g = Green + Clover, and Dry_Total_g = Green + Dead + Clover. The competition score is a weighted R², where Dry_Total_g is weighted 0.5, GDM_g 0.2, and the rest 0.1.
+Using a dataset for precision argriculture, the task is to predict pasture biomass from top-view images and some tabular metadata. Pasture biomass is defined as dry weight including:
+
+• Dry_Green_g: Green vegetation other than clover (grams)
+• Dry_Dead_g: Senescent material (grams)
+• Dry_Clover_g: Clover component (grams)
+• GDM_g: Green dry matter, calculated as the sum of green vegetation and clover (grams). GDM_g = Green + Clover
+• Dry_Total_g: Total biomass, combining all components (grams). Dry_Total_g = Green + Dead + Clover
+
+The competition score is a weighted R², where Dry_Total_g is weighted 0.5, GDM_g weighted 0.2, and the rest 0.1.
+
 
 ## Pipeline
 
@@ -48,14 +57,6 @@ If the vision backbone is swapped (e.g. DINO / DINOv2) or the PCA dimensionality
 
 TabPFN is better on every target. The biggest jumps are Dry_Clover_g (+0.26) and Dry_Total_g (+0.14), which matters because Dry_Total_g carries the largest weight in the final score.
 
-### Reproducing
-
-```bash
-cd src
-uv run python -m main.run_only_train --model extra_trees
-uv run python -m main.run_only_train --model tabpfn
-```
-
 ## Requirements
 
 See `pyproject.toml`. We use [uv](https://docs.astral.sh/uv/getting-started/installation/) to manage the environment:
@@ -64,6 +65,11 @@ See `pyproject.toml`. We use [uv](https://docs.astral.sh/uv/getting-started/inst
 pip install uv
 uv sync
 ```
+
+If using a virtual environment, run this:
+uv venv .venv ### Create a venv
+uv sync ### Install exactly what’s in uv.lock in the venv
+. venv\Scripts\activate ### Activate the venv
 
 ## How to run
 
@@ -77,10 +83,28 @@ uv run python -m main.run --model extra_trees
 # Training + 5-fold CV evaluation only (no test predictions)
 uv run python -m main.run_only_train --model tabpfn
 uv run python -m main.run_only_train --model extra_trees
+
+# Full pipeline Explicit DINO
+uv run python -m main.run --model tabpfn --vision-backbone dino
+uv run python -m main.run --model extra_trees --vision-backbone dino
+
+# Training + 5-fold CV evaluation only (no test predictions) Explicit DINO
+uv run python -m main.run_only_train --model extra_trees --vision-backbone dino
+uv run python -m main.run_only_train --model extra_trees --vision-backbone dino
+ 
 ```
 
-If you don't pass `--model`, TabPFN is used by default.
+If you don’t pass:
+
+--model → defaults to TabPFN
+--vision-backbone → defaults to DINO
 
 ## Formatting
 
 We use [ruff](https://docs.astral.sh/ruff/) to format the code.
+
+
+## Lower Resources for faster training
+Change this parameter in utils to debug and speed up the train process
+
+train_cfg.lower_resources = True
