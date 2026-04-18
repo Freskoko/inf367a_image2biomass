@@ -44,10 +44,13 @@ If the vision backbone is swapped (e.g. DINO / DINOv2) or the PCA dimensionality
 
 ### Weighted R² (competition metric)
 
-| Model               | Weighted R² |
-|---------------------|-------------|
-| ExtraTreesRegressor | 0.640       |
-| **TabPFN**          | **0.747**   |
+| Model                             | Weighted R² |
+|-----------------------------------|-------------|
+| ExtraTreesRegressor with ResNet   | 0.640       |
+| TabPFN with ResNet                | 0.747       | 
+| ExtraTreesRegressor with DiNO     | 0.763       |
+| **TabPFN with DiNO**              | **0.763**   |
+ 
 
 ### Per-target R²
 
@@ -80,11 +83,13 @@ uv sync ### Install exactly what’s in uv.lock in the venv
 ```bash
 cd src
 
-# Full pipeline: train + predict on the test set, writes submission.csv
+# Full pipeline: train on the training set, predict on the test set, and write submission.csv
+# Default settings: --model tabpfn, --vision-backbone dino
 uv run python -m main.run --model tabpfn
 uv run python -m main.run --model extra_trees
 
 # Training + 5-fold CV evaluation only (no test predictions)
+# Default settings: --model tabpfn, --vision-backbone dino
 uv run python -m main.run_only_train --model tabpfn
 uv run python -m main.run_only_train --model extra_trees
 
@@ -93,8 +98,17 @@ uv run python -m main.run --model tabpfn --vision-backbone dino
 uv run python -m main.run --model extra_trees --vision-backbone dino
 
 # Training + 5-fold CV evaluation only (no test predictions) Explicit DINO
+uv run python -m main.run_only_train --model tabpfn --vision-backbone dino
 uv run python -m main.run_only_train --model extra_trees --vision-backbone dino
-uv run python -m main.run_only_train --model extra_trees --vision-backbone dino
+
+# Full pipeline Explicit ResNet
+uv run python -m main.run --model tabpfn --vision-backbone resnet
+uv run python -m main.run --model extra_trees --vision-backbone resnet
+
+# Training + 5-fold CV evaluation only (no test predictions) Explicit ResNet
+uv run python -m main.run_only_train --model tabpfn --vision-backbone resnet
+uv run python -m main.run_only_train --model extra_trees --vision-backbone resnet
+
  
 ```
 
