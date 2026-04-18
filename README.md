@@ -101,6 +101,7 @@ uv run python -m main.run_only_train --model extra_trees --vision-backbone dino
 If you don’t pass:
 
 --model → defaults to TabPFN
+
 --vision-backbone → defaults to DINO
 
 ## Formatting
