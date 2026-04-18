@@ -49,18 +49,18 @@ If the vision backbone is swapped (e.g. DINO / DINOv2) or the PCA dimensionality
 | ExtraTreesRegressor with ResNet   | 0.640       |
 | TabPFN with ResNet                | 0.747       | 
 | ExtraTreesRegressor with DiNO     | 0.763       |
-| **TabPFN with DiNO**              | **0.763**   |
+| **TabPFN with DiNO**              | **0.864**   |
  
 
 ### Per-target R²
 
-| Target                | ExtraTrees | TabPFN |
-|-----------------------|------------|--------|
-| Dry_Clover_g (w=0.1)  | 0.284      | 0.548  |
-| Dry_Dead_g   (w=0.1)  | 0.239      | 0.365  |
-| Dry_Green_g  (w=0.1)  | 0.639      | 0.761  |
-| GDM_g        (w=0.2)  | 0.524      | 0.683  |
-| Dry_Total_g  (w=0.5)  | 0.501      | 0.644  |
+| Target                | ExtraTrees_ResNet | TabPFN_ResNet |ExtraTrees_DINO |TabPFN_DINO |
+|-----------------------|-------------------|---------------|----------------|------------|
+| Dry_Clover_g (w=0.1)  | 0.284             | 0.548         |0.646           |0.724       |
+| Dry_Dead_g   (w=0.1)  | 0.239             | 0.365         |0.424           |0.588       |
+| Dry_Green_g  (w=0.1)  | 0.639             | 0.761         |0.746           |0.862       |
+| GDM_g        (w=0.2)  | 0.524             | 0.683         |0.721           |0.843       |
+| Dry_Total_g  (w=0.5)  | 0.501             | 0.644         |0.682           |0.819       |
 
 TabPFN is better on every target. The biggest jumps are Dry_Clover_g (+0.26) and Dry_Total_g (+0.14), which matters because Dry_Total_g carries the largest weight in the final score.
 
