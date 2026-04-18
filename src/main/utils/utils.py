@@ -75,7 +75,7 @@ class VisionModelConfig:
     # imagenet mean and std
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-
+    model_name: str = "dinov2_vits14"
 
 @dataclass(frozen=True)
 class DatasetPaths:
@@ -95,8 +95,8 @@ class DatasetPaths:
 
     @property
     def vision_feats_train(self):
-        return self.model_dir / "features_train.npy"
+        return self.model_dir / "feature_train_dino.npy"
 
     @property
     def vision_feats_test(self):
-        return self.model_dir / "features_test.npy"
+        return self.model_dir / "feature_test_dino.npy"

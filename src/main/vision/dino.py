@@ -77,19 +77,30 @@ def _get_device(device: str) -> torch.device:
     return torch.device("cpu")
 
 
-def build_feature_extractor(device: torch.device) -> torch.nn.Module:
-    m = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-    m.fc = torch.nn.Identity()
-    m.eval()
-    m.to(device)
-    return m
+def build_feature_extractor(
+    device: torch.device,
+    backbone: str = "dino",
+    model_name: str = "dinov2_vits14",
+):
+    if backbone == "dino":
+        model = torch.hub.load("facebookresearch/dinov2", model_name)
+        model.eval().to(device)
+        return model
 
+    if backbone == "resnet":
+        model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
+        model.fc = torch.nn.Identity()
+        model.eval().to(device)
+        return model
+
+    raise ValueError(f"Unknown backbone: {backbone}")
 
 @torch.inference_mode()
 def extract_features(
     out_npy: Path,
     vision_cfg: VisionModelConfig,
     ds,
+    backbone: str = "dino",
 ) -> np.ndarray:
     out_npy.parent.mkdir(parents=True, exist_ok=True)
 
@@ -102,15 +113,22 @@ def extract_features(
         pin_memory=(device.type == "cuda"),
     )
 
-    model = build_feature_extractor(device)
+    model = build_feature_extractor(
+        device=device,
+        backbone=backbone,
+    )
 
     feats = []
     keys = []
 
     for xb, rels in dl:
         xb = xb.to(device, non_blocking=True)
-        fb = model(xb).detach().cpu().numpy()
-        feats.append(fb)
+        fb = model(xb)
+
+        if isinstance(fb, dict):
+            fb = fb["x_norm_clstoken"]
+
+        feats.append(fb.cpu().numpy())
         keys.extend(rels)
 
     feats = np.concatenate(feats, axis=0)
@@ -120,6 +138,6 @@ def extract_features(
     keys = [keys[i] for i in order]
 
     np.save(out_npy, feats)
-    (out_npy.with_suffix(".paths.txt")).write_text("\n".join(keys))
+    out_npy.with_suffix(".paths.txt").write_text("\n".join(keys))
 
     return feats

@@ -5,7 +5,7 @@ from loguru import logger
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train
 from main.utils.utils import DatasetPaths, ModelType, TrainConfig
-from main.vision.resnet import VisionModelConfig
+from main.vision.dino import VisionModelConfig
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data
@@ -24,6 +24,13 @@ def parse_args() -> argparse.Namespace:
         default="tabpfn",
         help="Regression model to use (default: tabpfn).",
     )
+    parser.add_argument(
+        "--vision-backbone",
+        type=str,
+        choices=["resnet", "dino"],
+        default="dino",
+        help="Vision backbone to use for feature extraction.",
+    )
     return parser.parse_args()
 
 
@@ -41,16 +48,19 @@ def main():
     logger.info("Tabular data loaded")
 
     # Run the ResNet feature extractor only if we don't already have cached features.
-    if (
-        not path_cfg.vision_feats_train.with_suffix(".paths.txt").exists()
-        or not path_cfg.vision_feats_test.with_suffix(".paths.txt").exists()
-    ):
-        extract_vision_data(
-            path_cfg=path_cfg,
-            vision_cfg=vision_cfg,
-            train_df=train_wide,
-            test_df=test_df,
-        )
+    # if (
+    #     not path_cfg.vision_feats_train.with_suffix(".paths.txt").exists()
+    #     or not path_cfg.vision_feats_test.with_suffix(".paths.txt").exists()
+    # ):
+        
+    extract_vision_data(
+        path_cfg=path_cfg,
+        vision_cfg=vision_cfg,
+        train_df=train_wide,
+        test_df=test_df,
+        backbone=args.vision_backbone,
+    )
+    
     img_feat_train = load_feature_store(path_cfg.vision_feats_train)
     img_feat_test = load_feature_store(path_cfg.vision_feats_test)
     logger.info("Vision features ready")
