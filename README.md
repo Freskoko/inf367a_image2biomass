@@ -7,9 +7,13 @@ Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
 Using a dataset for precision argriculture, the task is to predict pasture biomass from top-view images and some tabular metadata. Pasture biomass is defined as dry weight including:
 
 • Dry_Green_g: Green vegetation other than clover (grams)
+
 • Dry_Dead_g: Senescent material (grams)
+
 • Dry_Clover_g: Clover component (grams)
+
 • GDM_g: Green dry matter, calculated as the sum of green vegetation and clover (grams). GDM_g = Green + Clover
+
 • Dry_Total_g: Total biomass, combining all components (grams). Dry_Total_g = Green + Dead + Clover
 
 The competition score is a weighted R², where Dry_Total_g is weighted 0.5, GDM_g weighted 0.2, and the rest 0.1.
