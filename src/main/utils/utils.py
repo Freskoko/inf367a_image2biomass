@@ -22,7 +22,7 @@ class TrainConfig:
     pca_n_components: int = 128
 
     # resources
-    lower_resources = True
+    lower_resources = False
     max_cv_groups = 160
 
     # targets

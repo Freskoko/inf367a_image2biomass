@@ -45,26 +45,22 @@ def main():
 
     # 2. load vision extraction data from file
     img_feat_train = load_feature_store(path_cfg.vision_feats_train)
-    img_feat_test = load_feature_store(path_cfg.vision_feats_test)
     logger.info("2.2 Vision data loaded from file")
 
-    # 3 apply PCA on vision output data
-    X_vision_train, _ = apply_pca_train_test(
-        img_feat_train, img_feat_test, train_cfg=train_cfg
-    )
-    logger.info("3. PCA on vision data complete")
+    
+    # print(img_feat_train.columns)
+    img_feat_train_raw = img_feat_train.copy()
 
-    # 4 combine data
-    X_train = merge_features(Xtr_meta, X_vision_train)
-    logger.info("4.1 Vision and tabular data combined")
-
-    logger.info("Dropped test data, only doing train")
-    X_train = apply_scaling_train(X_train)
-
-    # 4.1 scale data
-    logger.info("4.2 Train scaled")
+    # (optional) make feature columns strings so sklearn/pandas behave nicely
+    feat_cols = [c for c in img_feat_train_raw.columns if c != "image_path"]
+    img_feat_train_raw = img_feat_train_raw.rename(columns={c: f"vision_{c}" for c in feat_cols})
+    X_train = img_feat_train_raw
+ 
+    print("X train", X_train.shape)
+    
 
     logger.info("6. Calculating R2 CV score")
+
     if train_cfg.lower_resources:
         rng = np.random.default_rng(train_cfg.random_state)
         keep_groups = rng.choice(
@@ -73,18 +69,24 @@ def main():
 
         mask = X_train["image_path"].isin(keep_groups)
         X_train_cv = X_train.loc[mask].reset_index(drop=True)
+        print(X_train_cv.shape)
         y_cv = y.loc[mask].reset_index(drop=True)
 
         groups = X_train_cv["image_path"].to_numpy()
         train_r2_score = cv_mean_r2(
             train_cfg=train_cfg, X=X_train_cv, y=y_cv, groups=groups
         )
+        print("unique image paths:", X_train["image_path"].nunique())
+        print("max_cv_groups:", train_cfg.max_cv_groups)
+        print("kept unique paths:", len(keep_groups))
+        print("rows kept:", X_train_cv.shape[0])
+
     else:
         groups = X_train["image_path"].to_numpy()
         train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
 
     print("R2 Score on training data:")
-    print("CV mean R2:", train_r2_score["mean_r2"])
+    print("CV mean R2:", train_r2_score["global_weighted_r2"])
     print("Per-target R2:", train_r2_score["per_target_r2"])
     logger.info("End of file")
 

@@ -27,3 +27,6 @@ Run [predict.py](/src/main/predict.py)
 
 cd src  
 python -m main.run_only_train
+
+# Change this parameter in utils to debug and speed up the train process 
+train_cfg.lower_resources = False

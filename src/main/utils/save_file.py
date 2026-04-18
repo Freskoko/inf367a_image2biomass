@@ -17,6 +17,8 @@ def save_predictions(path_cfg: DatasetPaths, long_pred: pd.DataFrame) -> None:
         raise ValueError(f"Submission has {missing} missing predictions after merge.")
 
     out_path = path_cfg.root / "submission.csv"
-
-    sub = sub.drop(columns=["target"]).rename(columns={"pred": "target"})
+    #sub = sub.drop(columns=["target", "image_path", "target_name"], errors="ignore") \
+    #     .rename(columns={"pred": "target"})
+    
+    sub = sub.drop(columns=["target", "sample_id"]).rename(columns={"pred": "target"})
     sub.to_csv(out_path, index=False)
