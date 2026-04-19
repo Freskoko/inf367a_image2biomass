@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from PIL import Image
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torchvision import models, transforms
 
 from main.utils.utils import DataType, VisionModelConfig
@@ -33,18 +33,11 @@ class ImagePathDataset(Dataset):
         return len(self.image_paths)
 
     def _get_train_transform(self):
-        # TODO MOVE ME SOMEWHERE ELSE!
-        """
-        When training across epochs,
-        images are randomly flipped, either vertically, horizontally, or both
-        Source: https://link.springer.com/article/10.1186/s40537-019-0197-0?
-        """
         return transforms.Compose(
             [
                 transforms.Resize((self.cfg.image_size, self.cfg.image_size * 2)),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomVerticalFlip(p=0.5),
-                # transforms.v2.GaussianNoise(mean = 1, std = 0.1), can hurt predictions
                 transforms.ToTensor(),
                 transforms.Normalize(self.cfg.mean, self.cfg.std),
             ]
@@ -67,6 +60,21 @@ class ImagePathDataset(Dataset):
         return x, rel
 
 
+class ConvNeXtTinyBackbone(torch.nn.Module):
+    """Return the 768-d penultimate embedding from ConvNeXt-Tiny."""
+
+    def __init__(self, model: torch.nn.Module):
+        super().__init__()
+        self.features = model.features
+        self.avgpool = model.avgpool
+        self.pre_logits = torch.nn.Sequential(*list(model.classifier.children())[:-1])
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.features(x)
+        x = self.avgpool(x)
+        return self.pre_logits(x)
+
+
 def _get_device(device: str) -> torch.device:
     if device != "auto":
         return torch.device(device)
@@ -79,35 +87,20 @@ def _get_device(device: str) -> torch.device:
 
 def build_feature_extractor(
     device: torch.device,
-    backbone: str = "dino",
-    model_name: str = "dinov2_vits14",
-):
-    if backbone == "dino":
-        model = torch.hub.load("facebookresearch/dinov2", model_name)
-        model.eval().to(device)
-        return model
+    weights: models.ConvNeXt_Tiny_Weights | None = models.ConvNeXt_Tiny_Weights.DEFAULT,
+) -> torch.nn.Module:
+    model = models.convnext_tiny(weights=weights)
+    model = ConvNeXtTinyBackbone(model)
+    model.eval()
+    model.to(device)
+    return model
 
-    if backbone == "resnet":
-        model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
-        model.fc = torch.nn.Identity()
-        model.eval().to(device)
-        return model
-
-    if backbone == "convnext":
-        from main.vision.ConvNeXt.convnext import (
-            build_feature_extractor as build_convnext_feature_extractor,
-        )
-
-        return build_convnext_feature_extractor(device)
-
-    raise ValueError(f"Unknown backbone: {backbone}")
 
 @torch.inference_mode()
 def extract_features(
     out_npy: Path,
     vision_cfg: VisionModelConfig,
     ds,
-    backbone: str = "dino",
 ) -> np.ndarray:
     out_npy.parent.mkdir(parents=True, exist_ok=True)
 
@@ -120,22 +113,15 @@ def extract_features(
         pin_memory=(device.type == "cuda"),
     )
 
-    model = build_feature_extractor(
-        device=device,
-        backbone=backbone,
-    )
+    model = build_feature_extractor(device)
 
     feats = []
     keys = []
 
     for xb, rels in dl:
         xb = xb.to(device, non_blocking=True)
-        fb = model(xb)
-
-        if isinstance(fb, dict):
-            fb = fb["x_norm_clstoken"]
-
-        feats.append(fb.cpu().numpy())
+        fb = model(xb).detach().cpu().numpy()
+        feats.append(fb)
         keys.extend(rels)
 
     feats = np.concatenate(feats, axis=0)
@@ -145,6 +131,6 @@ def extract_features(
     keys = [keys[i] for i in order]
 
     np.save(out_npy, feats)
-    out_npy.with_suffix(".paths.txt").write_text("\n".join(keys))
+    (out_npy.with_suffix(".paths.txt")).write_text("\n".join(keys))
 
     return feats
