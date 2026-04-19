@@ -47,10 +47,10 @@ def main():
     )
     logger.info("Tabular data loaded")
 
-    # Run the ResNet feature extractor only if we don't already have cached features.
+    # Run the vision model feature extractor only if we don't already have cached features.
     if (
-        not path_cfg.vision_feats_train.with_suffix(".paths.txt").exists()
-        or not path_cfg.vision_feats_test.with_suffix(".paths.txt").exists()
+        not path_cfg.vision_feats_train.with_suffix(f"_{args.vision_backbone}.paths.txt").exists()
+        or not path_cfg.vision_feats_test.with_suffix(f"_{args.vision_backbone}.paths.txt").exists()
     ):
         
         extract_vision_data(
