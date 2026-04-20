@@ -3,8 +3,8 @@ import argparse
 
 import numpy as np
 from loguru import logger
-from main.preprocessing.pca import apply_pca_train_test
-from main.preprocessing.scaling import apply_scaling_train
+# from main.preprocessing.pca import apply_pca_train_test
+# from main.preprocessing.scaling import apply_scaling_train
 from main.utils.utils import DatasetPaths, ModelType, TrainConfig, VisionModelConfig
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
@@ -66,16 +66,10 @@ def main():
         )
 
     img_feat_train = load_feature_store(train_feat_path)
-    img_feat_test = load_feature_store(test_feat_path)
     logger.info(f"Vision features ready ({args.vision_backbone})")
 
-    X_vision_train, _ = apply_pca_train_test(
-        img_feat_train, img_feat_test, train_cfg=train_cfg
-    )
-    X_train = merge_features(Xtr_meta, X_vision_train)
-    X_train = apply_scaling_train(X_train)
-    logger.info("Features merged and scaled")
-    
+    X_train = img_feat_train
+
     logger.info("Device setup: {}".format(train_cfg.device))
 
     # When lower_resources is on, CV runs on a random subset of image groups
