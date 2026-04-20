@@ -4,7 +4,7 @@ Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
 
 ## Task
 
-Using a dataset for precision argriculture, the task is to predict pasture biomass from top-view images and some tabular metadata. Pasture biomass is defined as dry weight including:
+Using a dataset for precision agriculture, the task is to predict pasture biomass from top-view images and some tabular metadata. Pasture biomass is defined as dry weight including:
 
 • Dry_Green_g: Green vegetation other than clover (grams)
 

@@ -1,10 +1,10 @@
 # Novel Method: TabPFN
 
-### What it is
+## What it is
 
-TabPFN (Tabular Prior-Fitted Network) is a foundation model for tabular data from Hollmann et al. (2025, TabPFN v2). I presented TabPFN v1, but since it is allowed i implemented v2. So instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
+TabPFN (Tabular Prior-Fitted Network) is a foundation model for tabular data from Hollmann et al. (2025, TabPFN v2). My in-class presentation covered TabPFN v1; for this implementation I used v2 (course staff confirmed this is allowed), which is the version that supports regression. Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
 
-### How it works
+## How it works
 
 During pre training, TabPFN learned to approximate Bayesian inference across a wide range of data generating processes sampled from its prior. When you call `.fit()` on a new dataset, the model mostly just stores and preprocesses the training data. When you call `.predict()`, the training set and the test inputs are fed through the transformer together, and attention produces predictions that implicitly marginalize over plausible models. You can kind of think of it as doing model selection and hyperparameter tuning "inside" the forward pass, using the knowledge the authors gave it during pre training.
 
@@ -16,17 +16,17 @@ Main practical properties:
 - Works well on small and medium tabular datasets, which matches what we have in this exercise.
 - "Training" is basically free, the cost is at prediction time, because every prediction is a transformer forward pass over the full training set.
 
-### Why does it fit this task
+## Why does it fit this task
 
 Our dataset is small (~700 images, plus ~150 features). That's in the range TabPFN was designed for. Tree ensembles like ExtraTrees work fine but need some hyperparameter tuning to not overfit on small data.
 
-### Implementation
+## Implementation
 
 Getting TabPFN running took more work than I thought it would. Here are the main things I ran into:
 
 **Getting the model to download.** TabPFN doesn't ship the weights inside the pip package. The first time you call `.fit()` it tries to download them from Prior Labs, and the download is behind a license you have to get. So first i got `TabPFNLicenseError` until i registered on `ux.priorlabs.ai`, accepted everything, copied the API key from your account page, and set it as `TABPFN_TOKEN`. I dropped the token into `utils.py` and set it as an environment variable when the module is imported, so anyone cloning the repo can just run the scripts without doing the browser dance themselves. The token is read only, so it's fine to keep in the repo, no need to hide it as an env var.
 
-**Making it work with multiple targets.** TabPFN only predicts one target at a time, but we have three (Dry_Green_g, Dry_Dead_g, Dry_Clover_g). The code already uses `MultiOutputRegressor` for this. It didn't, and figuring out why took a while. The first failure looked like a license error even though I'd set the token correctly, which was confusing. Reading the errors more carefully it turned out the error was actually raised inside a worker process, not in my main one. With `n_jobs=-1`, `MultiOutputRegressor` trains the three copies (one per target) in parallel worker processes. On macOS those workers start with the `spawn` method, which doesn't get the parent's `os.environ` changes, so `TABPFN_TOKEN` was fine in my main process but missing in the workers. On top of that, TabPFN objects don't fit cleanly into workers anyway (they hold stuff that doesn't survive serialization). I tried a couple of things first (forcing the env var earlier in import order, constructing the model a bit differently) before settling on the simpler fix: detect the TabPFN case in `model_wrapper_creator` and force `n_jobs=1` for it so everything runs in one process. TabPFN does its own parallelism internally so the time increase from dropping external parallelism is pretty small.
+**Making it work with multiple targets.** TabPFN only predicts one target at a time, but we have three (Dry_Green_g, Dry_Dead_g, Dry_Clover_g). The code already uses `MultiOutputRegressor` for exactly this situation, so I figured TabPFN would just slot in. That didn't work, and figuring out why took a while. The first failure looked like a license error even though I'd set the token correctly, which was confusing. Reading the errors more carefully it turned out the error was actually raised inside a worker process, not in my main one. With `n_jobs=-1`, `MultiOutputRegressor` trains the three copies (one per target) in parallel worker processes. On macOS those workers start with the `spawn` method, which doesn't get the parent's `os.environ` changes, so `TABPFN_TOKEN` was fine in my main process but missing in the workers. On top of that, TabPFN objects don't pickle cleanly into workers anyway (they hold state that doesn't survive serialization). I tried a couple of things first (forcing the env var earlier in import order, constructing the model a bit differently) before settling on the simpler fix: detect the TabPFN case in `model_wrapper_creator` and force `n_jobs=1` for it so everything runs in one process. TabPFN does its own parallelism internally so the time increase from dropping external parallelism is pretty small.
 
 **Reproducibility.** TabPFN runs several forward passes with shuffled features and averages them. If you don't set `random_state` it picks its own, which means two CV runs give slightly different numbers. Not a bug, just annoying when you're trying to compare models. I pass `TrainConfig.random_state` into the constructor so runs are repeatable.
 
@@ -34,7 +34,7 @@ Getting TabPFN running took more work than I thought it would. Here are the main
 
 **Making CV fast enough.** TabPFN's prediction time scales with the size of the training set, because every prediction is a transformer forward pass over all the training rows. Running a full 5 fold CV over the whole dataset was too slow to iterate on, so I used the `lower_resources` flag that was already in the code. It samples 160 image groups and runs CV on those. That's enough to compare models, and a full CV with TabPFN takes about 2 minutes on CPU instead of way longer.
 
-### How the data reaches TabPFN
+## How the data reaches TabPFN
 
 Once all of that is in place, I never call TabPFN's API directly. Everything goes through the sklearn `Pipeline` that `model_wrapper_creator` builds, so the same code path handles both ExtraTrees and TabPFN.
 
@@ -46,7 +46,7 @@ When `pipe.fit(X, y)` is called (either in `fit_full` for the full run, or insid
 
 The rest of the pipeline (loading data, vision features, PCA, scaling, CV, metrics) is shared with the ExtraTrees path.
 
-### Files I changed "individual work"
+## Files I changed (individual work)
 
 None of the changes is huge in line count, but a lot of them came out of debugging rather than just writing code, so I want to be clear about what was done.
 
