@@ -5,8 +5,8 @@ from loguru import logger
 
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train_test
-from main.utils.utils import DatasetPaths, ModelType, TrainConfig, VisionModelConfig
 from main.utils.save_file import save_predictions
+from main.utils.utils import DatasetPaths, ModelType, TrainConfig, VisionModelConfig
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data, wide_to_long_predictions
@@ -106,6 +106,11 @@ def main():
     X_train = merge_features(Xtr_meta, X_vision_train)
     X_test = merge_features(Xte_meta, X_vision_test)
     X_train, X_test = align_feature_columns(X_train, X_test)
+
+    # Keep only columns present in both splits so the scaler sees matching columns.
+    common_cols = [c for c in X_train.columns if c in X_test.columns]
+    X_train = X_train[common_cols]
+    X_test = X_test[common_cols]
 
     X_train, X_test = apply_scaling_train_test(X_train, X_test)
     logger.info("Features merged and scaled")

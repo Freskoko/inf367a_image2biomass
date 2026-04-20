@@ -1,5 +1,6 @@
 from __future__ import annotations
 import argparse
+
 import numpy as np
 from loguru import logger
 from main.preprocessing.pca import apply_pca_train_test
@@ -12,7 +13,6 @@ from main.regression.baseline_training import (
     cv_mean_r2,
     load_feature_store,
 )
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run 5-fold GroupKFold CV evaluation.")
@@ -51,7 +51,6 @@ def main():
     # Run the vision model feature extractor only if we don't already have cached features.
     train_feat_path = path_cfg.vision_feats_train_path(args.vision_backbone)
     test_feat_path = path_cfg.vision_feats_test_path(args.vision_backbone)
-
     if (
         not train_feat_path.exists()
         or not train_feat_path.with_suffix(".paths.txt").exists()
