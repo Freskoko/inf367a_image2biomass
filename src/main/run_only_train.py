@@ -1,6 +1,5 @@
 from __future__ import annotations
 import argparse
-from pathlib import Path
 
 import numpy as np
 from loguru import logger
@@ -15,22 +14,6 @@ from main.regression.baseline_training import (
     load_feature_store,
 )
 
-
-def get_vision_feature_paths(path_cfg: DatasetPaths, backbone: str) -> tuple[Path, Path]:
-    # Must match the save locations used in wrangling/img_data.py::extract_vision_data.
-    if backbone == "dino":
-        return (
-            path_cfg.model_dir / "feature_train_dino.npy",
-            path_cfg.model_dir / "feature_test_dino.npy",
-        )
-    if backbone == "resnet":
-        return (
-            path_cfg.model_dir / "feature_train_resnet.npy",
-            path_cfg.model_dir / "feature_test_resnet.npy",
-        )
-    raise ValueError(f"Unknown backbone: {backbone}")
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run 5-fold GroupKFold CV evaluation.")
     parser.add_argument(
@@ -43,7 +26,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--vision-backbone",
         type=str,
-        choices=["resnet", "dino"],
+        choices=["resnet", "dino", "convnext"],
         default="dino",
         help="Vision backbone to use for feature extraction.",
     )
@@ -55,7 +38,7 @@ def main():
     args = parse_args()
     path_cfg = DatasetPaths()
     train_cfg = TrainConfig(model_type=ModelType.from_string(args.model))
-    vision_cfg = VisionModelConfig()
+    vision_cfg = VisionModelConfig(vision_backbone=args.vision_backbone)
     logger.info(
         f"Configs loaded (model={args.model}, vision_backbone={args.vision_backbone})"
     )
@@ -65,11 +48,9 @@ def main():
     )
     logger.info("Tabular data loaded")
 
-    train_feat_path, test_feat_path = get_vision_feature_paths(
-        path_cfg, args.vision_backbone
-    )
-
-    # Only run the vision feature extractor if we don't already have cached features for this backbone.
+    # Run the vision model feature extractor only if we don't already have cached features.
+    train_feat_path = path_cfg.vision_feats_train_path(args.vision_backbone)
+    test_feat_path = path_cfg.vision_feats_test_path(args.vision_backbone)
     if (
         not train_feat_path.exists()
         or not train_feat_path.with_suffix(".paths.txt").exists()
@@ -94,6 +75,8 @@ def main():
     X_train = merge_features(Xtr_meta, X_vision_train)
     X_train = apply_scaling_train(X_train)
     logger.info("Features merged and scaled")
+    
+    logger.info("Device setup: {}".format(train_cfg.device))
 
     # When lower_resources is on, CV runs on a random subset of image groups
     #to keep TabPFN runs reasonable in wall clock time.

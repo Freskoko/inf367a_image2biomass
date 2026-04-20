@@ -3,6 +3,7 @@ from enum import Enum, auto
 from pathlib import Path
 from attr import dataclass
 from sklearn.ensemble import ExtraTreesRegressor
+import torch
 
 # TabPFN needs a token for the one time model download + license check.
 # This one is read only (inference only), so fine to keep in the repo, dont need to hide behind env vars.
@@ -30,6 +31,31 @@ class ModelType(Enum):
             )
         return mapping[key]
 
+class VisionBackbone(str, Enum):
+    DINO = "dino"
+    RESNET = "resnet"
+    CONVNEXT = "convnext"
+
+    @classmethod
+    def from_string(cls, name: str) -> "VisionBackbone":
+        try:
+            return cls(name.lower())
+        except ValueError as exc:
+            raise ValueError(
+                f"Unknown vision backbone '{name}'. Valid options: {[m.value for m in cls]}"
+            ) from exc
+
+    def __str__(self) -> str:
+        return self.value
+
+
+def _normalize_vision_backbone(
+    backbone: VisionBackbone | str,
+) -> VisionBackbone:
+    if isinstance(backbone, VisionBackbone):
+        return backbone
+    return VisionBackbone.from_string(backbone)
+
 
 @dataclass(frozen=True)
 class TrainConfig:
@@ -46,6 +72,13 @@ class TrainConfig:
     # resources
     lower_resources = True
     max_cv_groups = 160
+
+    if torch.cuda.is_available():
+        device = "cuda"
+    elif torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        device = "cpu"
 
     # targets
     TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g"]
@@ -68,19 +101,42 @@ class TrainConfig:
 
 @dataclass(frozen=True)
 class VisionModelConfig:
+    vision_backbone: VisionBackbone | str = VisionBackbone.DINO
     image_size: int = 350
     batch_size: int = 64
     num_workers: int = 0
-    device: str = "auto"
+    
+    if torch.cuda.is_available():
+        device = "cuda"
+    elif torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        device = "cpu"
 
-    # imagenet mean and std
+    def __attrs_post_init__(self):
+        object.__setattr__(
+            self,
+            "vision_backbone",
+            _normalize_vision_backbone(self.vision_backbone),
+        )
+
+    @property
+    def model_name(self) -> str:
+        if self.vision_backbone == VisionBackbone.DINO:
+            return "dinov2_vits14"
+
+        raise ValueError(
+            f"No model_name is defined for vision backbone '{self.vision_backbone}'."
+        )
+
+    # ImageNet mean and std
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
-    model_name: str = "dinov2_vits14"
+
 
 @dataclass(frozen=True)
 class DatasetPaths:
-    def __init__(self):
+    def __attrs_post_init__(self):
         self.model_dir.mkdir(parents=True, exist_ok=True)
 
     root: Path = Path(__file__).parent.parent.parent / "data"
@@ -93,3 +149,21 @@ class DatasetPaths:
     @property
     def test_csv(self) -> Path:
         return self.root / "test.csv"
+
+    def vision_feats_train_path(
+        self, backbone: VisionBackbone | str = VisionBackbone.DINO
+    ) -> Path:
+        return self.model_dir / f"feature_train_{_normalize_vision_backbone(backbone)}.npy"
+
+    @property
+    def vision_feats_train(self) -> Path:
+        return self.vision_feats_train_path()
+
+    def vision_feats_test_path(
+        self, backbone: VisionBackbone | str = VisionBackbone.DINO
+    ) -> Path:
+        return self.model_dir / f"feature_test_{_normalize_vision_backbone(backbone)}.npy"
+
+    @property
+    def vision_feats_test(self) -> Path:
+        return self.vision_feats_test_path()

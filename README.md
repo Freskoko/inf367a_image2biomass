@@ -22,7 +22,7 @@ The competition score is a weighted R², where Dry_Total_g is weighted 0.5, GDM_
 ## Pipeline
 
 1. Load the long-format CSV and pivot it so each row is one image. Extract year/month/day/dayofyear from the sampling date.
-2. Run a pretrained vision backbone (DINOv2 by default, ResNet18 optional via `--vision-backbone resnet`) over the images and take the penultimate-layer features. Cache them to `.npy` so we don't redo this on every run.
+2. Run a pretrained vision backbone (DINOv2 by default, ResNet18 or ConvNeXt-Tiny via `--vision-backbone resnet|convnext`) over the images and take the penultimate-layer features. Cache them to `.npy` so we don't redo this on every run.
 3. Reduce the vision features to 128 components with PCA.
 4. Merge the PCA features with the tabular metadata and one-hot encode categoricals (State, Species). Scale numerics with StandardScaler.
 5. Fit a multi-output regressor on the three direct targets. The two composite targets are computed from the predictions afterwards.
@@ -48,7 +48,7 @@ uv sync ### Install exactly what’s in uv.lock in the venv
 Both scripts take two flags:
 
 - `--model`: `tabpfn` (default) or `extra_trees`
-- `--vision-backbone`: `dino` (default) or `resnet`
+- `--vision-backbone`: `dino` (default), `resnet`, or `convnext` (`torchvision.models.convnext_tiny`)
 
 ```bash
 cd src

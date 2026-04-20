@@ -26,14 +26,8 @@ def extract_vision_data(
         mode=DataType.VAL,
     )
 
-    if backbone == "dino":
-        train_out = path_cfg.model_dir / "feature_train_dino.npy"
-        test_out = path_cfg.model_dir / "feature_test_dino.npy"
-    elif backbone == "resnet":
-        train_out = path_cfg.model_dir / "feature_train_resnet.npy"
-        test_out = path_cfg.model_dir / "feature_test_resnet.npy"
-    else:
-        raise ValueError(f"Unknown backbone: {backbone}")
+    train_out = path_cfg.vision_feats_train_path(backbone)
+    test_out = path_cfg.vision_feats_test_path(backbone)
 
     extract_features(
         out_npy=train_out,
