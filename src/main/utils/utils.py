@@ -3,7 +3,6 @@ from enum import Enum, auto
 from pathlib import Path
 from attr import dataclass
 from sklearn.ensemble import ExtraTreesRegressor
-from tabpfn import TabPFNRegressor
 
 # TabPFN needs a token for the one time model download + license check.
 # This one is read only (inference only), so fine to keep in the repo, dont need to hide behind env vars.
@@ -54,6 +53,8 @@ class TrainConfig:
 
     def get_model(self):
         if self.model_type == ModelType.TABPFN:
+            # Lazy import so runs with --model extra_trees don't pay the tabpfn import cost.
+            from tabpfn import TabPFNRegressor
             return TabPFNRegressor(random_state=self.random_state)
 
         return ExtraTreesRegressor(
@@ -92,11 +93,3 @@ class DatasetPaths:
     @property
     def test_csv(self) -> Path:
         return self.root / "test.csv"
-
-    @property
-    def vision_feats_train(self):
-        return self.model_dir / "feature_train_dino.npy"
-
-    @property
-    def vision_feats_test(self):
-        return self.model_dir / "feature_test_dino.npy"

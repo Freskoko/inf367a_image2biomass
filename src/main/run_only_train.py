@@ -1,11 +1,12 @@
 from __future__ import annotations
 import argparse
+from pathlib import Path
+
 import numpy as np
 from loguru import logger
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train
-from main.utils.utils import DatasetPaths, ModelType, TrainConfig
-from main.vision.dino import VisionModelConfig
+from main.utils.utils import DatasetPaths, ModelType, TrainConfig, VisionModelConfig
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data
@@ -13,6 +14,21 @@ from main.regression.baseline_training import (
     cv_mean_r2,
     load_feature_store,
 )
+
+
+def get_vision_feature_paths(path_cfg: DatasetPaths, backbone: str) -> tuple[Path, Path]:
+    # Must match the save locations used in wrangling/img_data.py::extract_vision_data.
+    if backbone == "dino":
+        return (
+            path_cfg.model_dir / "feature_train_dino.npy",
+            path_cfg.model_dir / "feature_test_dino.npy",
+        )
+    if backbone == "resnet":
+        return (
+            path_cfg.model_dir / "feature_train_resnet.npy",
+            path_cfg.model_dir / "feature_test_resnet.npy",
+        )
+    raise ValueError(f"Unknown backbone: {backbone}")
 
 
 def parse_args() -> argparse.Namespace:
@@ -40,30 +56,37 @@ def main():
     path_cfg = DatasetPaths()
     train_cfg = TrainConfig(model_type=ModelType.from_string(args.model))
     vision_cfg = VisionModelConfig()
-    logger.info(f"Configs loaded (model={args.model})")
+    logger.info(
+        f"Configs loaded (model={args.model}, vision_backbone={args.vision_backbone})"
+    )
 
     train_wide, test_df, Xtr_meta, _, y = load_data(
         path_cfg=path_cfg, train_cfg=train_cfg
     )
     logger.info("Tabular data loaded")
 
-    # Run the ResNet feature extractor only if we don't already have cached features.
-    if (
-        not path_cfg.vision_feats_train.with_suffix(".paths.txt").exists()
-        or not path_cfg.vision_feats_test.with_suffix(".paths.txt").exists()
-    ):
-        
-        extract_vision_data(
-        path_cfg=path_cfg,
-        vision_cfg=vision_cfg,
-        train_df=train_wide,
-        test_df=test_df,
-        backbone=args.vision_backbone,
+    train_feat_path, test_feat_path = get_vision_feature_paths(
+        path_cfg, args.vision_backbone
     )
-    
-    img_feat_train = load_feature_store(path_cfg.vision_feats_train)
-    img_feat_test = load_feature_store(path_cfg.vision_feats_test)
-    logger.info("Vision features ready")
+
+    # Only run the vision feature extractor if we don't already have cached features for this backbone.
+    if (
+        not train_feat_path.exists()
+        or not train_feat_path.with_suffix(".paths.txt").exists()
+        or not test_feat_path.exists()
+        or not test_feat_path.with_suffix(".paths.txt").exists()
+    ):
+        extract_vision_data(
+            path_cfg=path_cfg,
+            vision_cfg=vision_cfg,
+            train_df=train_wide,
+            test_df=test_df,
+            backbone=args.vision_backbone,
+        )
+
+    img_feat_train = load_feature_store(train_feat_path)
+    img_feat_test = load_feature_store(test_feat_path)
+    logger.info(f"Vision features ready ({args.vision_backbone})")
 
     X_vision_train, _ = apply_pca_train_test(
         img_feat_train, img_feat_test, train_cfg=train_cfg

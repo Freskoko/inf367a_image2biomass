@@ -5,15 +5,15 @@ from loguru import logger
 
 from main.preprocessing.pca import apply_pca_train_test
 from main.preprocessing.scaling import apply_scaling_train_test
-from main.utils.utils import DatasetPaths, ModelType, TrainConfig
-from main.vision.dino import VisionModelConfig
+from main.utils.save_file import save_predictions
+from main.utils.utils import DatasetPaths, ModelType, TrainConfig, VisionModelConfig
 from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
-from main.wrangling.tabular_data import load_data
+from main.wrangling.tabular_data import load_data, wide_to_long_predictions
 from main.regression.baseline_training import (
+    fit_full,
     load_feature_store,
-    fit_and_predict,
-    write_submission,
+    predict,
 )
 
 
@@ -39,15 +39,16 @@ def parse_args() -> argparse.Namespace:
 
 
 def get_vision_feature_paths(path_cfg: DatasetPaths, backbone: str) -> tuple[Path, Path]:
+    # Must match the save locations used in wrangling/img_data.py::extract_vision_data.
     if backbone == "dino":
         return (
-            path_cfg.root / "feature_train_dino.npy",
-            path_cfg.root / "feature_test_dino.npy",
+            path_cfg.model_dir / "feature_train_dino.npy",
+            path_cfg.model_dir / "feature_test_dino.npy",
         )
     if backbone == "resnet":
         return (
-            path_cfg.root / "feature_train_resnet.npy",
-            path_cfg.root / "feature_test_resnet.npy",
+            path_cfg.model_dir / "feature_train_resnet.npy",
+            path_cfg.model_dir / "feature_test_resnet.npy",
         )
     raise ValueError(f"Unknown backbone: {backbone}")
 
@@ -95,11 +96,20 @@ def main():
     X_train = merge_features(Xtr_meta, X_vision_train)
     X_test = merge_features(Xte_meta, X_vision_test)
 
+    # Keep only columns present in both splits so the scaler sees matching columns.
+    common_cols = [c for c in X_train.columns if c in X_test.columns]
+    X_train = X_train[common_cols]
+    X_test = X_test[common_cols]
+
     X_train, X_test = apply_scaling_train_test(X_train, X_test)
     logger.info("Features merged and scaled")
 
-    preds = fit_and_predict(train_cfg=train_cfg, X_train=X_train, y=y, X_test=X_test)
-    write_submission(path_cfg=path_cfg, preds=preds)
+    pipe = fit_full(train_cfg, X_train, y)
+    test_preds = predict(pipe, X_test)
+    long_pred = wide_to_long_predictions(
+        image_paths=X_test["image_path"], preds=test_preds, train_cfg=train_cfg
+    )
+    save_predictions(path_cfg, long_pred)
     logger.info("submission.csv written")
 
 
