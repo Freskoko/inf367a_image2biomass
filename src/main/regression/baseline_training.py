@@ -10,6 +10,8 @@ from sklearn.model_selection import GroupKFold
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
+from main.preprocessing.pca import apply_pca_train_test
+from main.preprocessing.scaling import apply_scaling_train_test
 
 from main.utils.utils import ModelType, TrainConfig
 
@@ -86,6 +88,7 @@ def cv_mean_r2(
     groups: np.ndarray,
 ) -> dict:
     gkf = GroupKFold(n_splits=train_cfg.n_splits)
+    target_cols = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "GDM_g", "Dry_Total_g"]
 
     fold_scores: list[float] = []
     per_target_scores: list[np.ndarray] = []
@@ -96,6 +99,9 @@ def cv_mean_r2(
 
         Xtr = Xtr.drop(columns=["image_path", "State", "Species"], errors="ignore")
         Xva = Xva.drop(columns=["image_path", "State", "Species"], errors="ignore")
+
+        Xtr, Xva = apply_pca_train_test(Xtr, Xva, train_cfg=train_cfg)
+        Xtr, Xva = apply_scaling_train_test(Xtr, Xva)
 
         pipe = model_wrapper_creator(train_cfg, Xtr)
         pipe.fit(Xtr, ytr)
@@ -114,7 +120,6 @@ def cv_mean_r2(
             y_pred["Dry_Green_g"] + y_pred["Dry_Dead_g"] + y_pred["Dry_Clover_g"]
         )
 
-        target_cols = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "GDM_g", "Dry_Total_g"]
 
         target_r2 = np.array([r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float)
         global_weighted_r2 = weighted_r2_global(y_true, y_pred, target_cols)

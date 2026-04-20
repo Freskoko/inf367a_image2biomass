@@ -31,3 +31,5 @@ def apply_scaling_train(
     Xtr_scaled[num_cols] = scaler.fit_transform(X_train[num_cols])
 
     return Xtr_scaled
+
+ 

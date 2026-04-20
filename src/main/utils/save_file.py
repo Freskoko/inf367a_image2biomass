@@ -20,3 +20,5 @@ def save_predictions(path_cfg: DatasetPaths, long_pred: pd.DataFrame) -> None:
 
     sub = sub.drop(columns=["target"]).rename(columns={"pred": "target"})
     sub.to_csv(out_path, index=False)
+
+    print(f"Submission saved to: {out_path.resolve()}")
