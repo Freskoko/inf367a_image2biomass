@@ -28,3 +28,4 @@ submissions/
 src/main/ccgan_improved/dump_fake_data
 src/main/ccgan_improved/output/saved_models
 output/saved_models
+dump_fake_data

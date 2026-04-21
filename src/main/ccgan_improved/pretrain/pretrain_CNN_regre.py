@@ -1,7 +1,5 @@
 """
-
 Pre-train a CNN on the whole dataset for evaluation purpose
-
 """
 
 import os
@@ -22,11 +20,6 @@ from main.ccgan_improved.models.ResNet_regre import (
     ResNet50_regre,
 )
 from main.ccgan_improved.utils.utils import IMGs_dataset
-
-
-#############################
-# Settings
-#############################
 
 parser = argparse.ArgumentParser(description="Pre-train CNNs")
 parser.add_argument("--root_path", type=str, default="")
@@ -72,8 +65,6 @@ parser.add_argument(
     default=False,
     help="crop images for CNN training",
 )
-# parser.add_argument('--CVMode', action='store_true', default=False,
-#                    help='CV mode?')
 parser.add_argument("--img_size", type=int, default=64, metavar="N", choices=[64, 128])
 args = parser.parse_args()
 
@@ -99,13 +90,8 @@ save_logs_folder = wd + "/output/saved_logs/"
 os.makedirs(save_logs_folder, exist_ok=True)
 
 
-###########################################################################################################
-# Necessary functions
-###########################################################################################################
-
-
-# initialize CNNs
 def net_initialization(Pretrained_CNN_Name, ngpu=1):
+    """Initialize CNN"""
     if Pretrained_CNN_Name == "ResNet18_regre":
         net = ResNet18_regre(ngpu=ngpu)
     elif Pretrained_CNN_Name == "ResNet34_regre":
@@ -121,13 +107,9 @@ def net_initialization(Pretrained_CNN_Name, ngpu=1):
     return net, net_name
 
 
-# adjust CNN learning rate
 def adjust_learning_rate(optimizer, epoch, BASE_LR_CNN):
+    """adjusts ccn learning rate"""
     lr = BASE_LR_CNN
-    # if epoch >= 35:
-    #     lr /= 10
-    # if epoch >= 70:
-    #     lr /= 10
     if epoch >= 50:
         lr /= 10
     if epoch >= 120:
@@ -141,17 +123,15 @@ def train_CNN():
         net.train()
         train_loss = 0
         adjust_learning_rate(optimizer, epoch, args.base_lr)
-        for batch_idx, (batch_train_images, batch_train_labels) in enumerate(
+        for _batch_idx, (batch_train_images, batch_train_labels) in enumerate(
             trainloader
         ):
-            # batch_train_images = nn.functional.interpolate(batch_train_images, size = (299,299), scale_factor=None, mode='bilinear', align_corners=False)
-
             batch_train_images = batch_train_images.type(torch.float).to(device)
             batch_train_labels = (
                 batch_train_labels.type(torch.float).view(-1, 1).to(device)
             )
 
-            # Forward pass
+            # forward pass
             outputs, _ = net(batch_train_images)
             loss = criterion(outputs, batch_train_labels)
 
@@ -161,7 +141,6 @@ def train_CNN():
             optimizer.step()
 
             train_loss += loss.cpu().item()
-        # end for batch_idx
         train_loss = train_loss / len(trainloader)
 
         valid_loss = valid_CNN(verbose=False)
@@ -169,7 +148,6 @@ def train_CNN():
             "CNN: [epoch %d/%d] train_loss:%f valid_loss (avg_abs):%f"
             % (epoch + 1, args.epochs, train_loss, valid_loss)
         )
-    # end for epoch
 
     return net, optimizer
 
@@ -179,7 +157,7 @@ def valid_CNN(verbose=True):
     with torch.no_grad():
         abs_diff_avg = 0
         total = 0
-        for batch_idx, (images, labels) in enumerate(validloader):
+        for _batch_idx, (images, labels) in enumerate(validloader):
             images = images.type(torch.float).to(device)
             labels = labels.type(torch.float).view(-1).cpu().numpy()
             outputs, _ = net(images)
@@ -195,9 +173,8 @@ def valid_CNN(verbose=True):
     return abs_diff_avg / total
 
 
-###########################################################################################################
 # Training and Testing
-###########################################################################################################
+
 # data loader
 h5py_file = (
     args.data_path + "/BIOMASS_" + str(args.img_size) + "x" + str(args.img_size) + ".h5"
@@ -231,7 +208,7 @@ for i in range(n_unique_cellcount):
         counts_subset = np.concatenate(
             (counts_subset, counts_train[index_curr_cellcount])
         )
-# for i
+
 images_train = images_subset
 counts_train = counts_subset
 del images_subset, counts_subset
@@ -243,8 +220,7 @@ assert len(images_train) == len(counts_train)
 
 print("Number of images: {}/{}".format(N_train, N_valid))
 
-# noralization is very important here!!!!!!!!!
-# counts = counts/np.max(counts)
+# normalization is very important here
 counts_train = counts_train / args.end_count
 counts_valid = counts_valid / args.end_count
 
@@ -294,13 +270,11 @@ filename_ckpt = (
 
 # training
 if not os.path.isfile(filename_ckpt):
-    # TRAIN CNN
     print("\n Begin training CNN: ")
     start = timeit.default_timer()
     net, optimizer = train_CNN()
     stop = timeit.default_timer()
     print("Time elapses: {}s".format(stop - start))
-    # save model
     torch.save(
         {
             "net_state_dict": net.state_dict(),
@@ -312,9 +286,8 @@ else:
     print("\n Loading...")
     checkpoint = torch.load(filename_ckpt)
     net.load_state_dict(checkpoint["net_state_dict"])
-torch.cuda.empty_cache()  # release GPU mem which is  not references
+torch.cuda.empty_cache()
 
 
-# validation
 _ = valid_CNN(True)
 torch.cuda.empty_cache()

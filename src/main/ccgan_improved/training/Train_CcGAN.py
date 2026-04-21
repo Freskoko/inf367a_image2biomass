@@ -70,9 +70,7 @@ def train_CcGAN(
         optimizerG.load_state_dict(checkpoint["optimizerG_state_dict"])
         optimizerD.load_state_dict(checkpoint["optimizerD_state_dict"])
         torch.set_rng_state(checkpoint["rng_state"])
-    # end if
 
-    #################
     unique_train_labels = np.sort(np.array(list(set(train_labels))))
     min_label = np.min(unique_train_labels)
     max_label = np.max(unique_train_labels)
@@ -101,17 +99,16 @@ def train_CcGAN(
 
     start_time = timeit.default_timer()
     for niter in range(resume_niters, niters):
-        ## randomly draw batch_size_disc y's from unique_train_labels
+        # randomly draw batch_size_disc y's from unique_train_labels
         batch_target_labels_in_dataset = np.random.choice(
             unique_train_labels, size=batch_size_max, replace=True
         )
-        ## add Gaussian noise; we estimate image distribution conditional on these labels
+        # add Gaussian noise; we estimate image distribution conditional on these labels
         batch_epsilons = np.random.normal(0, kernel_sigma, batch_size_max)
         batch_target_labels_with_epsilon = (
             batch_target_labels_in_dataset + batch_epsilons
         )
         if clip_label:
-            # batch_target_labels_with_epsilon = np.clip(batch_target_labels_with_epsilon, 0.0, 1.0)
             indx_clip = find_outliers(batch_target_labels_with_epsilon)
             while len(indx_clip) > 1:
                 batch_epsilons = np.random.normal(0, kernel_sigma, len(indx_clip))
@@ -120,18 +117,18 @@ def train_CcGAN(
                 )
                 indx_clip = find_outliers(batch_target_labels_with_epsilon)
 
-        """  Train Discriminator   """
+        """Train Discriminator """
         batch_target_labels = batch_target_labels_with_epsilon[0:batch_size_disc]
 
-        ## find index of real images with labels in the vicinity of batch_target_labels
-        ## generate labels for fake image generation; these labels are also in the vicinity of batch_target_labels
+        # find index of real images with labels in the vicinity of batch_target_labels
+        # generate labels for fake image generation; these labels are also in the vicinity of batch_target_labels
         batch_real_indx = np.zeros(
             batch_size_disc, dtype=int
         )  # index of images in the datata; the labels of these images are in the vicinity
         batch_fake_labels = np.zeros(batch_size_disc)
 
         for j in range(batch_size_disc):
-            ## index for real images
+            # index for real images
             if threshold_type == "hard":
                 indx_real_in_vicinity = np.where(
                     np.abs(train_labels - batch_target_labels[j]) <= kappa
@@ -143,14 +140,13 @@ def train_CcGAN(
                     <= -np.log(nonzero_soft_weight_threshold) / kappa
                 )[0]
 
-            ## if the max gap between two consecutive ordered unique labels is large, it is possible that len(indx_real_in_vicinity)<1
+            # if the max gap between two consecutive ordered unique labels is large, it is possible that len(indx_real_in_vicinity)<1
             while len(indx_real_in_vicinity) < 1:
                 batch_epsilons_j = np.random.normal(0, kernel_sigma, 1)
                 batch_target_labels[j] = (
                     batch_target_labels_in_dataset[j] + batch_epsilons_j
                 )
                 if clip_label:
-                    # batch_target_labels = np.clip(batch_target_labels, 0.0, 1.0)
                     while (
                         batch_target_labels[j] > max_label
                         or batch_target_labels[j] < min_label
@@ -159,7 +155,7 @@ def train_CcGAN(
                         batch_target_labels[j] = (
                             batch_target_labels_in_dataset[j] + batch_epsilons_j
                         )
-                ## index for real images
+                # index for real images
                 if threshold_type == "hard":
                     indx_real_in_vicinity = np.where(
                         np.abs(train_labels - batch_target_labels[j]) <= kappa
@@ -170,13 +166,12 @@ def train_CcGAN(
                         (train_labels - batch_target_labels[j]) ** 2
                         <= -np.log(nonzero_soft_weight_threshold) / kappa
                     )[0]
-            # end while len(indx_real_in_vicinity)<1
 
             assert len(indx_real_in_vicinity) >= 1
 
             batch_real_indx[j] = np.random.choice(indx_real_in_vicinity, size=1)[0]
 
-            ## labels for fake images generation
+            # labels for fake images generation
             if threshold_type == "hard":
                 lb = batch_target_labels[j] - kappa
                 ub = batch_target_labels[j] + kappa
@@ -193,9 +188,8 @@ def train_CcGAN(
             assert lb >= 0 and ub >= 0
             assert lb <= 1 and ub <= 1
             batch_fake_labels[j] = np.random.uniform(lb, ub, size=1)[0]
-        # end for j
 
-        ## draw the real image batch from the training set
+        # draw the real image batch from the training set
         batch_real_images = train_images[batch_real_indx]
         assert batch_real_images.max() > 1
         batch_real_labels = train_labels[batch_real_indx]
@@ -203,7 +197,7 @@ def train_CcGAN(
             torch.from_numpy(batch_real_labels).type(torch.float).to(device)
         )
 
-        ## transform (rotate, flip, etc.) and normalize real images
+        # transform (rotate, flip, etc.) and normalize real images
         if transform:
             trainset = IMGs_dataset(
                 batch_real_images,
@@ -220,24 +214,24 @@ def train_CcGAN(
             trainset, batch_size=batch_size_disc, shuffle=False
         )
         train_dataloader = iter(train_dataloader)
-        batch_real_images = next(train_dataloader)  # .next() is deprecated
+        batch_real_images = next(train_dataloader)  # fixed since .next() is deprecated
         assert len(batch_real_images) == batch_size_disc
         batch_real_images = batch_real_images.type(torch.float).to(device)
         assert batch_real_images.max().item() <= 1
 
-        ## generate the fake image batch
+        # generate the fake image batch
         batch_fake_labels = (
             torch.from_numpy(batch_fake_labels).type(torch.float).to(device)
         )
         z = torch.randn(batch_size_disc, dim_gan, dtype=torch.float).to(device)
         batch_fake_images = netG(z, net_y2h(batch_fake_labels))
 
-        ## target labels on gpu
+        # target labels on gpu
         batch_target_labels = (
             torch.from_numpy(batch_target_labels).type(torch.float).to(device)
         )
 
-        ## weight vector
+        # weight vector
         if threshold_type == "soft":
             real_weights = torch.exp(
                 -kappa * (batch_real_labels - batch_target_labels) ** 2
@@ -248,7 +242,6 @@ def train_CcGAN(
         else:
             real_weights = torch.ones(batch_size_disc, dtype=torch.float).to(device)
             fake_weights = torch.ones(batch_size_disc, dtype=torch.float).to(device)
-        # end if threshold type
 
         # forward pass
         real_dis_out = netD(batch_real_images, net_y2h(batch_target_labels))
@@ -343,7 +336,6 @@ def train_CcGAN(
                 },
                 save_file,
             )
-    # end for niter
     return netG, netD
 
 
@@ -358,7 +350,6 @@ def SampCcGAN_given_label(netG, net_y2h, label, path=None, NFAKE=10000, batch_si
     )  # np.float is deprecated
     netG = netG.to(device)
     netG.eval()
-    # print(f"DEBUG: fake_images shape is {fake_images.shape}")
 
     with torch.no_grad():
         tmp = 0
@@ -388,23 +379,8 @@ def SampCcGAN_given_label(netG, net_y2h, label, path=None, NFAKE=10000, batch_si
         for i in range(NFAKE):
             filename = path + "/" + str(i) + ".png"
 
-            # FIX: Transpose from (C, H, W) to (H, W, C) for PIL
-            # And change mode to 'RGB'
+            # fixed, changed to RGB, and transposed
             img_np = raw_fake_images[i].transpose(1, 2, 0)
-
-            if img_np.shape[2] == 1:
-                print("CRITICAL: The generator is only outputting 1 channel!")
-
-            # Inside the for loop in SampCcGAN_given_label
-            chan_std = np.std(
-                img_np, axis=2
-            )  # Standard deviation across the R,G,B axis
-            if np.mean(chan_std) < 1.0:
-                print(
-                    f"Frame {i}: Channels are nearly identical (Mean STD: {np.mean(chan_std)})"
-                )
-            else:
-                print(f"Frame {i}: Color detected! (Mean STD: {np.mean(chan_std)})")
 
             im = Image.fromarray(img_np, mode="RGB")
 

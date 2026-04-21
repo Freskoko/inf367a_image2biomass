@@ -1,8 +1,3 @@
-"""
-Some helpful functions
-
-"""
-
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
@@ -11,8 +6,6 @@ import sys
 from PIL import Image
 
 
-# ################################################################################
-# Progress Bar
 class SimpleProgressBar:
     def __init__(self, width=50):
         self.last_x = -1
@@ -32,9 +25,9 @@ class SimpleProgressBar:
             print("")
 
 
-################################################################################
-# torch dataset from numpy array
 class IMGs_dataset(torch.utils.data.Dataset):
+    """torch dataset from numpy array"""
+
     def __init__(
         self,
         images,
@@ -69,10 +62,8 @@ class IMGs_dataset(torch.utils.data.Dataset):
         image = self.images[index]  # Expected shape: (3, 64, 64)
 
         if self.rotate or self.hflip or self.vflip:
-            # 1. Prepare for PIL: (C, H, W) -> (H, W, C)
+            # fixed to work with RGB
             image = image.transpose(1, 2, 0)
-
-            # 2. Convert to RGB PIL Image
             PIL_im = Image.fromarray(np.uint8(image), mode="RGB")
 
             if self.rotate:
@@ -85,10 +76,9 @@ class IMGs_dataset(torch.utils.data.Dataset):
             if self.vflip:
                 PIL_im = PIL_im.transpose(Image.FLIP_TOP_BOTTOM)
 
-            # 3. Convert back to Numpy and Transpose to (C, H, W)
             image = np.array(PIL_im).transpose(2, 0, 1)
 
-        # 4. Normalization (Works on all channels at once)
+        # normalize channels
         if self.normalize:
             image = image / 255.0
             image = (image - 0.5) / 0.5
@@ -107,12 +97,10 @@ def PlotLoss(loss, filename):
     x_axis = np.arange(start=1, stop=len(loss) + 1)
     plt.switch_backend("agg")
     mpl.style.use("seaborn")
-    fig = plt.figure()
+    _fig = plt.figure()
     ax = plt.subplot(111)
     ax.plot(x_axis, np.array(loss))
     plt.xlabel("epoch")
     plt.ylabel("training loss")
     plt.legend()
-    # ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15),  shadow=True, ncol=3)
-    # plt.title('Training Loss')
     plt.savefig(filename)

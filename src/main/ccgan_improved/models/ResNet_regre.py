@@ -149,11 +149,7 @@ class ResNet_regre(nn.Module):
             out = out.view(out.size(0), -1)
             out = self.linear(out)
 
-        # ext_features = self.avgpool(ft4) #reduce the dim so that computing FID won't too long
-        # # ext_features = torch.mean(ft4, (2,3)) #reduce the dim so that computing FID won't too long
-        # ext_features = ext_features.view(ext_features.size(0), -1)
-
-        ## use f3 feature
+        # use f3 feature
         ext_features = self.adaptmaxpool(ft3)
         ext_features = ext_features.view(ext_features.size(0), -1)
 

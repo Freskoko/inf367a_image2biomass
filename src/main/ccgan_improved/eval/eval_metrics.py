@@ -12,27 +12,21 @@ Xg: high-level features for fake images; ng by d array
 Yg: labels for fake images
 IMGSr: real images
 IMGSg: fake images
-
 """
 
 import gc
 import numpy as np
 
-# from numpy import linalg as LA
 from scipy import linalg
 import torch
 import torch.nn as nn
-from scipy.stats import entropy
-from torch.nn import functional as F
 
 from main.ccgan_improved.utils.utils import SimpleProgressBar
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 
-##############################################################################
 # FID scores
-##############################################################################
 # compute FID based on extracted features
 def FID(Xr, Xg, eps=1e-10):
     """
@@ -67,15 +61,8 @@ def FID(Xr, Xg, eps=1e-10):
     return fid_score
 
 
-##test
-# Xr = np.random.rand(10000,1000)
-# Xg = np.random.rand(10000,1000)
-# print(FID(Xr, Xg))
-
-
-# compute FID from raw images
 def cal_FID(PreNetFID, IMGSr, IMGSg, batch_size=500, resize=None):
-    # resize: if None, do not resize; if resize = (H,W), resize images to 3 x H x W
+    """Calculate FID from raw  images"""
 
     PreNetFID.eval()
 
@@ -87,7 +74,6 @@ def cal_FID(PreNetFID, IMGSr, IMGSg, batch_size=500, resize=None):
 
     if batch_size > min(nr, ng):
         batch_size = min(nr, ng)
-        # print("FID: recude batch size to {}".format(batch_size))
 
     # compute the length of extracted features
     with torch.no_grad():
@@ -104,14 +90,12 @@ def cal_FID(PreNetFID, IMGSr, IMGSg, batch_size=500, resize=None):
                 mode="bilinear",
                 align_corners=False,
             )
-        # _, test_features = PreNetFID(test_img)
         test_features = PreNetFID(test_img)
         d = test_features.shape[1]  # length of extracted features
 
     Xr = np.zeros((nr, d))
     Xg = np.zeros((ng, d))
 
-    # batch_size = 500
     with torch.no_grad():
         tmp = 0
         pb1 = SimpleProgressBar()
@@ -130,7 +114,6 @@ def cal_FID(PreNetFID, IMGSr, IMGSg, batch_size=500, resize=None):
                     mode="bilinear",
                     align_corners=False,
                 )
-            # _, Xr_tmp = PreNetFID(imgr_tensor)
             Xr_tmp = PreNetFID(imgr_tensor)
             Xr[tmp : (tmp + batch_size)] = Xr_tmp.detach().cpu().numpy()
             tmp += batch_size
@@ -155,7 +138,6 @@ def cal_FID(PreNetFID, IMGSr, IMGSg, batch_size=500, resize=None):
                     mode="bilinear",
                     align_corners=False,
                 )
-            # _, Xg_tmp = PreNetFID(imgg_tensor)
             Xg_tmp = PreNetFID(imgg_tensor)
             Xg[tmp : (tmp + batch_size)] = Xg_tmp.detach().cpu().numpy()
             tmp += batch_size
@@ -168,10 +150,6 @@ def cal_FID(PreNetFID, IMGSr, IMGSg, batch_size=500, resize=None):
     return fid_score
 
 
-##############################################################################
-# label_score
-# difference between assigned label and predicted label
-##############################################################################
 def cal_labelscore(
     PreNet,
     images,
@@ -186,13 +164,13 @@ def cal_labelscore(
     images: fake images
     labels_assi: assigned labels
     resize: if None, do not resize; if resize = (H,W), resize images to 3 x H x W
+
+    Calculate difference between assigned label and predicted label
     """
     PreNet.eval()
 
     # assume images are nxncximg_sizeximg_size
     n = images.shape[0]
-    nc = images.shape[1]  # number of channels
-    img_size = images.shape[2]
     labels_assi = labels_assi.reshape(-1)
 
     # predict labels
@@ -220,7 +198,6 @@ def cal_labelscore(
                 labels_batch.detach().cpu().numpy().reshape(-1)
             )
             tmp += batch_size
-        # del image_tensor; gc.collect()
         torch.cuda.empty_cache()
 
     labels_pred = (labels_pred * max_label_after_shift) - np.abs(min_label_before_shift)

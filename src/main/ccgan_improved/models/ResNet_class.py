@@ -104,7 +104,6 @@ class ResNet_class(nn.Module):
             nn.Conv2d(nc, 64, kernel_size=3, stride=1, padding=1, bias=False),  # h=h
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            # self._make_layer(block, 64, num_blocks[0], stride=1),  # h=h
             self._make_layer(block, 64, num_blocks[0], stride=2),  # h=h/2 32
             self._make_layer(block, 128, num_blocks[1], stride=2),
             self._make_layer(block, 256, num_blocks[2], stride=2),

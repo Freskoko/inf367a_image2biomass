@@ -24,7 +24,6 @@ IMG_SIZE = 64
 DIM_EMBED = 128
 
 
-# ------------------------------------------------------------------------------
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -106,15 +105,12 @@ class ResNet_embed(nn.Module):
 
         self.main = nn.Sequential(
             nn.Conv2d(nc, 64, kernel_size=3, stride=1, padding=1, bias=False),  # h=h
-            # nn.Conv2d(nc, 64, kernel_size=4, stride=2, padding=1, bias=False),  # h=h/2
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            # self._make_layer(block, 64, num_blocks[0], stride=1),  # h=h
             self._make_layer(block, 64, num_blocks[0], stride=2),  # h=h/2 32
             self._make_layer(block, 128, num_blocks[1], stride=2),  # h=h/2 16
             self._make_layer(block, 256, num_blocks[2], stride=2),  # h=h/2 8
             self._make_layer(block, 512, num_blocks[3], stride=2),  # h=h/2 4
-            # nn.AvgPool2d(kernel_size=4)
             nn.AdaptiveAvgPool2d((1, 1)),
         )
 
@@ -166,7 +162,6 @@ def ResNet50_embed(dim_embed=DIM_EMBED, ngpu=1):
     return ResNet_embed(Bottleneck, [3, 4, 6, 3], dim_embed=dim_embed, ngpu=ngpu)
 
 
-# ------------------------------------------------------------------------------
 # map labels to the embedding space
 class model_y2h(nn.Module):
     def __init__(self, dim_embed=DIM_EMBED):

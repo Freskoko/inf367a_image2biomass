@@ -68,7 +68,6 @@ def train_cGAN(images, labels, netG, netD, save_images_folder, save_models_folde
         optimizerG.load_state_dict(checkpoint["optimizerG_state_dict"])
         optimizerD.load_state_dict(checkpoint["optimizerD_state_dict"])
         torch.set_rng_state(checkpoint["rng_state"])
-    # end if
 
     n_row = 10
     z_fixed = torch.randn(n_row**2, dim_gan, dtype=torch.float).to(device)
@@ -90,8 +89,6 @@ def train_cGAN(images, labels, netG, netD, save_images_folder, save_models_folde
 
     start_time = timeit.default_timer()
     for niter in range(resume_niters, niters):
-        # print(f"on {niter} of {niters}")
-
         if batch_idx + 1 == len(train_dataloader):
             dataloader_iter = iter(train_dataloader)
             batch_idx = 0
@@ -99,7 +96,7 @@ def train_cGAN(images, labels, netG, netD, save_images_folder, save_models_folde
         # training images
         batch_train_images, batch_train_labels = next(
             dataloader_iter
-        )  # .next() is deprecated
+        )  # fixed since .next() is deprecated
         assert batch_size == batch_train_images.shape[0]
         batch_train_images = batch_train_images.type(torch.float).to(device)
         batch_train_labels = batch_train_labels.type(torch.long).to(device)
@@ -201,7 +198,6 @@ def train_cGAN(images, labels, netG, netD, save_images_folder, save_models_folde
                 },
                 save_file,
             )
-    # end for niter
 
     return netG, netD
 

@@ -1,7 +1,6 @@
 import torch
 from torch import nn
 
-# from spectral_normalization import SpectralNorm
 from torch.nn.utils import spectral_norm
 
 
@@ -20,18 +19,11 @@ class ConditionalBatchNorm2d(nn.Module):
         self.num_features = num_features
         self.bn = nn.BatchNorm2d(num_features, affine=False)
 
-        # self.embed = nn.Linear(dim_embed, num_features * 2, bias=False)
-        # self.embed.weight.data[:, :num_features].normal_(1, 0.02)  # Initialise scale at N(1, 0.02)
-        # self.embed.weight.data[:, num_features:].zero_()  # Initialise bias at 0
-        # # self.embed = spectral_norm(self.embed) #seems not work
-
         self.embed_gamma = nn.Linear(dim_embed, num_features, bias=False)
         self.embed_beta = nn.Linear(dim_embed, num_features, bias=False)
 
     def forward(self, x, y):
         out = self.bn(x)
-        # gamma, beta = self.embed(y).chunk(2, 1)
-        # out = gamma.view(-1, self.num_features, 1, 1) * out + beta.view(-1, self.num_features, 1, 1)
 
         gamma = self.embed_gamma(y).view(-1, self.num_features, 1, 1)
         beta = self.embed_beta(y).view(-1, self.num_features, 1, 1)
@@ -40,9 +32,9 @@ class ConditionalBatchNorm2d(nn.Module):
         return out
 
 
-#########################################################
-# genearator
 class cont_cond_cnn_generator(nn.Module):
+    """Architecture for the continious conditional cnn generator model"""
+
     def __init__(self, nz=128, dim_embed=DIM_EMBED, ngf=GEN_SIZE):
         super(cont_cond_cnn_generator, self).__init__()
         self.nz = nz
@@ -104,9 +96,9 @@ class cont_cond_cnn_generator(nn.Module):
         return out
 
 
-#########################################################
-# discriminator
 class cont_cond_cnn_discriminator(nn.Module):
+    """Architecture for the continious conditional cnn discriminator model"""
+
     def __init__(self, dim_embed=DIM_EMBED, ndf=DISC_SIZE):
         super(cont_cond_cnn_discriminator, self).__init__()
         self.ndf = ndf
@@ -145,10 +137,7 @@ class cont_cond_cnn_discriminator(nn.Module):
                 padding=1,
                 bias=bias,
             ),  # h=h/2
-            # nn.BatchNorm2d(self.ndf*8),
             nn.LeakyReLU(0.2, inplace=True),
-            # nn.Conv2d(self.ndf*8, self.ndf*8, 3, stride=1, padding=1, bias=bias),  #h=h
-            # nn.LeakyReLU(0.2, inplace=True)
         )
 
         self.linear1 = nn.Linear(self.ndf * 8 * 4 * 4, 1, bias=True)
@@ -158,17 +147,9 @@ class cont_cond_cnn_discriminator(nn.Module):
         nn.init.xavier_uniform_(self.linear2.weight.data, 1.0)
         self.linear2 = spectral_norm(self.linear2)
 
-        # self.linear1 = nn.Linear(self.ndf*8, 1, bias=True)
-        # nn.init.xavier_uniform_(self.linear1.weight.data, 1.)
-        # self.linear1 = spectral_norm(self.linear1)
-        # self.linear2 = nn.Linear(self.dim_embed, self.ndf*8, bias=False)
-        # nn.init.xavier_uniform_(self.linear2.weight.data, 1.)
-        # self.linear2 = spectral_norm(self.linear2)
-
     def forward(self, x, y):
         out = self.conv(x)
 
-        # out = torch.sum(out, dim=(2,3))
         out = out.view(-1, self.ndf * 8 * 4 * 4)
         out_y = torch.sum(out * self.linear2(y), 1, keepdim=True)
         out = self.linear1(out) + out_y

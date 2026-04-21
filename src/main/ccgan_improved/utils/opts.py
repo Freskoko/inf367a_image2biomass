@@ -15,9 +15,9 @@ def parse_opts():
     parser.add_argument(
         "--seed",
         type=int,
-        default=2020,
+        default=2026,
         metavar="S",
-        help="random seed (default: 2020)",
+        help="random seed (default: 2026)",
     )
 
     """ Dataset """

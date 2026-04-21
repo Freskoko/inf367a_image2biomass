@@ -3,6 +3,8 @@ from torch import nn
 
 
 class encoder(nn.Module):
+    """Architecture for the encoder model"""
+
     def __init__(self, dim_bottleneck=512, ch=64):
         super(encoder, self).__init__()
         self.ch = ch
@@ -37,7 +39,6 @@ class encoder(nn.Module):
 
         self.linear = nn.Sequential(
             nn.Linear(ch * 8 * 4 * 4, dim_bottleneck),
-            # nn.ReLU()
         )
 
     def forward(self, x):
@@ -48,17 +49,15 @@ class encoder(nn.Module):
 
 
 class decoder(nn.Module):
+    """Architecture for the decoder model"""
+
     def __init__(self, dim_bottleneck=512, ch=64):
         super(decoder, self).__init__()
         self.ch = ch
         self.dim_bottleneck = dim_bottleneck
 
         self.linear = nn.Sequential(
-            # nn.BatchNorm1d(dim_bottleneck),
-            # nn.ReLU(),
             nn.Linear(dim_bottleneck, ch * 8 * 4 * 4),
-            # nn.BatchNorm1d(ch*8*4*4),
-            # nn.ReLU(),
         )
 
         self.deconv = nn.Sequential(
@@ -106,7 +105,6 @@ class decoder(nn.Module):
 
 
 if __name__ == "__main__":
-    # test
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     net_encoder = encoder(dim_bottleneck=512, ch=64).to(device)
