@@ -1,7 +1,5 @@
 """
-
 based on the CNN structure in "Spectral normalization for generator adversarial networks"
-
 """
 
 import torch
@@ -12,9 +10,9 @@ default_bias = False
 NC = 3
 
 
-#########################################################
-# genearator
 class cond_cnn_generator(nn.Module):
+    """Architecture for the conditional cnn generator model"""
+
     def __init__(self, nz=128, ngf=128, nc=NC, num_classes=10, bias=default_bias):
         super(cond_cnn_generator, self).__init__()
         self.nz = nz
@@ -68,6 +66,8 @@ class cond_cnn_generator(nn.Module):
 
 
 class cond_cnn_discriminator(nn.Module):
+    """Architecture for the conditional cnn discriminator model"""
+
     def __init__(self, nc=NC, ndf=128, num_classes=10, bias=default_bias):
         super(cond_cnn_discriminator, self).__init__()
         self.ndf = ndf

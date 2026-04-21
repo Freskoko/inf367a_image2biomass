@@ -1,8 +1,3 @@
-print(
-    "\n==================================================================================================="
-)
-
-
 import copy
 import gc
 import numpy as np
@@ -38,6 +33,9 @@ from main.ccgan_improved.eval.eval_metrics import cal_FID, cal_labelscore
 """                                   Settings                                      """
 #######################################################################################
 
+print(
+    "\n==================================================================================================="
+)
 
 # -----------------------------
 # images
@@ -59,7 +57,7 @@ cudnn.benchmark = False
 np.random.seed(args.seed)
 
 # -------------------------------
-# Embedding
+# embedding
 base_lr_x2y = 0.01
 base_lr_y2h = 0.01
 
@@ -72,10 +70,6 @@ os.makedirs(save_images_folder, exist_ok=True)
 save_traincurves_folder = wd + "/output/training_loss_fig"
 os.makedirs(save_traincurves_folder, exist_ok=True)
 
-
-#######################################################################################
-"""                                    Data loader                                 """
-#######################################################################################
 # data loader
 
 data_filename = args.data_path + "/BIOMASS_{}x{}.h5".format(IMG_SIZE, IMG_SIZE)
@@ -88,7 +82,6 @@ hf.close()
 raw_images = copy.deepcopy(images)
 raw_counts = copy.deepcopy(counts)
 
-##############
 ### show some real  images
 if args.show_real_imgs:
     unique_counts_show = sorted(list(set(counts)))
@@ -112,9 +105,9 @@ if args.show_real_imgs:
         normalize=True,
     )
 
-##############
 # images for training GAN
 # for each cell count select n_imgs_per_cellcount images
+
 n_imgs_per_cellcount = args.num_imgs_per_count
 selected_cellcounts = np.arange(
     args.start_count, args.end_count + 1, args.stepsize_count
@@ -140,7 +133,7 @@ for i in range(n_unique_cellcount):
         counts_subset = np.concatenate(
             (counts_subset, counts[index_curr_cellcount[0:n_imgs_per_cellcount]])
         )
-# for i
+
 images = images_subset
 counts = counts_subset
 del images_subset, counts_subset
@@ -148,9 +141,7 @@ gc.collect()
 
 print("Number of images: %d" % len(images))
 
-# ok this is it here now
 if args.GAN == "cGAN":  # treated as classification; convert cell counts to class labels
-    print("Made it to if args.GAN == cGAN")
     unique_counts = np.sort(
         np.array(list(set(raw_counts)))
     )  # not counts because we want the last element is the max_count
@@ -161,8 +152,8 @@ if args.GAN == "cGAN":  # treated as classification; convert cell counts to clas
         )
     )
 
-    ## convert cell counts to class labels and vice versa
-    ### step 1: prepare two dictionaries
+    # convert cell counts to class labels and vice versa
+    # step 1: prepare two dictionaries
     label2class = dict()
     class2label = dict()
     num_labels_per_class = num_unique_counts // args.cGAN_num_classes
@@ -180,11 +171,11 @@ if args.GAN == "cGAN":  # treated as classification; convert cell counts to clas
     class_cutoff_points.append(unique_counts[-1])
     assert len(class_cutoff_points) - 1 == args.cGAN_num_classes
 
-    ### the cell count of each interval equals to the average of the two end points
+    # the cell count of each interval equals to the average of the two end points
     for i in range(args.cGAN_num_classes):
         class2label[i] = (class_cutoff_points[i] + class_cutoff_points[i + 1]) / 2
 
-    ### step 2: convert cell counts to class labels
+    # step 2: convert cell counts to class labels
     counts_new = -1 * np.ones(len(counts))
     for i in range(len(counts)):
         counts_new[i] = label2class[counts[i]]
@@ -206,13 +197,6 @@ else:
             )
         )
 
-    # if args.kappa<0:
-    #     kappa_base = np.abs(args.kappa)/n_unique_cellcount
-    #     if args.threshold_type=="hard":
-    #         args.kappa = kappa_base
-    #     else:
-    #         args.kappa = 1/(kappa_base**2)
-
     if args.kappa < 0:
         unique_counts_norm = np.sort(np.array(list(set(counts))))
 
@@ -225,7 +209,6 @@ else:
             args.kappa = kappa_base
         else:
             args.kappa = 1 / kappa_base**2
-# end if
 
 
 #######################################################################################
@@ -260,7 +243,6 @@ if args.GAN == "CcGAN":
         trainset, batch_size=args.batch_size_embed, shuffle=True
     )
 
-    print("starting debug")
     if args.net_embed == "ResNet18_embed":
         net_embed = ResNet18_embed(dim_embed=args.dim_embed, ngpu=NGPU)
     elif args.net_embed == "ResNet34_embed":
@@ -269,16 +251,11 @@ if args.GAN == "CcGAN":
         net_embed = ResNet50_embed(dim_embed=args.dim_embed, ngpu=NGPU)
     net_embed = net_embed.to(device)
 
-    print("start model y2h")
-
     net_y2h = model_y2h(dim_embed=args.dim_embed)
     net_y2h = net_y2h.to(device)
 
-    print("train model started")
-
-    ## (1). Train net_embed first: x2h+h2y
+    # 1. train net_embed first: x2h+h2y
     if not os.path.isfile(net_embed_filename_ckpt):
-        print("\n Start training CNN for label embedding >>>")
         optimizer_net_embed = torch.optim.SGD(
             net_embed.parameters(), lr=base_lr_x2y, momentum=0.9, weight_decay=1e-4
         )
@@ -292,8 +269,7 @@ if args.GAN == "CcGAN":
             save_models_folder=save_models_folder,
             resumeepoch=args.resumeepoch_cnn_embed,
             device=device,
-        )  # add cpu device here
-        # save model
+        )
         torch.save(
             {
                 "net_state_dict": net_embed.state_dict(),
@@ -305,9 +281,8 @@ if args.GAN == "CcGAN":
         print("\n Loading...")
         checkpoint = torch.load(net_embed_filename_ckpt)
         net_embed.load_state_dict(checkpoint["net_state_dict"])
-    # end not os.path.isfile
 
-    ## (2). Train y2h
+    ## 2. train y2h
     # train a net which maps a label back to the embedding space
     if not os.path.isfile(net_y2h_filename_ckpt):
         print("\n Start training net_y2h >>>")
@@ -336,9 +311,6 @@ if args.GAN == "CcGAN":
         print("\n Loading...")
         checkpoint = torch.load(net_y2h_filename_ckpt)
         net_y2h.load_state_dict(checkpoint["net_state_dict"])
-    # end not os.path.isfile
-
-    print("run tests")
 
     ##some simple test
     indx_tmp = np.arange(len(unique_counts_norm))
@@ -360,10 +332,8 @@ if args.GAN == "CcGAN":
     print("\n counts vs reconstructed counts")
     print(results)
 
+# gan training
 
-#######################################################################################
-"""                                    GAN training                                 """
-#######################################################################################
 print(
     "{}, Sigma is {}, Kappa is {}".format(
         args.threshold_type, args.kernel_sigma, args.kappa
@@ -381,7 +351,6 @@ os.makedirs(save_GANimages_InTrain_folder, exist_ok=True)
 
 start = timeit.default_timer()
 print("\n Begin Training %s:" % args.GAN)
-# ----------------------------------------------
 # cGAN: treated as a classification dataset
 if args.GAN == "cGAN":
     Filename_GAN = (
@@ -400,7 +369,7 @@ if args.GAN == "cGAN":
         netG = nn.DataParallel(netG)
         netD = nn.DataParallel(netD)
 
-        # Start training
+        # start training
         netG, netD = train_cGAN(
             images,
             counts,
@@ -410,7 +379,6 @@ if args.GAN == "cGAN":
             save_models_folder=save_models_folder,
         )
 
-        # store model
         torch.save(
             {
                 "netG_state_dict": netG.state_dict(),
@@ -440,8 +408,7 @@ if args.GAN == "cGAN":
         )
         return fake_images, fake_counts
 
-# ----------------------------------------------
-# Concitnuous cGAN
+# continuous cGAN
 elif args.GAN == "CcGAN":
     Filename_GAN = (
         save_models_folder
@@ -518,17 +485,15 @@ if args.comp_FID == "True":
 
     # for LS
     PreNetLS = ResNet34_regre(ngpu=NGPU).to(device)
-    # Filename_PreCNNForEvalGANs = save_models_folder + '/ckpt_PreCNNForEvalGANs_ResNet34_regre_epoch_200_seed_2026_Transformation_True_Cell_200.pth'
 
     Filename_PreCNNForEvalGANs = (
         save_models_folder
         + "/ckpt_PreCNNForEvalGANs_ResNet34_regre_epoch_200_seed_2026_Transformation_True_Cell_185.pth"
-    )  # 185 for some reasom
+    )
 
     checkpoint_PreNet = torch.load(Filename_PreCNNForEvalGANs)
     PreNetLS.load_state_dict(checkpoint_PreNet["net_state_dict"])
 
-    #####################
     # generate nfake images
     print(
         "Start sampling {} fake images per label from GAN >>>".format(
@@ -590,12 +555,11 @@ if args.comp_FID == "True":
             image_i = fake_images[i]
             image_i = ((image_i * 0.5 + 0.5) * 255.0).astype(np.uint8)
 
-            # FIX: Transpose to (H, W, C) and save as RGB
+            # fixed: transpose and enable RGB
             image_i_transposed = image_i.transpose(1, 2, 0)
             image_i_pil = Image.fromarray(image_i_transposed, mode="RGB")
 
             image_i_pil.save(filename_i)
-        # end for i
 
     print(
         "End sampling {} fake images per label from GAN >>>".format(
@@ -603,14 +567,12 @@ if args.comp_FID == "True":
         )
     )
 
-    #####################
     # normalize real images and labels
     real_images = (raw_images / 255.0 - 0.5) / 0.5
     real_labels = raw_counts / args.end_count
     nfake_all = len(fake_images)
     nreal_all = len(real_images)
 
-    #####################
     # Evaluate FID within a sliding window with a radius R on the label's range (i.e., [args.start_count,args.end_count]). The center of the sliding window locate on [R+args.start_count,2,3,...,args.end_count-R].
     center_start = args.start_count + args.FID_radius
     center_stop = args.end_count - args.FID_radius
@@ -638,18 +600,17 @@ if args.comp_FID == "True":
         fake_labels_assigned_curr = fake_labels_assigned[indx_fake]
         # FID
 
-        # --- ADD THIS CHECK TO SKIP ---
         if len(real_images_curr) < 2 or len(fake_images_curr) < 2:
-            # Not enough samples to calculate covariance. Skip this center.
+            # not enough samples to calculate covariance: skip this center.
             FID_over_centers[i] = 0
             labelscores_over_centers[i] = 0
+            print("skipping this center due to missing data")
             continue
-        # ------------------------------
 
         FID_over_centers[i] = cal_FID(
             PreNetFID, real_images_curr, fake_images_curr, batch_size=200, resize=None
         )
-        # Label score
+        # label score
         labelscores_over_centers[i], _ = cal_labelscore(
             PreNetLS,
             fake_images_curr,
@@ -715,7 +676,6 @@ if args.comp_FID == "True":
         centers=centers_loc,
     )
 
-    #####################
     # FID: Evaluate FID on all fake images
     indx_shuffle_real = np.arange(nreal_all)
     np.random.shuffle(indx_shuffle_real)
@@ -730,7 +690,6 @@ if args.comp_FID == "True":
     )
     print("\n {}: FID of {} fake images: {}.".format(args.GAN, nfake_all, FID))
 
-    #####################
     # Overall LS: abs(y_assigned - y_predicted)
     ls_mean_overall, ls_std_overall = cal_labelscore(
         PreNetLS,
@@ -748,12 +707,10 @@ if args.comp_FID == "True":
     )
 
 
-#######################################################################################
-"""               Visualize fake images of the trained GAN                          """
-#######################################################################################
+# Visualize fake images of the trained GAN
 if args.visualize_fake_images:
     # First, visualize conditional generation on several unseen cell counts
-    ## 3 rows (3 samples); 10 columns (10 unseen cell counts; displayed cell count starts from 10)
+    # 3 rows (3 samples); 10 columns (10 unseen cell counts; displayed cell count starts from 10)
     n_row = 3
     n_col = 20
     all_unique_cellcounts = np.arange(args.start_count, args.end_count + 1)
@@ -772,7 +729,7 @@ if args.visualize_fake_images:
         displayed_cellcounts,
     )
 
-    ### output some real images as baseline
+    # output some real images as baseline
     filename_real_images = save_images_folder + "/real_images_grid_{}x{}.png".format(
         n_row, n_col
     )
@@ -785,13 +742,12 @@ if args.visualize_fake_images:
                 curr_label = displayed_cellcounts[j_col]
                 indx_curr_label = np.where(raw_counts == curr_label)[0]
 
-                # --- NEW CHECK ---
                 if len(indx_curr_label) == 0:
                     print(
                         f"Warning: No real images found for cell count {curr_label}. Skipping this sample in the grid."
                     )
+                    print(f"Warning: skipping this!!!, {i_row=}, {i_col=}")
                     continue
-                # -----------------
 
                 np.random.shuffle(indx_curr_label)
                 indx_curr_label = indx_curr_label[0]
@@ -800,7 +756,7 @@ if args.visualize_fake_images:
         images_show = torch.from_numpy(images_show)
         save_image(images_show.data, filename_real_images, nrow=n_col, normalize=True)
 
-    ### output fake images from a trained GAN
+    # output fake images from a trained GAN
     if args.GAN == "CcGAN":
         filename_fake_images = (
             save_images_folder
@@ -832,7 +788,6 @@ if args.visualize_fake_images:
     save_image(images_show.data, filename_fake_images, nrow=n_col, normalize=True)
 
     # Second, fix z but increase y; check whether there is a continuous change, only for CcGAN
-    # y's range: [ 10  31  52  73  94 115 136 157 178 200]
     if args.GAN == "CcGAN":
         n_continuous_labels = 10
         normalized_continuous_cellcounts = np.linspace(0.05, 1, n_continuous_labels)

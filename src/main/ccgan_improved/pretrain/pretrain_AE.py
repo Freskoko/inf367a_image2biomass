@@ -11,12 +11,9 @@ import h5py
 from main.ccgan_improved.models.autoencoder import decoder, encoder
 from main.ccgan_improved.utils.utils import IMGs_dataset
 
+"""Take in inputs"""
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-
-#############################
-# Settings
-#############################
 
 parser = argparse.ArgumentParser(description="Pre-train AE for computing FID")
 parser.add_argument("--root_path", type=str, default="")
@@ -106,9 +103,6 @@ save_AE_images_in_valid_folder = (
 os.makedirs(save_AE_images_in_valid_folder, exist_ok=True)
 
 
-###########################################################################################################
-# Data
-###########################################################################################################
 # data loader
 data_filename = (
     args.data_path + "/BIOMASS_" + str(args.img_size) + "x" + str(args.img_size) + ".h5"
@@ -176,11 +170,6 @@ else:
     )
 
 
-###########################################################################################################
-# Necessary functions
-###########################################################################################################
-
-
 def adjust_learning_rate(
     epoch, epochs, optimizer, base_lr, lr_decay_epochs, lr_decay_factor
 ):
@@ -194,25 +183,11 @@ def adjust_learning_rate(
         param_group["lr"] = lr
 
 
-# def adjust_learning_rate(optimizer, epoch, base_lr):
-#     lr = base_lr
-#     if epoch >= 50:
-#         lr /= 10
-#     if epoch >= 120:
-#         lr /= 10
-#     for param_group in optimizer.param_groups:
-#         param_group['lr'] = lr
-
-
 def train_AE():
-    # define optimizer
     params = list(net_encoder.parameters()) + list(net_decoder.parameters())
     optimizer = torch.optim.Adam(
         params, lr=base_lr, betas=(0.5, 0.999), weight_decay=args.weight_dacay
     )
-    # optimizer = torch.optim.SGD(params, lr = base_lr, momentum=0.9)
-
-    # criterion
     criterion = nn.MSELoss()
 
     if resume_epoch > 0:
@@ -295,8 +270,6 @@ def train_AE():
                         timeit.default_timer() - start_time,
                     )
                 )
-        # end for batch_idx
-
         if (epoch + 1) % args.save_ckpt_freq == 0:
             save_file = (
                 save_models_folder
@@ -315,8 +288,6 @@ def train_AE():
                 },
                 save_file,
             )
-    # end for epoch
-
     return net_encoder, net_decoder
 
 
@@ -345,10 +316,6 @@ if args.CVMode:
         return None
 
 
-###########################################################################################################
-# Training and validation
-###########################################################################################################
-
 # model initialization
 net_encoder = encoder(dim_bottleneck=args.dim_bottleneck).to(device)
 net_decoder = decoder(dim_bottleneck=args.dim_bottleneck).to(device)
@@ -366,7 +333,6 @@ if not os.path.isfile(filename_ckpt):
     net_encoder, net_decoder = train_AE()
     stop = timeit.default_timer()
     print("Time elapses: {}s".format(stop - start))
-    # save model
     torch.save(
         {
             "net_encoder_state_dict": net_encoder.state_dict(),
@@ -382,5 +348,4 @@ else:
     net_decoder.load_state_dict(checkpoint["net_decoder_state_dict"])
 
 if args.CVMode:
-    # validation
     _ = valid_AE()

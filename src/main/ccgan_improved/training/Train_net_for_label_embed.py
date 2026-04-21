@@ -45,28 +45,23 @@ def train_net_embed(
         net.load_state_dict(checkpoint["net_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         torch.set_rng_state(checkpoint["rng_state"])
-    # end if
 
     start_tmp = timeit.default_timer()
     for epoch in range(resumeepoch, epochs):
         net.train()
         train_loss = 0
         adjust_learning_rate(optimizer, epoch, base_lr)
-        for batch_idx, (batch_train_images, batch_train_labels) in enumerate(
+        for _batch_idx, (batch_train_images, batch_train_labels) in enumerate(
             trainloader
         ):
-            # batch_train_images = nn.functional.interpolate(batch_train_images, size = (299,299), scale_factor=None, mode='bilinear', align_corners=False)
-
             batch_train_images = batch_train_images.type(torch.float).to(device)
             batch_train_labels = (
                 batch_train_labels.type(torch.float).view(-1, 1).to(device)
             )
 
             # Forward pass
-            outputs, batch_train_features = net(batch_train_images)
+            outputs, _batch_train_features = net(batch_train_images)
             loss = criterion(outputs, batch_train_labels)
-
-            # batch_train_feature_cov = cov(batch_train_features)
 
             # backward pass
             optimizer.zero_grad()
@@ -74,10 +69,7 @@ def train_net_embed(
             optimizer.step()
 
             train_loss += loss.cpu().item()
-        # end for batch_idx
         train_loss = train_loss / len(trainloader)
-
-        # print('Train net_x2y for embedding: [epoch %d/%d] train_loss:%f Time:%.4f' % (epoch+1, epochs, train_loss, timeit.default_timer()-start_tmp))
 
         if testloader is None:
             print(
@@ -127,7 +119,6 @@ def train_net_embed(
                 },
                 save_file,
             )
-    # end for epoch
 
     return net
 
@@ -148,7 +139,7 @@ class label_dataset(torch.utils.data.Dataset):
         return self.n_samples
 
 
-def adjust_learning_rate2(optimizer, epoch, base_lr):
+def adjust_learning_rate_y2h(optimizer, epoch, base_lr):
     lr = base_lr
     if epoch >= 60:
         lr /= 5
@@ -188,8 +179,8 @@ def train_net_y2h(
         train_loss = 0
         train_loss_1 = 0
         train_loss_2 = 0
-        adjust_learning_rate2(optimizer_y2h, epoch, base_lr)
-        for batch_idx, batch_labels in enumerate(trainloader):
+        adjust_learning_rate_y2h(optimizer_y2h, epoch, base_lr)
+        for _batch_idx, batch_labels in enumerate(trainloader):
             batch_labels = batch_labels.type(torch.float).view(-1, 1).to(device)
 
             # generate noises which will be added to labels
@@ -208,15 +199,12 @@ def train_net_y2h(
             batch_rec_labels_noise = net_h2y(batch_hiddens_noise)
 
             loss1 = nn.MSELoss()(batch_rec_labels_noise, batch_labels_noise)
-            # loss2 = - nn.MSELoss()(batch_hiddens, batch_hiddens_noise)
             batch_label_diff = (batch_labels_noise - batch_labels) ** 2
             batch_hidden_diff = torch.mean(
                 (batch_hiddens - batch_hiddens_noise) ** 2, dim=1, keepdim=True
             )
             loss2 = torch.mean((batch_hidden_diff - batch_label_diff) ** 2)
-            loss = loss1  # + loss2
-
-            # loss = nn.MSELoss()(batch_rec_labels_noise, batch_labels_noise)
+            loss = loss1
 
             # backward pass
             optimizer_y2h.zero_grad()
@@ -226,10 +214,8 @@ def train_net_y2h(
             train_loss += loss.cpu().item()
             train_loss_1 += loss1.cpu().item()
             train_loss_2 += loss2.cpu().item()
-        # end for batch_idx
         train_loss = train_loss / len(trainloader)
 
-        # print('Train net_y2h: [epoch %d/%d] train_loss:%f Time:%.4f' % (epoch+1, epochs, train_loss, timeit.default_timer()-start_tmp))
         print(
             "Train net_y2h: [epoch %d/%d] train_loss:%f loss1:%f loss2:%f Time:%.4f"
             % (
@@ -241,6 +227,5 @@ def train_net_y2h(
                 timeit.default_timer() - start_tmp,
             )
         )
-    # end for epoch
 
     return net_y2h
