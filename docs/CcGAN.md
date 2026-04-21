@@ -177,7 +177,7 @@ The code allows us to see images generated across iterations, but first, lets vi
 
 | Iteration 100 | Iteration 1000 | Iteration 2000 |
 | :---: | :---: | :---: |
-| ![img](../output/saved_images/CcGAN_soft_0.06381135070109936_5.925380886426591_InTrain/100.png) | ![img2](../output/saved_images/CcGAN_soft_0.06381135070109936_5.925380886426591_InTrain/1000.png) | ![img3](../output/saved_images/CcGAN_soft_0.06381135070109936_5.925380886426591_InTrain/2000.png) |
+| ![img](images/soft_100.png) | ![img2](images/soft_1000.png) | ![img3](images/soft_2000.png) |
 
 For instance at iteration 100, images created by the best model simply look like strange shadows.
 After 1000 iterations, the images become somewhat clearer. Finally, after 2000 images, the images are even better.
@@ -188,7 +188,7 @@ From a distance, I may be fooled by some of images after 2000 iterations
 
 | Iteration 100 | Iteration 1000 | Iteration 2000 |
 | :---: | :---: | :---: |
-| ![img](../output/saved_images/cGAN_InTrain/100.png) | ![img2](../output/saved_images/cGAN_InTrain/1000.png) | ![img](../output/saved_images/cGAN_InTrain/2000.png) |
+| ![img](images/cgan_100.png) | ![img2](images/cgan_1000.png) | ![img3](images/cgan_2000.png) |
 
 
 At iteration 100, the images look like strange grids.

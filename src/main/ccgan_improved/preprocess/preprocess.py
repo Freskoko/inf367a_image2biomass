@@ -60,7 +60,7 @@ with h5py.File(OUTPUT_H5, "w") as f:
     f.create_dataset("cell_counts", data=train_labels)
     # test
     f.create_dataset("imgs_color_test", data=test_imgs)
-    f.create_dataset("cell_counts_test", data=test_imgs)
+    f.create_dataset("cell_counts_test", data=test_labels)
 
 print(f"Created {OUTPUT_H5}")
 print(f"train samples len: {len(train_labels)}")
