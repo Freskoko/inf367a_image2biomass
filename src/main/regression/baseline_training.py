@@ -16,6 +16,9 @@ from main.utils.utils import ModelType, TrainConfig
 
 
 def load_feature_store(npy_path: Path) -> pd.DataFrame:
+    """Load cached vision features (.npy) plus their sibling .paths.txt key
+    file and return a DataFrame whose first column is ``image_path`` and the
+    rest are the raw feature dimensions."""
     feats = np.load(npy_path)
     paths_txt = npy_path.with_suffix(".paths.txt")
     keys = paths_txt.read_text().splitlines()
@@ -26,12 +29,18 @@ def load_feature_store(npy_path: Path) -> pd.DataFrame:
 
 
 def _build_preprocessor(X: pd.DataFrame, train_cfg: TrainConfig) -> ColumnTransformer:
+    """Build the ColumnTransformer used inside the sklearn ``Pipeline``.
+
+    Numeric columns (the vision features) flow through a nested pipeline
+    ``StandardScaler -> PCA(n_components=pca_n_components)`` so that scaler
+    statistics and the PCA basis are refit on the training portion of each
+    CV fold — this is what prevents validation-fold leakage. Categorical
+    columns (if any) get one-hot encoded; the current pipeline has none
+    because ``test.csv`` doesn't ship the tabular fields.
+    """
     cat_cols = [c for c in X.columns if X[c].dtype == "object"]
     num_cols = [c for c in X.columns if c not in cat_cols]
 
-    # StandardScaler + PCA live inside the numeric branch so they refit on each
-    # CV fold's train portion only. This avoids leaking validation-fold
-    # statistics into the PCA basis or scaler.
     n_components = min(train_cfg.pca_n_components, len(num_cols))
     num_pipeline = Pipeline(
         [
@@ -50,8 +59,14 @@ def _build_preprocessor(X: pd.DataFrame, train_cfg: TrainConfig) -> ColumnTransf
 
 
 def model_wrapper_creator(train_cfg: TrainConfig, X_example):
-    # TabPFN can't be pickled into worker processes, so force n_jobs=1 for it.
-    # It does its own parallelism internally anyway.
+    """Return the full sklearn ``Pipeline`` = preprocessor + MultiOutputRegressor.
+
+    ``n_jobs`` is forced to 1 when ``train_cfg.model_type == ModelType.TABPFN``
+    because (a) TabPFN holds state that doesn't survive worker-process
+    serialization and (b) on macOS spawned workers don't inherit the
+    ``TABPFN_TOKEN`` env var. TabPFN has internal parallelism so the
+    wall-clock cost of dropping external parallelism is small.
+    """
     pre = _build_preprocessor(X_example, train_cfg)
     n_jobs = 1 if train_cfg.model_type == ModelType.TABPFN else train_cfg.n_jobs
     model = MultiOutputRegressor(train_cfg.get_model(), n_jobs=n_jobs)
@@ -67,6 +82,14 @@ TARGET_WEIGHTS = {
 }
 
 def weighted_r2_global(y_true_df: pd.DataFrame, y_pred_df: pd.DataFrame, target_cols: list[str]) -> float:
+    """Global weighted R^2 using the competition's target weights.
+
+    All target columns are flattened into a single vector of residuals, each
+    row tagged with that target's weight from ``TARGET_WEIGHTS``, and one R^2
+    is computed over the pooled vector. Complements the per-target weighted R^2
+    (``sum(w_t * R^2_t)``) — we report both because it isn't obvious from the
+    task description which formula Kaggle actually scores.
+    """
     # stack to long vectors
     y_true = np.concatenate([y_true_df[c].to_numpy() for c in target_cols], axis=0)
     y_pred = np.concatenate([y_pred_df[c].to_numpy() for c in target_cols], axis=0)
@@ -97,6 +120,17 @@ def cv_mean_r2(
     y: pd.DataFrame,
     groups: np.ndarray,
 ) -> dict:
+    """Run 5-fold GroupKFold CV (grouped by ``image_path``) and return three
+    metrics computed on the pooled out-of-fold predictions:
+
+    - ``global_weighted_r2``: per-row-weighted R^2 over the flattened target vector
+    - ``per_target_weighted_r2``: ``sum(w_t * R^2_t)`` over per-target R^2 scores
+    - ``per_target_r2``: R^2 per target column (dict)
+
+    The composite targets (``GDM_g``, ``Dry_Total_g``) are recomputed from the
+    three base predictions inside each fold so evaluation is consistent with
+    how the submission is built in ``wide_to_long_predictions``.
+    """
     gkf = GroupKFold(n_splits=train_cfg.n_splits)
     target_cols = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "GDM_g", "Dry_Total_g"]
 
@@ -153,12 +187,19 @@ def cv_mean_r2(
 
 
 def fit_full(train_cfg: TrainConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeline:
+    """Fit the full pipeline on the entire training set for the submission
+    run. Drops the ``image_path`` grouping column before handing X to the
+    sklearn pipeline; the PCA and scaler inside the pipeline fit on this
+    (single) training split — no leakage to worry about here because there is
+    no test-side validation."""
     X = X.drop(columns=["image_path"], errors="ignore")
     return model_wrapper_creator(train_cfg, X).fit(X, y)
 
 
 def predict(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
+    """Run the fitted pipeline on X and clip predictions to be non-negative
+    (biomass in grams can't be negative; regressors occasionally produce
+    slightly negative values near zero-biomass rows)."""
     X = X.drop(columns=["image_path"], errors="ignore")
     preds = np.asarray(pipe.predict(X))
-    # Biomass is non-negative; clip near-zero negatives produced by the regressor.
     return np.clip(preds, 0.0, None)

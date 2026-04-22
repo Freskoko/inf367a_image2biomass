@@ -90,8 +90,15 @@ class TrainConfig:
     MANUAL_TARGETS = ["Dry_Total_g", "GDM_g"]
 
     def get_model(self):
+        """Return the single-output regressor selected by ``self.model_type``.
+
+        For TabPFN, import lazily so ExtraTrees runs don't pay the
+        ``tabpfn``/``torch`` import cost (and so the project still runs if
+        someone hasn't installed the full dep set yet). ``random_state`` is
+        passed through explicitly — TabPFN otherwise picks its own seed per
+        call and CV becomes non-deterministic.
+        """
         if self.model_type == ModelType.TABPFN:
-            # Lazy import so runs with --model extra_trees don't pay the tabpfn import cost.
             from tabpfn import TabPFNRegressor
             return TabPFNRegressor(random_state=self.random_state)
 

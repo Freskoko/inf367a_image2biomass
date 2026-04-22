@@ -21,13 +21,16 @@ The competition score is a weighted R², where Dry_Total_g is weighted 0.5, GDM_
 
 ## Pipeline
 
-1. Load the long-format CSV and pivot it so each row is one image. Extract year/month/day/dayofyear from the sampling date.
+1. Load the long-format CSV and pivot it so each row is one image. The tabular metadata (`State`, `Species`, `Pre_GSHH_NDVI`, `Height_Ave_cm`, `Sampling_Date`) isn't used as features — `test.csv` doesn't contain these columns, so the production pipeline is vision-only and CV is kept symmetric with it.
 2. Run a pretrained vision backbone (DINOv2 by default, ResNet18 or ConvNeXt-Tiny via `--vision-backbone resnet|convnext`) over the images and take the penultimate-layer features. Cache them to `.npy` so we don't redo this on every run.
-3. Reduce the vision features to 128 components with PCA.
-4. Merge the PCA features with the tabular metadata and one-hot encode categoricals (State, Species). Scale numerics with StandardScaler.
-5. Fit a multi-output regressor on the three direct targets. The two composite targets are computed from the predictions afterwards.
+3. Inside the sklearn `Pipeline`, fit `StandardScaler → PCA(n_components=128)` on the training split. Under CV both refit per fold so validation-fold statistics don't leak into the PCA basis or the scaler.
+4. Fit a multi-output regressor on the three direct targets (`Dry_Clover_g`, `Dry_Dead_g`, `Dry_Green_g`). The two composite targets (`GDM_g`, `Dry_Total_g`) are computed from those predictions afterwards.
 
-Two regressors are available: the baseline `ExtraTreesRegressor` and the novel method `TabPFN`. See [docs/TabPFN.md](docs/TabPFN.md) for the TabPFN description, implementation notes, and evaluation results.
+## Regressors
+
+Two regressors are available: the baseline `ExtraTreesRegressor` and the novel method `TabPFN`.
+
+**TabPFN** (Tabular Prior-Fitted Network; Hollmann et al., 2025, v2) is a transformer pretrained on millions of synthetic tabular datasets. It performs prediction in a single forward pass over the training set used as in-context examples — no per-task training and no hyperparameter search. It fits our setting because the dataset is small (~357 images after pivot, 128 PCA-reduced vision features), well within TabPFN's ~10k-sample / 500-feature range. See [docs/TabPFN.md](docs/TabPFN.md) for full implementation notes and evaluation results.
 
 ## Requirements
 
