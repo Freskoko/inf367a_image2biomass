@@ -3,10 +3,8 @@ import argparse
 
 import numpy as np
 from loguru import logger
-# from main.preprocessing.pca import apply_pca_train_test
-# from main.preprocessing.scaling import apply_scaling_train
+
 from main.utils.utils import DatasetPaths, ModelType, TrainConfig, VisionModelConfig
-from main.wrangling.combined_data import merge_features
 from main.wrangling.img_data import extract_vision_data
 from main.wrangling.tabular_data import load_data
 from main.regression.baseline_training import (
@@ -49,8 +47,12 @@ def main():
     logger.info("Tabular data loaded")
 
     # Run the vision model feature extractor only if we don't already have cached features.
-    train_feat_path = path_cfg.vision_feats_train_path(args.vision_backbone)
-    test_feat_path = path_cfg.vision_feats_test_path(args.vision_backbone)
+    train_feat_path = path_cfg.vision_feats_train_path(
+        args.vision_backbone, image_size=vision_cfg.image_size
+    )
+    test_feat_path = path_cfg.vision_feats_test_path(
+        args.vision_backbone, image_size=vision_cfg.image_size
+    )
     if (
         not train_feat_path.exists()
         or not train_feat_path.with_suffix(".paths.txt").exists()
@@ -90,7 +92,8 @@ def main():
         groups = X_train["image_path"].to_numpy()
         train_r2_score = cv_mean_r2(train_cfg=train_cfg, X=X_train, y=y, groups=groups)
 
-    print("CV weighted R2:", train_r2_score["global_weighted_r2"])
+    print("CV global weighted R2:", train_r2_score["global_weighted_r2"])
+    print("CV per-target weighted R2:", train_r2_score["per_target_weighted_r2"])
     print("Per-target R2:", train_r2_score["per_target_r2"])
 
 

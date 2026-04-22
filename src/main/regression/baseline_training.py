@@ -5,13 +5,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.decomposition import PCA
 from sklearn.metrics import r2_score
 from sklearn.model_selection import GroupKFold
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
-from main.preprocessing.pca import apply_pca_train_test
-from main.preprocessing.scaling import apply_scaling_train_test
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from main.utils.utils import ModelType, TrainConfig
 
@@ -26,13 +25,24 @@ def load_feature_store(npy_path: Path) -> pd.DataFrame:
     return df
 
 
-def _build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
+def _build_preprocessor(X: pd.DataFrame, train_cfg: TrainConfig) -> ColumnTransformer:
     cat_cols = [c for c in X.columns if X[c].dtype == "object"]
     num_cols = [c for c in X.columns if c not in cat_cols]
 
+    # StandardScaler + PCA live inside the numeric branch so they refit on each
+    # CV fold's train portion only. This avoids leaking validation-fold
+    # statistics into the PCA basis or scaler.
+    n_components = min(train_cfg.pca_n_components, len(num_cols))
+    num_pipeline = Pipeline(
+        [
+            ("scale", StandardScaler()),
+            ("pca", PCA(n_components=n_components, random_state=train_cfg.random_state)),
+        ]
+    )
+
     return ColumnTransformer(
         [
-            ("num", "passthrough", num_cols),
+            ("num", num_pipeline, num_cols),
             ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
         ],
         remainder="drop",
@@ -42,7 +52,7 @@ def _build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
 def model_wrapper_creator(train_cfg: TrainConfig, X_example):
     # TabPFN can't be pickled into worker processes, so force n_jobs=1 for it.
     # It does its own parallelism internally anyway.
-    pre = _build_preprocessor(X_example)
+    pre = _build_preprocessor(X_example, train_cfg)
     n_jobs = 1 if train_cfg.model_type == ModelType.TABPFN else train_cfg.n_jobs
     model = MultiOutputRegressor(train_cfg.get_model(), n_jobs=n_jobs)
     return Pipeline([("pre", pre), ("model", model)])
@@ -90,18 +100,17 @@ def cv_mean_r2(
     gkf = GroupKFold(n_splits=train_cfg.n_splits)
     target_cols = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g", "GDM_g", "Dry_Total_g"]
 
-    fold_scores: list[float] = []
-    per_target_scores: list[np.ndarray] = []
+    # Accumulate out-of-fold predictions so the final weighted R^2 is computed
+    # once on the pooled predictions instead of averaging per-fold scores.
+    oof_true_parts: list[pd.DataFrame] = []
+    oof_pred_parts: list[pd.DataFrame] = []
 
     for fold, (tr, va) in enumerate(gkf.split(X, y, groups=groups), start=1):
         Xtr, Xva = X.iloc[tr].copy(), X.iloc[va].copy()
         ytr, yva = y.iloc[tr], y.iloc[va]
 
-        Xtr = Xtr.drop(columns=["image_path", "State", "Species"], errors="ignore")
-        Xva = Xva.drop(columns=["image_path", "State", "Species"], errors="ignore")
-
-        Xtr, Xva = apply_pca_train_test(Xtr, Xva, train_cfg=train_cfg)
-        Xtr, Xva = apply_scaling_train_test(Xtr, Xva)
+        Xtr = Xtr.drop(columns=["image_path"], errors="ignore")
+        Xva = Xva.drop(columns=["image_path"], errors="ignore")
 
         pipe = model_wrapper_creator(train_cfg, Xtr)
         pipe.fit(Xtr, ytr)
@@ -120,22 +129,26 @@ def cv_mean_r2(
             y_pred["Dry_Green_g"] + y_pred["Dry_Dead_g"] + y_pred["Dry_Clover_g"]
         )
 
+        oof_true_parts.append(y_true[target_cols])
+        oof_pred_parts.append(y_pred[target_cols])
 
-        target_r2 = np.array([r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float)
-        global_weighted_r2 = weighted_r2_global(y_true, y_pred, target_cols)
+        fold_r2 = weighted_r2_global(y_true, y_pred, target_cols)
+        fold_per_target = np.array([r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float)
+        print(f"fold {fold}: global_weighted_r2={fold_r2:.4f} targets={np.round(fold_per_target, 4)}")
 
-        fold_scores.append(global_weighted_r2)
-        per_target_scores.append(target_r2)
+    oof_true = pd.concat(oof_true_parts, axis=0)
+    oof_pred = pd.concat(oof_pred_parts, axis=0)
 
-        print(f"fold {fold}: global_weighted_r2={global_weighted_r2:.4f} targets={np.round(target_r2, 4)}")
-
-    per_target_mean = np.mean(np.vstack(per_target_scores), axis=0)
-    per_target_r2_dict = dict(zip(target_cols, per_target_mean.tolist()))
-    print(per_target_r2_dict)
+    per_target_r2 = {c: float(r2_score(oof_true[c], oof_pred[c])) for c in target_cols}
+    global_weighted_r2 = weighted_r2_global(oof_true, oof_pred, target_cols)
+    per_target_weighted_r2 = float(
+        sum(TARGET_WEIGHTS[c] * per_target_r2[c] for c in target_cols)
+    )
 
     return {
-        "global_weighted_r2": float(np.mean(fold_scores)),
-        "per_target_r2": per_target_r2_dict,
+        "global_weighted_r2": global_weighted_r2,
+        "per_target_weighted_r2": per_target_weighted_r2,
+        "per_target_r2": per_target_r2,
     }
 
 
@@ -146,4 +159,6 @@ def fit_full(train_cfg: TrainConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeli
 
 def predict(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
     X = X.drop(columns=["image_path"], errors="ignore")
-    return np.asarray(pipe.predict(X))
+    preds = np.asarray(pipe.predict(X))
+    # Biomass is non-negative; clip near-zero negatives produced by the regressor.
+    return np.clip(preds, 0.0, None)

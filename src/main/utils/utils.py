@@ -7,8 +7,18 @@ import torch
 
 # TabPFN needs a token for the one time model download + license check.
 # This one is read only (inference only), so fine to keep in the repo, dont need to hide behind env vars.
+# An env-provided TABPFN_TOKEN still takes precedence so token rotation can be
+# handled without a repo edit.
 TABPFN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYzk1YTBjNGMtNDZjYS00MjhiLTgyNDQtNWRlMWNhNGJkZTdkIiwiZXhwIjoxODA3NjM3MzMyfQ.4V6VuHGT9OEHg1lzLr8lEM411T6IHMCuEg1j1yWfo10"
-os.environ["TABPFN_TOKEN"] = TABPFN_TOKEN
+os.environ.setdefault("TABPFN_TOKEN", TABPFN_TOKEN)
+
+
+def _auto_device() -> str:
+    if torch.cuda.is_available():
+        return "cuda"
+    if torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
 
 
 class DataType(Enum):
@@ -70,15 +80,10 @@ class TrainConfig:
     model_type: ModelType = ModelType.EXTRA_TREES
 
     # resources
-    lower_resources = True
-    max_cv_groups = 160
+    lower_resources: bool = True
+    max_cv_groups: int = 160
 
-    if torch.cuda.is_available():
-        device = "cuda"
-    elif torch.backends.mps.is_available():
-        device = "mps"
-    else:
-        device = "cpu"
+    device: str = _auto_device()
 
     # targets
     TARGETS = ["Dry_Clover_g", "Dry_Dead_g", "Dry_Green_g"]
@@ -105,13 +110,8 @@ class VisionModelConfig:
     image_size: int = 350
     batch_size: int = 64
     num_workers: int = 0
-    
-    if torch.cuda.is_available():
-        device = "cuda"
-    elif torch.backends.mps.is_available():
-        device = "mps"
-    else:
-        device = "cpu"
+
+    device: str = _auto_device()
 
     def __attrs_post_init__(self):
         object.__setattr__(
@@ -150,20 +150,27 @@ class DatasetPaths:
     def test_csv(self) -> Path:
         return self.root / "test.csv"
 
-    def vision_feats_train_path(
-        self, backbone: VisionBackbone | str = VisionBackbone.DINO
+    def _vision_feats_path(
+        self,
+        split: str,
+        backbone: VisionBackbone | str,
+        image_size: int | None,
     ) -> Path:
-        return self.model_dir / f"feature_train_{_normalize_vision_backbone(backbone)}.npy"
+        name = f"feature_{split}_{_normalize_vision_backbone(backbone)}"
+        if image_size is not None:
+            name += f"_s{image_size}"
+        return self.model_dir / f"{name}.npy"
 
-    @property
-    def vision_feats_train(self) -> Path:
-        return self.vision_feats_train_path()
+    def vision_feats_train_path(
+        self,
+        backbone: VisionBackbone | str = VisionBackbone.DINO,
+        image_size: int | None = None,
+    ) -> Path:
+        return self._vision_feats_path("train", backbone, image_size)
 
     def vision_feats_test_path(
-        self, backbone: VisionBackbone | str = VisionBackbone.DINO
+        self,
+        backbone: VisionBackbone | str = VisionBackbone.DINO,
+        image_size: int | None = None,
     ) -> Path:
-        return self.model_dir / f"feature_test_{_normalize_vision_backbone(backbone)}.npy"
-
-    @property
-    def vision_feats_test(self) -> Path:
-        return self.vision_feats_test_path()
+        return self._vision_feats_path("test", backbone, image_size)

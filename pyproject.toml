@@ -28,7 +28,15 @@ url = "https://download.pytorch.org/whl/cu130"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# Use the cu130 wheels on Linux/Windows (CUDA 13). macOS has no cu130 wheels,
+# so it falls back to the default PyPI index and pulls the CPU/MPS build.
 [tool.uv.sources]
-torch = { index = "pytorch-cu130" }
-torchvision = { index = "pytorch-cu130" }
-torchaudio = { index = "pytorch-cu130" }
+torch = [
+    { index = "pytorch-cu130", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+    { index = "pytorch-cu130", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchaudio = [
+    { index = "pytorch-cu130", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
