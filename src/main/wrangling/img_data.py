@@ -26,8 +26,12 @@ def extract_vision_data(
         mode=DataType.VAL,
     )
 
-    train_out = path_cfg.vision_feats_train_path(backbone)
-    test_out = path_cfg.vision_feats_test_path(backbone)
+    train_out = path_cfg.vision_feats_train_path(
+        backbone, image_size=vision_cfg.image_size
+    )
+    test_out = path_cfg.vision_feats_test_path(
+        backbone, image_size=vision_cfg.image_size
+    )
 
     extract_features(
         out_npy=train_out,

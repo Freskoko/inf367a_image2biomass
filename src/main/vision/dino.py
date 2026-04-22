@@ -135,10 +135,19 @@ def extract_features(
         if isinstance(fb, dict):
             fb = fb["x_norm_clstoken"]
 
+        if fb.ndim != 2:
+            raise ValueError(
+                f"Expected 2-D feature tensor (batch, dim) from {backbone}, got shape {tuple(fb.shape)}."
+            )
+
         feats.append(fb.cpu().numpy())
         keys.extend(rels)
 
     feats = np.concatenate(feats, axis=0)
+    if feats.ndim != 2 or feats.shape[0] != len(keys):
+        raise ValueError(
+            f"Feature array shape {feats.shape} inconsistent with {len(keys)} image keys."
+        )
 
     order = np.argsort(np.array(keys))
     feats = feats[order]
