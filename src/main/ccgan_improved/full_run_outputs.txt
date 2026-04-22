@@ -1,0 +1,989 @@
+-------------------------------------------------------------------------------------------------
+PREPROCESS DATA
+pivoting and flooring dataset...
+packing images...
+splitting data into train/test sets...
+Created src/data/BIOMASS_64x64.h5
+train samples len: 285
+test samples len: 72
+max label: 185.0 min label: 1.0
+-------------------------------------------------------------------------------------------------
+AE
+ Ckpt already exists
+ Loading...
+-------------------------------------------------------------------------------------------------
+regression CNN for evaluation
+Number of images: 285/72
+ Begin training CNN:
+CNN: [epoch 1/200] train_loss:0.105220 valid_loss (avg_abs):0.183062
+CNN: [epoch 2/200] train_loss:0.079999 valid_loss (avg_abs):0.214264
+CNN: [epoch 3/200] train_loss:0.053919 valid_loss (avg_abs):0.214264
+CNN: [epoch 4/200] train_loss:0.055024 valid_loss (avg_abs):0.214264
+CNN: [epoch 5/200] train_loss:0.062385 valid_loss (avg_abs):0.214264
+CNN: [epoch 6/200] train_loss:0.059624 valid_loss (avg_abs):0.214264
+CNN: [epoch 7/200] train_loss:0.039615 valid_loss (avg_abs):0.214264
+CNN: [epoch 8/200] train_loss:0.040395 valid_loss (avg_abs):0.214264
+CNN: [epoch 9/200] train_loss:0.030314 valid_loss (avg_abs):0.214264
+CNN: [epoch 10/200] train_loss:0.041147 valid_loss (avg_abs):0.214264
+CNN: [epoch 11/200] train_loss:0.041008 valid_loss (avg_abs):0.214264
+CNN: [epoch 12/200] train_loss:0.024420 valid_loss (avg_abs):0.201123
+CNN: [epoch 13/200] train_loss:0.020415 valid_loss (avg_abs):0.159641
+CNN: [epoch 14/200] train_loss:0.018255 valid_loss (avg_abs):0.149505
+CNN: [epoch 15/200] train_loss:0.026325 valid_loss (avg_abs):0.153438
+CNN: [epoch 16/200] train_loss:0.034358 valid_loss (avg_abs):0.149533
+CNN: [epoch 17/200] train_loss:0.034570 valid_loss (avg_abs):0.129456
+CNN: [epoch 18/200] train_loss:0.028067 valid_loss (avg_abs):0.114738
+CNN: [epoch 19/200] train_loss:0.023122 valid_loss (avg_abs):0.112111
+CNN: [epoch 20/200] train_loss:0.015209 valid_loss (avg_abs):0.111641
+CNN: [epoch 21/200] train_loss:0.017721 valid_loss (avg_abs):0.106574
+CNN: [epoch 22/200] train_loss:0.023442 valid_loss (avg_abs):0.103236
+CNN: [epoch 23/200] train_loss:0.015350 valid_loss (avg_abs):0.105567
+CNN: [epoch 24/200] train_loss:0.021537 valid_loss (avg_abs):0.107879
+CNN: [epoch 25/200] train_loss:0.026606 valid_loss (avg_abs):0.105540
+CNN: [epoch 26/200] train_loss:0.021311 valid_loss (avg_abs):0.100906
+CNN: [epoch 27/200] train_loss:0.017792 valid_loss (avg_abs):0.100707
+CNN: [epoch 28/200] train_loss:0.021420 valid_loss (avg_abs):0.099934
+CNN: [epoch 29/200] train_loss:0.016131 valid_loss (avg_abs):0.096600
+CNN: [epoch 30/200] train_loss:0.022846 valid_loss (avg_abs):0.094956
+CNN: [epoch 31/200] train_loss:0.014849 valid_loss (avg_abs):0.090368
+CNN: [epoch 32/200] train_loss:0.023680 valid_loss (avg_abs):0.088683
+CNN: [epoch 33/200] train_loss:0.011514 valid_loss (avg_abs):0.089256
+CNN: [epoch 34/200] train_loss:0.015380 valid_loss (avg_abs):0.092329
+CNN: [epoch 35/200] train_loss:0.011750 valid_loss (avg_abs):0.094450
+CNN: [epoch 36/200] train_loss:0.020228 valid_loss (avg_abs):0.094135
+CNN: [epoch 37/200] train_loss:0.019086 valid_loss (avg_abs):0.091503
+CNN: [epoch 38/200] train_loss:0.013649 valid_loss (avg_abs):0.086567
+CNN: [epoch 39/200] train_loss:0.014496 valid_loss (avg_abs):0.092354
+CNN: [epoch 40/200] train_loss:0.011290 valid_loss (avg_abs):0.096807
+CNN: [epoch 41/200] train_loss:0.014463 valid_loss (avg_abs):0.098082
+CNN: [epoch 42/200] train_loss:0.009862 valid_loss (avg_abs):0.101804
+CNN: [epoch 43/200] train_loss:0.012949 valid_loss (avg_abs):0.095935
+CNN: [epoch 44/200] train_loss:0.012384 valid_loss (avg_abs):0.087224
+CNN: [epoch 45/200] train_loss:0.011192 valid_loss (avg_abs):0.087919
+CNN: [epoch 46/200] train_loss:0.011961 valid_loss (avg_abs):0.088046
+CNN: [epoch 47/200] train_loss:0.010314 valid_loss (avg_abs):0.086475
+CNN: [epoch 48/200] train_loss:0.010117 valid_loss (avg_abs):0.088214
+CNN: [epoch 49/200] train_loss:0.010316 valid_loss (avg_abs):0.093482
+CNN: [epoch 50/200] train_loss:0.007799 valid_loss (avg_abs):0.107498
+CNN: [epoch 51/200] train_loss:0.009684 valid_loss (avg_abs):0.107959
+CNN: [epoch 52/200] train_loss:0.008915 valid_loss (avg_abs):0.105837
+CNN: [epoch 53/200] train_loss:0.009938 valid_loss (avg_abs):0.102755
+CNN: [epoch 54/200] train_loss:0.008157 valid_loss (avg_abs):0.100801
+CNN: [epoch 55/200] train_loss:0.012305 valid_loss (avg_abs):0.097764
+CNN: [epoch 56/200] train_loss:0.008309 valid_loss (avg_abs):0.094315
+CNN: [epoch 57/200] train_loss:0.006957 valid_loss (avg_abs):0.091366
+CNN: [epoch 58/200] train_loss:0.004868 valid_loss (avg_abs):0.090127
+CNN: [epoch 59/200] train_loss:0.005627 valid_loss (avg_abs):0.088058
+CNN: [epoch 60/200] train_loss:0.007283 valid_loss (avg_abs):0.083879
+CNN: [epoch 61/200] train_loss:0.005078 valid_loss (avg_abs):0.083578
+CNN: [epoch 62/200] train_loss:0.006370 valid_loss (avg_abs):0.082970
+CNN: [epoch 63/200] train_loss:0.005603 valid_loss (avg_abs):0.082986
+CNN: [epoch 64/200] train_loss:0.009800 valid_loss (avg_abs):0.082963
+CNN: [epoch 65/200] train_loss:0.006065 valid_loss (avg_abs):0.083102
+CNN: [epoch 66/200] train_loss:0.008081 valid_loss (avg_abs):0.081715
+CNN: [epoch 67/200] train_loss:0.006185 valid_loss (avg_abs):0.083215
+CNN: [epoch 68/200] train_loss:0.009664 valid_loss (avg_abs):0.083022
+CNN: [epoch 69/200] train_loss:0.005152 valid_loss (avg_abs):0.083054
+CNN: [epoch 70/200] train_loss:0.003829 valid_loss (avg_abs):0.086070
+CNN: [epoch 71/200] train_loss:0.006539 valid_loss (avg_abs):0.087270
+CNN: [epoch 72/200] train_loss:0.004200 valid_loss (avg_abs):0.086806
+CNN: [epoch 73/200] train_loss:0.005297 valid_loss (avg_abs):0.085734
+CNN: [epoch 74/200] train_loss:0.006495 valid_loss (avg_abs):0.082283
+CNN: [epoch 75/200] train_loss:0.004661 valid_loss (avg_abs):0.080719
+CNN: [epoch 76/200] train_loss:0.006156 valid_loss (avg_abs):0.080739
+CNN: [epoch 77/200] train_loss:0.004623 valid_loss (avg_abs):0.080858
+CNN: [epoch 78/200] train_loss:0.003357 valid_loss (avg_abs):0.082044
+CNN: [epoch 79/200] train_loss:0.005842 valid_loss (avg_abs):0.082597
+CNN: [epoch 80/200] train_loss:0.004841 valid_loss (avg_abs):0.083066
+CNN: [epoch 81/200] train_loss:0.004097 valid_loss (avg_abs):0.081436
+CNN: [epoch 82/200] train_loss:0.003846 valid_loss (avg_abs):0.082217
+CNN: [epoch 83/200] train_loss:0.003607 valid_loss (avg_abs):0.081833
+CNN: [epoch 84/200] train_loss:0.008981 valid_loss (avg_abs):0.080218
+CNN: [epoch 85/200] train_loss:0.004708 valid_loss (avg_abs):0.080143
+CNN: [epoch 86/200] train_loss:0.003688 valid_loss (avg_abs):0.080855
+CNN: [epoch 87/200] train_loss:0.003913 valid_loss (avg_abs):0.080760
+CNN: [epoch 88/200] train_loss:0.002919 valid_loss (avg_abs):0.082219
+CNN: [epoch 89/200] train_loss:0.008372 valid_loss (avg_abs):0.082301
+CNN: [epoch 90/200] train_loss:0.002548 valid_loss (avg_abs):0.081699
+CNN: [epoch 91/200] train_loss:0.003610 valid_loss (avg_abs):0.079443
+CNN: [epoch 92/200] train_loss:0.002585 valid_loss (avg_abs):0.079782
+CNN: [epoch 93/200] train_loss:0.002073 valid_loss (avg_abs):0.080142
+CNN: [epoch 94/200] train_loss:0.003372 valid_loss (avg_abs):0.081073
+CNN: [epoch 95/200] train_loss:0.005163 valid_loss (avg_abs):0.081569
+CNN: [epoch 96/200] train_loss:0.003673 valid_loss (avg_abs):0.081547
+CNN: [epoch 97/200] train_loss:0.003923 valid_loss (avg_abs):0.080974
+CNN: [epoch 98/200] train_loss:0.004583 valid_loss (avg_abs):0.081989
+CNN: [epoch 99/200] train_loss:0.004633 valid_loss (avg_abs):0.083700
+CNN: [epoch 100/200] train_loss:0.009232 valid_loss (avg_abs):0.083570
+CNN: [epoch 101/200] train_loss:0.003299 valid_loss (avg_abs):0.080629
+CNN: [epoch 102/200] train_loss:0.002703 valid_loss (avg_abs):0.078865
+CNN: [epoch 103/200] train_loss:0.002827 valid_loss (avg_abs):0.078614
+CNN: [epoch 104/200] train_loss:0.005558 valid_loss (avg_abs):0.080464
+CNN: [epoch 105/200] train_loss:0.009045 valid_loss (avg_abs):0.082899
+CNN: [epoch 106/200] train_loss:0.003519 valid_loss (avg_abs):0.080935
+CNN: [epoch 107/200] train_loss:0.003582 valid_loss (avg_abs):0.080130
+CNN: [epoch 108/200] train_loss:0.004315 valid_loss (avg_abs):0.079009
+CNN: [epoch 109/200] train_loss:0.003119 valid_loss (avg_abs):0.080881
+CNN: [epoch 110/200] train_loss:0.003029 valid_loss (avg_abs):0.083370
+CNN: [epoch 111/200] train_loss:0.005602 valid_loss (avg_abs):0.083320
+CNN: [epoch 112/200] train_loss:0.003895 valid_loss (avg_abs):0.084364
+CNN: [epoch 113/200] train_loss:0.009215 valid_loss (avg_abs):0.084531
+CNN: [epoch 114/200] train_loss:0.004458 valid_loss (avg_abs):0.080972
+CNN: [epoch 115/200] train_loss:0.006466 valid_loss (avg_abs):0.080003
+CNN: [epoch 116/200] train_loss:0.006625 valid_loss (avg_abs):0.078864
+CNN: [epoch 117/200] train_loss:0.002674 valid_loss (avg_abs):0.079272
+CNN: [epoch 118/200] train_loss:0.003604 valid_loss (avg_abs):0.079715
+CNN: [epoch 119/200] train_loss:0.002627 valid_loss (avg_abs):0.080010
+CNN: [epoch 120/200] train_loss:0.004194 valid_loss (avg_abs):0.082003
+CNN: [epoch 121/200] train_loss:0.003677 valid_loss (avg_abs):0.082431
+CNN: [epoch 122/200] train_loss:0.005253 valid_loss (avg_abs):0.081105
+CNN: [epoch 123/200] train_loss:0.002883 valid_loss (avg_abs):0.082078
+CNN: [epoch 124/200] train_loss:0.001756 valid_loss (avg_abs):0.082287
+CNN: [epoch 125/200] train_loss:0.002869 valid_loss (avg_abs):0.082787
+CNN: [epoch 126/200] train_loss:0.002203 valid_loss (avg_abs):0.082844
+CNN: [epoch 127/200] train_loss:0.005525 valid_loss (avg_abs):0.082658
+CNN: [epoch 128/200] train_loss:0.004824 valid_loss (avg_abs):0.081340
+CNN: [epoch 129/200] train_loss:0.006724 valid_loss (avg_abs):0.082466
+CNN: [epoch 130/200] train_loss:0.001689 valid_loss (avg_abs):0.082148
+CNN: [epoch 131/200] train_loss:0.002259 valid_loss (avg_abs):0.082324
+CNN: [epoch 132/200] train_loss:0.002198 valid_loss (avg_abs):0.081108
+CNN: [epoch 133/200] train_loss:0.003004 valid_loss (avg_abs):0.080430
+CNN: [epoch 134/200] train_loss:0.002765 valid_loss (avg_abs):0.081384
+CNN: [epoch 135/200] train_loss:0.002667 valid_loss (avg_abs):0.081105
+CNN: [epoch 136/200] train_loss:0.002545 valid_loss (avg_abs):0.081035
+CNN: [epoch 137/200] train_loss:0.003507 valid_loss (avg_abs):0.081596
+CNN: [epoch 138/200] train_loss:0.003811 valid_loss (avg_abs):0.081021
+CNN: [epoch 139/200] train_loss:0.004425 valid_loss (avg_abs):0.079757
+CNN: [epoch 140/200] train_loss:0.009619 valid_loss (avg_abs):0.079139
+CNN: [epoch 141/200] train_loss:0.003844 valid_loss (avg_abs):0.080530
+CNN: [epoch 142/200] train_loss:0.002237 valid_loss (avg_abs):0.081362
+CNN: [epoch 143/200] train_loss:0.002680 valid_loss (avg_abs):0.080711
+CNN: [epoch 144/200] train_loss:0.004464 valid_loss (avg_abs):0.082405
+CNN: [epoch 145/200] train_loss:0.002765 valid_loss (avg_abs):0.081730
+CNN: [epoch 146/200] train_loss:0.002851 valid_loss (avg_abs):0.080808
+CNN: [epoch 147/200] train_loss:0.002278 valid_loss (avg_abs):0.081544
+CNN: [epoch 148/200] train_loss:0.002841 valid_loss (avg_abs):0.082543
+CNN: [epoch 149/200] train_loss:0.002283 valid_loss (avg_abs):0.082391
+CNN: [epoch 150/200] train_loss:0.004020 valid_loss (avg_abs):0.083036
+CNN: [epoch 151/200] train_loss:0.002496 valid_loss (avg_abs):0.081299
+CNN: [epoch 152/200] train_loss:0.004358 valid_loss (avg_abs):0.080727
+CNN: [epoch 153/200] train_loss:0.005342 valid_loss (avg_abs):0.080334
+CNN: [epoch 154/200] train_loss:0.003045 valid_loss (avg_abs):0.080905
+CNN: [epoch 155/200] train_loss:0.002222 valid_loss (avg_abs):0.080186
+CNN: [epoch 156/200] train_loss:0.002078 valid_loss (avg_abs):0.079823
+CNN: [epoch 157/200] train_loss:0.003644 valid_loss (avg_abs):0.080180
+CNN: [epoch 158/200] train_loss:0.002472 valid_loss (avg_abs):0.080678
+CNN: [epoch 159/200] train_loss:0.004620 valid_loss (avg_abs):0.079547
+CNN: [epoch 160/200] train_loss:0.002621 valid_loss (avg_abs):0.079684
+CNN: [epoch 161/200] train_loss:0.002067 valid_loss (avg_abs):0.080425
+CNN: [epoch 162/200] train_loss:0.002186 valid_loss (avg_abs):0.080671
+CNN: [epoch 163/200] train_loss:0.002190 valid_loss (avg_abs):0.080502
+CNN: [epoch 164/200] train_loss:0.002535 valid_loss (avg_abs):0.080236
+CNN: [epoch 165/200] train_loss:0.002784 valid_loss (avg_abs):0.081080
+CNN: [epoch 166/200] train_loss:0.001376 valid_loss (avg_abs):0.079088
+CNN: [epoch 167/200] train_loss:0.009310 valid_loss (avg_abs):0.078642
+CNN: [epoch 168/200] train_loss:0.001802 valid_loss (avg_abs):0.079783
+CNN: [epoch 169/200] train_loss:0.001632 valid_loss (avg_abs):0.080817
+CNN: [epoch 170/200] train_loss:0.001112 valid_loss (avg_abs):0.081993
+CNN: [epoch 171/200] train_loss:0.001467 valid_loss (avg_abs):0.082300
+CNN: [epoch 172/200] train_loss:0.002491 valid_loss (avg_abs):0.081968
+CNN: [epoch 173/200] train_loss:0.001837 valid_loss (avg_abs):0.082173
+CNN: [epoch 174/200] train_loss:0.004163 valid_loss (avg_abs):0.082429
+CNN: [epoch 175/200] train_loss:0.001491 valid_loss (avg_abs):0.082295
+CNN: [epoch 176/200] train_loss:0.003367 valid_loss (avg_abs):0.080775
+CNN: [epoch 177/200] train_loss:0.003259 valid_loss (avg_abs):0.080668
+CNN: [epoch 178/200] train_loss:0.002761 valid_loss (avg_abs):0.080563
+CNN: [epoch 179/200] train_loss:0.001876 valid_loss (avg_abs):0.080587
+CNN: [epoch 180/200] train_loss:0.008173 valid_loss (avg_abs):0.079917
+CNN: [epoch 181/200] train_loss:0.001812 valid_loss (avg_abs):0.079840
+CNN: [epoch 182/200] train_loss:0.001767 valid_loss (avg_abs):0.080496
+CNN: [epoch 183/200] train_loss:0.002818 valid_loss (avg_abs):0.080542
+CNN: [epoch 184/200] train_loss:0.001952 valid_loss (avg_abs):0.081149
+CNN: [epoch 185/200] train_loss:0.002358 valid_loss (avg_abs):0.080383
+CNN: [epoch 186/200] train_loss:0.001814 valid_loss (avg_abs):0.080030
+CNN: [epoch 187/200] train_loss:0.003047 valid_loss (avg_abs):0.079639
+CNN: [epoch 188/200] train_loss:0.002293 valid_loss (avg_abs):0.079336
+CNN: [epoch 189/200] train_loss:0.004335 valid_loss (avg_abs):0.079536
+CNN: [epoch 190/200] train_loss:0.005664 valid_loss (avg_abs):0.079435
+CNN: [epoch 191/200] train_loss:0.003603 valid_loss (avg_abs):0.080228
+CNN: [epoch 192/200] train_loss:0.003286 valid_loss (avg_abs):0.079794
+CNN: [epoch 193/200] train_loss:0.002911 valid_loss (avg_abs):0.080230
+CNN: [epoch 194/200] train_loss:0.001666 valid_loss (avg_abs):0.081022
+CNN: [epoch 195/200] train_loss:0.002089 valid_loss (avg_abs):0.080870
+CNN: [epoch 196/200] train_loss:0.002717 valid_loss (avg_abs):0.081348
+CNN: [epoch 197/200] train_loss:0.005348 valid_loss (avg_abs):0.081455
+CNN: [epoch 198/200] train_loss:0.002110 valid_loss (avg_abs):0.081164
+CNN: [epoch 199/200] train_loss:0.003315 valid_loss (avg_abs):0.080548
+CNN: [epoch 200/200] train_loss:0.004424 valid_loss (avg_abs):0.079054
+Time elapses: 1309.2542114050011s
+Validation Average Absolute Difference: 0.07905428856611252
+-------------------------------------------------------------------------------------------------
+cGAN 50
+===================================================================================================
+Number of images: 139
+98 unique counts are split into 50 classes
+hard, Sigma is -1.0, Kappa is -1
+ Begin Training cGAN:
+./output/saved_models/ckpt_cGAN_niters_2000_nclass_50_seed_2026.pth
+Loading pre-trained generator >>>
+GAN training finished; Time elapses: 0.22806320900053834s
+Start evalulation
+Start sampling 40 fake images per label from GAN >>>
+End sampling!
+ We got 7400 fake images.
+End sampling 40 fake images per label from GAN >>>
+Center:21; Real:154; Fake:1640; FID:192.189374753656; LS:13.0975904934926.
+Center:22; Real:158; Fake:1640; FID:198.87205376299895; LS:13.37010690660284.
+Center:23; Real:159; Fake:1640; FID:198.867836459854; LS:13.879754525061879.
+Center:24; Real:161; Fake:1640; FID:197.89336143160392; LS:13.76289032439633.
+ Center:25; Real:165; Fake:1640; FID:197.8995556343079; LS:14.01639177901216.
+ Center:26; Real:171; Fake:1640; FID:194.6645508041417; LS:14.37325619619067.
+ Center:27; Real:173; Fake:1640; FID:195.33942818334697; LS:14.9855457618719.
+ Center:28; Real:174; Fake:1640; FID:196.7402979725254; LS:15.406489397249207.
+ Center:29; Real:176; Fake:1640; FID:197.7969060017232; LS:16.02420797154035.
+ Center:30; Real:178; Fake:1640; FID:192.9349686604469; LS:17.06249538704344.
+ Center:31; Real:180; Fake:1640; FID:193.9992924429962; LS:17.93673050030157.
+ Center:32; Real:180; Fake:1640; FID:197.33817988201963; LS:18.0776077675724.
+ Center:33; Real:182; Fake:1640; FID:197.72444082856174; LS:18.558434360694687.
+ Center:34; Real:183; Fake:1640; FID:195.74877209204078; LS:18.993331359063344.
+ Center:35; Real:182; Fake:1640; FID:198.417188697776; LS:19.33811631933218.
+ Center:36; Real:181; Fake:1640; FID:178.7606983691776; LS:19.925921936508086.
+ Center:37; Real:181; Fake:1640; FID:177.67678536368743; LS:20.57610336834701.
+ Center:38; Real:183; Fake:1640; FID:180.96178825029418; LS:21.32407733015262.
+ Center:39; Real:181; Fake:1640; FID:183.96543846623206; LS:21.812280221451527.
+ Center:40; Real:180; Fake:1640; FID:177.07397388988406; LS:22.428675944165033.
+ Center:41; Real:177; Fake:1640; FID:176.4125786044682; LS:23.048521391388665.
+ Center:42; Real:171; Fake:1640; FID:180.367447268531; LS:23.856091823374353.
+ Center:43; Real:168; Fake:1640; FID:183.50807092193656; LS:24.497371845619707.
+ Center:44; Real:167; Fake:1640; FID:181.48857166169972; LS:25.388461122523267.
+ Center:45; Real:165; Fake:1640; FID:183.05582524431188; LS:26.207991312605486.
+Center:46; Real:161; Fake:1640; FID:178.66346754969402; LS:26.994645353731496.
+Center:47; Real:160; Fake:1640; FID:178.13709532886168; LS:27.852287613679994.
+Center:48; Real:160; Fake:1640; FID:177.46187483228306; LS:28.570564063454455.
+Center:49; Real:156; Fake:1640; FID:181.43014818420676; LS:29.175168855077157.
+Center:50; Real:147; Fake:1640; FID:187.04722552241213; LS:30.118362652153778.
+Center:51; Real:144; Fake:1640; FID:189.27793094388744; LS:31.25081769726353.
+Center:52; Real:142; Fake:1640; FID:180.94304652873373; LS:31.859885167153326.
+Center:53; Real:140; Fake:1640; FID:181.96438606084712; LS:33.024228059130195.
+ Center:54; Real:131; Fake:1640; FID:187.7850757874622; LS:34.072568760492.
+ Center:55; Real:127; Fake:1640; FID:190.4675269247714; LS:34.62712888497995.
+ Center:56; Real:124; Fake:1640; FID:195.8787316154898; LS:35.452682888600975.
+ Center:57; Real:119; Fake:1640; FID:194.32486955609994; LS:36.35433224210425.
+ Center:58; Real:115; Fake:1640; FID:200.59735381598892; LS:37.24410824333431.
+Center:59; Real:109; Fake:1640; FID:203.82494564829418; LS:38.20850361739399.
+ Center:60; Real:111; Fake:1640; FID:199.3838487998774; LS:38.99850788143486.
+Center:61; Real:103; Fake:1640; FID:191.19573897724786; LS:39.813424701279985.
+Center:62; Real:99; Fake:1640; FID:194.1067146761832; LS:40.38761651318339.
+ Center:63; Real:94; Fake:1640; FID:172.41344122048835; LS:41.16230527274084.
+ Center:64; Real:93; Fake:1640; FID:170.98705767125654; LS:41.928724473217365.
+ Center:65; Real:92; Fake:1640; FID:172.0225311196302; LS:43.08345093080638.
+ Center:66; Real:87; Fake:1640; FID:173.06839063710197; LS:44.02305405865219.
+Center:67; Real:82; Fake:1640; FID:194.1553901624248; LS:44.85012974364047.
+Center:68; Real:79; Fake:1640; FID:190.5103681100057; LS:45.7782846189263.
+Center:69; Real:79; Fake:1640; FID:191.89772631360069; LS:46.59544865764314.
+ Center:70; Real:78; Fake:1640; FID:196.56144522614835; LS:47.19045782841106.
+Center:71; Real:73; Fake:1640; FID:193.7273591625771; LS:47.82141101621546.
+ Center:72; Real:70; Fake:1640; FID:191.23907061538466; LS:48.591691618580825.
+ Center:73; Real:69; Fake:1640; FID:184.96675891412994; LS:49.57191717115844.
+ Center:74; Real:68; Fake:1640; FID:192.540499052706; LS:50.31491649748258.
+Center:75; Real:64; Fake:1640; FID:184.37042430849155; LS:51.31862142975101.
+Center:76; Real:62; Fake:1640; FID:182.5325627401188; LS:52.318004335776514.
+Center:77; Real:60; Fake:1640; FID:186.05183177595748; LS:53.32211346799372.
+ Center:78; Real:58; Fake:1640; FID:193.17832328955444; LS:54.3317898748806.
+Center:79; Real:51; Fake:1640; FID:187.24508677837068; LS:55.32829757609473.
+ Center:80; Real:48; Fake:1640; FID:191.79429077420332; LS:56.310185788267454.
+Center:81; Real:46; Fake:1640; FID:193.9773600873869; LS:57.31767102374082.
+Center:82; Real:43; Fake:1640; FID:194.85471951940065; LS:58.328665419345405.
+ epoch
+ Center:83; Real:44; Fake:1640; FID:193.2879780057762; LS:59.323652684756716.
+Center:84; Real:41; Fake:1640; FID:182.2906204552337; LS:60.34797613858813.
+Center:85; Real:37; Fake:1640; FID:167.51196007795093; LS:61.33495491967968.
+Center:86; Real:37; Fake:1640; FID:165.32335377582143; LS:62.358018509453025.
+Center:87; Real:40; Fake:1640; FID:168.33064154163978; LS:63.335875486773325.
+Center:88; Real:39; Fake:1640; FID:178.57527764138058; LS:64.35327645568404.
+Center:89; Real:37; Fake:1640; FID:181.70768130068063; LS:65.36583008112886.
+Center:90; Real:36; Fake:1640; FID:178.5875325722135; LS:66.35712442026905.
+Center:91; Real:37; Fake:1640; FID:178.72070907336513; LS:67.3676840331996.
+Center:92; Real:37; Fake:1640; FID:179.08560055958594; LS:68.35856995075123.
+Center:93; Real:36; Fake:1640; FID:177.3919129993627; LS:69.3514850222074.
+Center:94; Real:34; Fake:1640; FID:180.12517213174817; LS:70.34606918531311.
+Center:95; Real:34; Fake:1640; FID:180.1239846171094; LS:71.35169137323776.
+Center:96; Real:33; Fake:1640; FID:179.38734214142744; LS:72.36043230323803.
+Center:97; Real:33; Fake:1640; FID:179.38032530754637; LS:73.37010605594644.
+Center:98; Real:32; Fake:1640; FID:184.04408960325853; LS:74.35705479472966.
+Center:99; Real:33; Fake:1640; FID:183.3241550100169; LS:75.34807162681912.
+Center:100; Real:33; Fake:1640; FID:184.05395565828917; LS:76.36127845752166.
+Center:101; Real:29; Fake:1640; FID:195.21965880780377; LS:77.35398463723136.
+Center:102; Real:29; Fake:1640; FID:195.22449815309406; LS:78.35824197480773.
+Center:103; Real:27; Fake:1640; FID:201.18808487468084; LS:79.35926668520835.
+Center:104; Real:27; Fake:1640; FID:201.18520170342265; LS:80.36287183868812.
+Center:105; Real:26; Fake:1640; FID:207.73999686887691; LS:81.36086770197059.
+Center:106; Real:26; Fake:1640; FID:226.5204235176872; LS:82.37080752556552.
+Center:107; Real:26; Fake:1640; FID:226.51307803212308; LS:83.37306687944546.
+Center:108; Real:25; Fake:1640; FID:182.01097820472643; LS:84.3802855195841.
+Center:109; Real:24; Fake:1640; FID:186.77750533583816; LS:85.3709142743042.
+Center:110; Real:22; Fake:1640; FID:188.3813888677637; LS:86.36999097150728.
+Center:111; Real:21; Fake:1640; FID:192.87911524754878; LS:87.36337142181014.
+Center:112; Real:21; Fake:1640; FID:192.88341195728052; LS:88.34910641519761.
+Center:113; Real:19; Fake:1640; FID:200.5678570224891; LS:89.35712907390624.
+Center:114; Real:20; Fake:1640; FID:198.38517927536068; LS:90.35705421985377.
+Center:115; Real:19; Fake:1640; FID:198.51555586477224; LS:91.36345886850229.
+Center:116; Real:19; Fake:1640; FID:198.52667540782892; LS:92.35355593950102.
+Center:117; Real:18; Fake:1640; FID:203.77488283298368; LS:93.3403199926791.
+Center:118; Real:18; Fake:1640; FID:203.77642268534544; LS:94.34765192118996.
+Center:119; Real:17; Fake:1640; FID:198.54911775039741; LS:95.34239882460182.
+Center:120; Real:17; Fake:1640; FID:198.5498873139676; LS:96.34718801567286.
+Center:121; Real:17; Fake:1640; FID:198.56029821663486; LS:97.33744869433434.
+Center:122; Real:17; Fake:1640; FID:198.55760712888758; LS:98.34003576949785.
+Center:123; Real:16; Fake:1640; FID:202.4839738082273; LS:99.33218181333164.
+Center:124; Real:15; Fake:1640; FID:205.36574066802052; LS:100.34242592613417.
+Center:125; Real:15; Fake:1640; FID:205.37377432019352; LS:101.34438478044893.
+Center:126; Real:13; Fake:1640; FID:219.40045478426526; LS:102.31823835397003.
+Center:127; Real:12; Fake:1640; FID:222.93396264331312; LS:103.32599535361841.
+Center:128; Real:8; Fake:1640; FID:259.6021423110427; LS:104.32139615987133.
+Center:129; Real:7; Fake:1640; FID:235.15234303269966; LS:105.31599102289665.
+Center:130; Real:6; Fake:1640; FID:259.89929122556885; LS:106.32823170741975.
+Center:131; Real:6; Fake:1640; FID:259.8994262758105; LS:107.3291487067529.
+Center:132; Real:5; Fake:1640; FID:283.912405511885; LS:108.33447615815918.
+Center:133; Real:4; Fake:1640; FID:313.15298889665667; LS:109.3478452131243.
+Center:134; Real:4; Fake:1640; FID:313.1686543447321; LS:110.33918574068514.
+Center:135; Real:4; Fake:1640; FID:313.1832605639615; LS:111.36186852308398.
+Center:136; Real:4; Fake:1640; FID:313.1769475118499; LS:112.36316471778584.
+Center:137; Real:5; Fake:1640; FID:291.46562044985836; LS:113.37397778627077.
+Center:138; Real:5; Fake:1640; FID:291.4809306176345; LS:114.35998130133149.
+Center:139; Real:5; Fake:1640; FID:291.48105046437024; LS:115.37076629502926.
+Center:140; Real:4; Fake:1640; FID:318.05276971832916; LS:116.37714332274003.
+Center:141; Real:3; Fake:1640; FID:422.05781043111557; LS:117.36907403184692.
+Center:142; Real:3; Fake:1640; FID:422.0448922492453; LS:118.38276904984946.
+Center:143; Real:3; Fake:1640; FID:422.04929672876517; LS:119.39483521835561.
+Center:144; Real:3; Fake:1640; FID:422.0484390945992; LS:120.38388307612935.
+Center:145; Real:3; Fake:1640; FID:422.05539058845216; LS:121.38433762562529.
+Center:146; Real:4; Fake:1640; FID:404.7630327785679; LS:122.37375518911314.
+Center:147; Real:3; Fake:1640; FID:302.23726181080974; LS:123.38046135932844.
+Center:148; Real:3; Fake:1640; FID:302.2257477607301; LS:124.38468593318106.
+Center:149; Real:3; Fake:1640; FID:302.2354263758142; LS:125.39289264378661.
+Center:150; Real:3; Fake:1640; FID:302.2336451372432; LS:126.38744111331862.
+Center:151; Real:3; Fake:1640; FID:302.24519714959774; LS:127.39220230020129.
+Center:152; Real:3; Fake:1640; FID:302.24758736528025; LS:128.39951484177897.
+Center:153; Real:3; Fake:1640; FID:302.24541930692254; LS:129.39256976020135.
+Center:154; Real:3; Fake:1640; FID:302.2415054435749; LS:130.3982081060048.
+Center:155; Real:2; Fake:1640; FID:384.3229460945186; LS:131.39108059378114.
+Center:156; Real:2; Fake:1640; FID:384.31823563938116; LS:132.38964801061354.
+Center:157; Real:2; Fake:1640; FID:384.3163605801576; LS:133.39073177354365.
+Center:158; Real:2; Fake:1640; FID:384.310082639593; LS:134.41194854256491.
+Center:159; Real:2; Fake:1640; FID:384.30478389395284; LS:135.4044209974023.
+Center:160; Real:2; Fake:1640; FID:384.306834385274; LS:136.39384911877173.
+Center:161; Real:2; Fake:1640; FID:384.30674125877096; LS:137.41326861730892.
+Center:162; Real:2; Fake:1640; FID:384.3040189806122; LS:138.40682853983216.
+Center:163; Real:2; Fake:1640; FID:384.30277054517285; LS:139.40762848384315.
+Center:164; Real:2; Fake:1640; FID:384.3048895830906; LS:140.41930085143483.
+Center:165; Real:3; Fake:1640; FID:636.6933841950654; LS:141.4097595277765.
+ cGAN SFID: 231.2257141971459(78.54286586241777); min/max: 165.32335377582143/636.6933841950654.
+ cGAN LS over centers: 71.45993162893751(39.09628078725995); min/max: 13.0975904934926/141.4097595277765.
+ epoch
+ cGAN: FID of 7400 fake images: 147.37702774440658.
+epoch
+ cGAN: overall LS of 7400 fake images: 72.82352008584685(48.2337327681454).
+ Displayed 20 cell counts are: [np.int64(10), np.int64(18), np.int64(26), np.int64(34), np.int64(42), np.int64(50), np.int64(58), np.int64(66), np.int64(74), np.int64(82), np.int64(90), np.int64(98), np.int64(106), np.int64(114), np.int64(122), np.int64(130), np.int64(138), np.int64(146), np.int64(154), np.int64(162)]
+-------------------------------------------------------------------------------------------------
+CcGAN: Hard
+===================================================================================================
+Number of images: 139
+ Use rule-of-thumb formula to compute kernel_sigma >>>
+ The std of 139 cell counts is 0.1620625899926293 so the kernel sigma is 0.06403032121124996
+CcGAN start
+ net_embed ckpt already exists
+ Loading...
+ net_y2h ckpt already exists
+ Loading...
+ counts vs reconstructed counts
+[[0.61687887 0.6141137 ]
+ [0.3292067  0.32767045]
+ [0.36427817 0.36528993]
+ [0.13635136 0.13591446]
+ [0.3474102  0.34739706]
+ [0.452949   0.4541527 ]
+ [0.14099139 0.14070916]
+ [0.2997536  0.29909104]
+ [0.6416666  0.6389649 ]
+ [0.4089164  0.40819716]]
+hard, Sigma is 0.06403032121124996, Kappa is 0.41081081081081083
+ Begin Training CcGAN:
+./output/saved_models/ckpt_CcGAN_niters_2000_seed_2026_hard_0.06403032121124996_0.41081081081081083.pth
+[0.07027027 0.07027027 0.07027027 0.07027027 0.07027027 0.07027027
+ 0.07027027 0.07027027 0.07027027 0.07027027 0.12672673 0.12672673
+ 0.12672673 0.12672673 0.12672673 0.12672673 0.12672673 0.12672673
+ 0.12672673 0.12672673 0.18318318 0.18318318 0.18318318 0.18318318
+ 0.18318318 0.18318318 0.18318318 0.18318318 0.18318318 0.18318318
+ 0.23963964 0.23963964 0.23963964 0.23963964 0.23963964 0.23963964
+ 0.23963964 0.23963964 0.23963964 0.23963964 0.2960961  0.2960961
+ 0.2960961  0.2960961  0.2960961  0.2960961  0.2960961  0.2960961
+ 0.2960961  0.2960961  0.35255255 0.35255255 0.35255255 0.35255255
+ 0.35255255 0.35255255 0.35255255 0.35255255 0.35255255 0.35255255
+ 0.40900901 0.40900901 0.40900901 0.40900901 0.40900901 0.40900901
+ 0.40900901 0.40900901 0.40900901 0.40900901 0.46546547 0.46546547
+ 0.46546547 0.46546547 0.46546547 0.46546547 0.46546547 0.46546547
+ 0.46546547 0.46546547 0.52192192 0.52192192 0.52192192 0.52192192
+ 0.52192192 0.52192192 0.52192192 0.52192192 0.52192192 0.52192192
+ 0.57837838 0.57837838 0.57837838 0.57837838 0.57837838 0.57837838
+ 0.57837838 0.57837838 0.57837838 0.57837838]
+CcGAN: [Iter 20/2000] [D loss: 1.6545e+00] [G loss: 3.1919e+00] [real prob: 0.550] [fake prob: 0.594] [Time: 169.7699]
+CcGAN: [Iter 40/2000] [D loss: 1.3638e+00] [G loss: 2.3390e+00] [real prob: 0.547] [fake prob: 0.500] [Time: 338.9566]
+CcGAN: [Iter 60/2000] [D loss: 1.2066e+00] [G loss: 2.7964e+00] [real prob: 0.542] [fake prob: 0.382] [Time: 508.4028]
+CcGAN: [Iter 80/2000] [D loss: 9.4826e-01] [G loss: 2.7659e+00] [real prob: 0.589] [fake prob: 0.264] [Time: 686.3762]
+CcGAN: [Iter 100/2000] [D loss: 8.8763e-01] [G loss: 3.0868e+00] [real prob: 0.654] [fake prob: 0.253] [Time: 855.3627]
+CcGAN: [Iter 120/2000] [D loss: 1.0146e+00] [G loss: 3.0231e+00] [real prob: 0.733] [fake prob: 0.465] [Time: 1025.2777]
+CcGAN: [Iter 140/2000] [D loss: 8.1783e-01] [G loss: 2.4868e+00] [real prob: 0.649] [fake prob: 0.239] [Time: 1194.8433]
+CcGAN: [Iter 160/2000] [D loss: 1.0976e+00] [G loss: 3.4876e+00] [real prob: 0.848] [fake prob: 0.530] [Time: 1364.2835]
+CcGAN: [Iter 180/2000] [D loss: 6.2089e-01] [G loss: 2.7945e+00] [real prob: 0.746] [fake prob: 0.245] [Time: 1533.6708]
+CcGAN: [Iter 200/2000] [D loss: 9.0375e-01] [G loss: 3.0822e+00] [real prob: 0.661] [fake prob: 0.296] [Time: 1702.9273]
+CcGAN: [Iter 220/2000] [D loss: 1.3219e+00] [G loss: 3.3709e+00] [real prob: 0.410] [fake prob: 0.105] [Time: 1872.8438]
+CcGAN: [Iter 240/2000] [D loss: 1.2621e+00] [G loss: 4.6417e+00] [real prob: 0.712] [fake prob: 0.513] [Time: 2042.1769]
+CcGAN: [Iter 260/2000] [D loss: 9.0077e-01] [G loss: 2.7177e+00] [real prob: 0.686] [fake prob: 0.340] [Time: 2211.7207]
+CcGAN: [Iter 280/2000] [D loss: 9.6214e-01] [G loss: 2.8438e+00] [real prob: 0.707] [fake prob: 0.392] [Time: 2380.9540]
+CcGAN: [Iter 300/2000] [D loss: 1.1068e+00] [G loss: 2.9182e+00] [real prob: 0.626] [fake prob: 0.378] [Time: 2550.2123]
+CcGAN: [Iter 320/2000] [D loss: 1.2740e+00] [G loss: 2.6443e+00] [real prob: 0.547] [fake prob: 0.378] [Time: 2720.0422]
+CcGAN: [Iter 340/2000] [D loss: 1.2743e+00] [G loss: 2.9740e+00] [real prob: 0.540] [fake prob: 0.391] [Time: 2889.2098]
+CcGAN: [Iter 360/2000] [D loss: 8.7492e-01] [G loss: 3.2441e+00] [real prob: 0.742] [fake prob: 0.397] [Time: 3058.3362]
+CcGAN: [Iter 380/2000] [D loss: 9.7561e-01] [G loss: 2.7106e+00] [real prob: 0.684] [fake prob: 0.385] [Time: 3227.6368]
+CcGAN: [Iter 400/2000] [D loss: 9.0587e-01] [G loss: 2.9642e+00] [real prob: 0.702] [fake prob: 0.307] [Time: 3396.9359]
+CcGAN: [Iter 420/2000] [D loss: 9.0999e-01] [G loss: 4.2968e+00] [real prob: 0.792] [fake prob: 0.411] [Time: 3566.3791]
+CcGAN: [Iter 440/2000] [D loss: 1.0344e+00] [G loss: 3.9234e+00] [real prob: 0.461] [fake prob: 0.050] [Time: 3742.0930]
+CcGAN: [Iter 460/2000] [D loss: 9.1550e-01] [G loss: 4.4651e+00] [real prob: 0.807] [fake prob: 0.431] [Time: 3917.0871]
+CcGAN: [Iter 480/2000] [D loss: 6.6825e-01] [G loss: 3.6669e+00] [real prob: 0.840] [fake prob: 0.338] [Time: 4086.5342]
+CcGAN: [Iter 500/2000] [D loss: 6.6360e-01] [G loss: 4.5253e+00] [real prob: 0.820] [fake prob: 0.315] [Time: 4259.3036]
+CcGAN: [Iter 520/2000] [D loss: 9.1768e-01] [G loss: 3.4639e+00] [real prob: 0.698] [fake prob: 0.335] [Time: 4430.0964]
+CcGAN: [Iter 540/2000] [D loss: 8.1152e-01] [G loss: 4.1934e+00] [real prob: 0.731] [fake prob: 0.317] [Time: 4600.1163]
+CcGAN: [Iter 560/2000] [D loss: 4.5624e-01] [G loss: 2.9732e+00] [real prob: 0.777] [fake prob: 0.130] [Time: 4770.2505]
+CcGAN: [Iter 580/2000] [D loss: 6.2504e-01] [G loss: 3.5792e+00] [real prob: 0.747] [fake prob: 0.225] [Time: 4940.1464]
+CcGAN: [Iter 600/2000] [D loss: 5.6116e-01] [G loss: 3.6592e+00] [real prob: 0.814] [fake prob: 0.245] [Time: 5110.2398]
+CcGAN: [Iter 620/2000] [D loss: 6.0108e-01] [G loss: 3.2089e+00] [real prob: 0.734] [fake prob: 0.197] [Time: 5280.9066]
+CcGAN: [Iter 640/2000] [D loss: 4.8818e-01] [G loss: 4.1289e+00] [real prob: 0.860] [fake prob: 0.241] [Time: 5451.2770]
+CcGAN: [Iter 660/2000] [D loss: 6.8428e-01] [G loss: 2.4820e+00] [real prob: 0.641] [fake prob: 0.131] [Time: 5621.5063]
+CcGAN: [Iter 680/2000] [D loss: 6.2609e-01] [G loss: 4.0420e+00] [real prob: 0.825] [fake prob: 0.309] [Time: 5791.5051]
+CcGAN: [Iter 700/2000] [D loss: 5.2265e-01] [G loss: 4.0105e+00] [real prob: 0.883] [fake prob: 0.287] [Time: 5961.6426]
+CcGAN: [Iter 720/2000] [D loss: 4.4737e-01] [G loss: 4.4724e+00] [real prob: 0.807] [fake prob: 0.169] [Time: 6131.6282]
+CcGAN: [Iter 740/2000] [D loss: 5.9958e-01] [G loss: 3.3045e+00] [real prob: 0.774] [fake prob: 0.246] [Time: 6301.0489]
+CcGAN: [Iter 760/2000] [D loss: 8.1630e-01] [G loss: 2.9367e+00] [real prob: 0.627] [fake prob: 0.191] [Time: 6470.4386]
+CcGAN: [Iter 780/2000] [D loss: 5.7311e-01] [G loss: 3.7324e+00] [real prob: 0.766] [fake prob: 0.173] [Time: 6639.9732]
+CcGAN: [Iter 800/2000] [D loss: 7.9864e-01] [G loss: 5.3056e+00] [real prob: 0.842] [fake prob: 0.368] [Time: 6809.7404]
+CcGAN: [Iter 820/2000] [D loss: 8.5051e-01] [G loss: 5.2138e+00] [real prob: 0.829] [fake prob: 0.426] [Time: 6979.9159]
+CcGAN: [Iter 840/2000] [D loss: 6.1908e-01] [G loss: 4.2705e+00] [real prob: 0.628] [fake prob: 0.053] [Time: 7149.7119]
+CcGAN: [Iter 860/2000] [D loss: 6.5035e-01] [G loss: 3.2838e+00] [real prob: 0.710] [fake prob: 0.201] [Time: 7319.4933]
+CcGAN: [Iter 880/2000] [D loss: 4.9131e-01] [G loss: 3.5729e+00] [real prob: 0.836] [fake prob: 0.243] [Time: 7489.3672]
+CcGAN: [Iter 900/2000] [D loss: 6.3285e-01] [G loss: 3.1469e+00] [real prob: 0.686] [fake prob: 0.149] [Time: 7659.1365]
+CcGAN: [Iter 920/2000] [D loss: 5.0169e-01] [G loss: 4.0790e+00] [real prob: 0.793] [fake prob: 0.197] [Time: 7829.3414]
+CcGAN: [Iter 940/2000] [D loss: 6.5245e-01] [G loss: 3.8697e+00] [real prob: 0.771] [fake prob: 0.243] [Time: 7999.2424]
+CcGAN: [Iter 960/2000] [D loss: 6.4061e-01] [G loss: 4.9222e+00] [real prob: 0.794] [fake prob: 0.284] [Time: 8169.1676]
+CcGAN: [Iter 980/2000] [D loss: 5.9464e-01] [G loss: 5.1345e+00] [real prob: 0.801] [fake prob: 0.274] [Time: 8338.9583]
+CcGAN: [Iter 1000/2000] [D loss: 4.2332e-01] [G loss: 4.8679e+00] [real prob: 0.811] [fake prob: 0.166] [Time: 8508.9815]
+CcGAN: [Iter 1020/2000] [D loss: 5.7872e-01] [G loss: 4.2035e+00] [real prob: 0.800] [fake prob: 0.249] [Time: 8679.4666]
+CcGAN: [Iter 1040/2000] [D loss: 4.3590e-01] [G loss: 4.2196e+00] [real prob: 0.777] [fake prob: 0.138] [Time: 8849.1495]
+CcGAN: [Iter 1060/2000] [D loss: 4.3742e-01] [G loss: 3.6771e+00] [real prob: 0.800] [fake prob: 0.163] [Time: 9019.2665]
+CcGAN: [Iter 1080/2000] [D loss: 5.0926e-01] [G loss: 3.5435e+00] [real prob: 0.717] [fake prob: 0.135] [Time: 9189.1309]
+CcGAN: [Iter 1100/2000] [D loss: 4.5871e-01] [G loss: 2.9985e+00] [real prob: 0.755] [fake prob: 0.128] [Time: 9358.7042]
+CcGAN: [Iter 1120/2000] [D loss: 7.9823e-01] [G loss: 3.7963e+00] [real prob: 0.646] [fake prob: 0.200] [Time: 9528.9127]
+CcGAN: [Iter 1140/2000] [D loss: 3.1442e-01] [G loss: 2.8282e+00] [real prob: 0.830] [fake prob: 0.093] [Time: 9698.2996]
+CcGAN: [Iter 1160/2000] [D loss: 3.7554e-01] [G loss: 2.8342e+00] [real prob: 0.819] [fake prob: 0.141] [Time: 9867.8653]
+CcGAN: [Iter 1180/2000] [D loss: 6.4587e-01] [G loss: 4.7807e+00] [real prob: 0.822] [fake prob: 0.309] [Time: 10037.2392]
+CcGAN: [Iter 1200/2000] [D loss: 3.3972e-01] [G loss: 5.4265e+00] [real prob: 0.830] [fake prob: 0.105] [Time: 10206.9049]
+CcGAN: [Iter 1220/2000] [D loss: 5.8522e-01] [G loss: 3.6185e+00] [real prob: 0.820] [fake prob: 0.267] [Time: 10376.9042]
+CcGAN: [Iter 1240/2000] [D loss: 5.0167e-01] [G loss: 3.2177e+00] [real prob: 0.730] [fake prob: 0.108] [Time: 10546.5950]
+CcGAN: [Iter 1260/2000] [D loss: 3.8603e-01] [G loss: 4.4734e+00] [real prob: 0.833] [fake prob: 0.160] [Time: 10716.1072]
+CcGAN: [Iter 1280/2000] [D loss: 3.2367e-01] [G loss: 5.2551e+00] [real prob: 0.857] [fake prob: 0.140] [Time: 10885.8633]
+CcGAN: [Iter 1300/2000] [D loss: 5.9848e-01] [G loss: 4.5487e+00] [real prob: 0.918] [fake prob: 0.359] [Time: 11055.2146]
+CcGAN: [Iter 1320/2000] [D loss: 5.1502e-01] [G loss: 5.3220e+00] [real prob: 0.837] [fake prob: 0.234] [Time: 11225.2177]
+CcGAN: [Iter 1340/2000] [D loss: 3.6041e-01] [G loss: 4.4822e+00] [real prob: 0.863] [fake prob: 0.143] [Time: 11394.7589]
+CcGAN: [Iter 1360/2000] [D loss: 3.1550e-01] [G loss: 4.3348e+00] [real prob: 0.883] [fake prob: 0.145] [Time: 11564.1085]
+CcGAN: [Iter 1380/2000] [D loss: 5.6838e-01] [G loss: 5.7307e+00] [real prob: 0.920] [fake prob: 0.345] [Time: 11733.6865]
+CcGAN: [Iter 1400/2000] [D loss: 3.9363e-01] [G loss: 4.2147e+00] [real prob: 0.773] [fake prob: 0.100] [Time: 11903.0481]
+CcGAN: [Iter 1420/2000] [D loss: 3.8327e-01] [G loss: 4.4602e+00] [real prob: 0.810] [fake prob: 0.121] [Time: 12073.4872]
+CcGAN: [Iter 1440/2000] [D loss: 3.7928e-01] [G loss: 4.9497e+00] [real prob: 0.843] [fake prob: 0.160] [Time: 12243.3376]
+CcGAN: [Iter 1460/2000] [D loss: 3.8782e-01] [G loss: 3.5806e+00] [real prob: 0.774] [fake prob: 0.078] [Time: 12412.9446]
+CcGAN: [Iter 1480/2000] [D loss: 4.4270e-01] [G loss: 4.2157e+00] [real prob: 0.829] [fake prob: 0.177] [Time: 12582.4756]
+CcGAN: [Iter 1500/2000] [D loss: 4.4079e-01] [G loss: 4.7011e+00] [real prob: 0.782] [fake prob: 0.149] [Time: 12751.9900]
+CcGAN: [Iter 1520/2000] [D loss: 4.6088e-01] [G loss: 3.0788e+00] [real prob: 0.756] [fake prob: 0.135] [Time: 12921.9765]
+CcGAN: [Iter 1540/2000] [D loss: 3.8956e-01] [G loss: 4.2051e+00] [real prob: 0.867] [fake prob: 0.147] [Time: 13091.6326]
+CcGAN: [Iter 1560/2000] [D loss: 6.2251e-01] [G loss: 6.9219e+00] [real prob: 0.796] [fake prob: 0.247] [Time: 13261.0224]
+CcGAN: [Iter 1580/2000] [D loss: 4.4287e-01] [G loss: 4.4282e+00] [real prob: 0.842] [fake prob: 0.211] [Time: 13430.7464]
+CcGAN: [Iter 1600/2000] [D loss: 2.5861e-01] [G loss: 5.2977e+00] [real prob: 0.856] [fake prob: 0.082] [Time: 13600.1060]
+CcGAN: [Iter 1620/2000] [D loss: 2.7869e-01] [G loss: 4.6539e+00] [real prob: 0.846] [fake prob: 0.085] [Time: 13770.3775]
+CcGAN: [Iter 1640/2000] [D loss: 3.4113e-01] [G loss: 4.3146e+00] [real prob: 0.851] [fake prob: 0.139] [Time: 13940.1036]
+CcGAN: [Iter 1660/2000] [D loss: 5.8423e-01] [G loss: 4.1139e+00] [real prob: 0.702] [fake prob: 0.140] [Time: 14109.8249]
+CcGAN: [Iter 1680/2000] [D loss: 6.7400e-01] [G loss: 4.9422e+00] [real prob: 0.648] [fake prob: 0.071] [Time: 14279.2607]
+CcGAN: [Iter 1700/2000] [D loss: 4.2000e-01] [G loss: 4.9374e+00] [real prob: 0.895] [fake prob: 0.205] [Time: 14448.7333]
+CcGAN: [Iter 1720/2000] [D loss: 4.2186e-01] [G loss: 5.6773e+00] [real prob: 0.936] [fake prob: 0.257] [Time: 14618.8531]
+CcGAN: [Iter 1740/2000] [D loss: 1.8388e-01] [G loss: 3.6184e+00] [real prob: 0.925] [fake prob: 0.093] [Time: 14788.3066]
+CcGAN: [Iter 1760/2000] [D loss: 4.2722e-01] [G loss: 2.5508e+00] [real prob: 0.696] [fake prob: 0.029] [Time: 14957.7099]
+CcGAN: [Iter 1780/2000] [D loss: 6.8298e-01] [G loss: 6.9863e+00] [real prob: 0.906] [fake prob: 0.382] [Time: 15127.2454]
+CcGAN: [Iter 1800/2000] [D loss: 5.6698e-01] [G loss: 6.7744e+00] [real prob: 0.929] [fake prob: 0.345] [Time: 15296.9337]
+CcGAN: [Iter 1820/2000] [D loss: 1.8346e-01] [G loss: 6.0550e+00] [real prob: 0.883] [fake prob: 0.046] [Time: 15466.7779]
+CcGAN: [Iter 1840/2000] [D loss: 3.0581e-01] [G loss: 4.4075e+00] [real prob: 0.904] [fake prob: 0.164] [Time: 15636.1900]
+CcGAN: [Iter 1860/2000] [D loss: 4.2515e-01] [G loss: 4.8414e+00] [real prob: 0.890] [fake prob: 0.219] [Time: 15805.5337]
+CcGAN: [Iter 1880/2000] [D loss: 3.3240e-01] [G loss: 4.6847e+00] [real prob: 0.878] [fake prob: 0.162] [Time: 15974.9475]
+CcGAN: [Iter 1900/2000] [D loss: 1.9754e-01] [G loss: 4.2343e+00] [real prob: 0.896] [fake prob: 0.078] [Time: 16144.5954]
+CcGAN: [Iter 1920/2000] [D loss: 2.6017e-01] [G loss: 4.8822e+00] [real prob: 0.820] [fake prob: 0.036] [Time: 16314.6773]
+CcGAN: [Iter 1940/2000] [D loss: 3.3263e-01] [G loss: 4.5248e+00] [real prob: 0.803] [fake prob: 0.077] [Time: 16484.1747]
+CcGAN: [Iter 1960/2000] [D loss: 7.9794e-01] [G loss: 4.7024e+00] [real prob: 0.624] [fake prob: 0.151] [Time: 16653.5977]
+CcGAN: [Iter 1980/2000] [D loss: 5.3006e-01] [G loss: 6.7275e+00] [real prob: 0.905] [fake prob: 0.274] [Time: 16823.1628]
+CcGAN: [Iter 2000/2000] [D loss: 3.7809e-01] [G loss: 3.8899e+00] [real prob: 0.850] [fake prob: 0.158] [Time: 16992.6881]
+GAN training finished; Time elapses: 16993.525768748s
+Start evalulation
+Start sampling 40 fake images per label from GAN >>>
+End sampling!
+ We got 7400 fake images.
+End sampling 40 fake images per label from GAN >>>
+Center:21; Real:154; Fake:1640; FID:76.0626114064914; LS:13.795281999088006.
+Center:22; Real:158; Fake:1640; FID:78.81021081728754; LS:13.401897809379621.
+Center:23; Real:159; Fake:1640; FID:79.07873059173583; LS:13.120936468068692.
+Center:24; Real:161; Fake:1640; FID:79.44781842115384; LS:12.948064219165683.
+ Center:25; Real:165; Fake:1640; FID:75.35452697127943; LS:12.772015435773334.
+ Center:26; Real:171; Fake:1640; FID:75.92182820733768; LS:12.703735930238645.
+ Center:27; Real:173; Fake:1640; FID:76.90080134606205; LS:12.553465686584028.
+ Center:28; Real:174; Fake:1640; FID:77.51154886419442; LS:12.642250479308025.
+ Center:29; Real:176; Fake:1640; FID:77.60873610484076; LS:12.710695833231254.
+ Center:30; Real:178; Fake:1640; FID:77.47457940748451; LS:12.86549402810406.
+ Center:31; Real:180; Fake:1640; FID:79.06060042474941; LS:13.117519230497773.
+ Center:32; Real:180; Fake:1640; FID:80.20962535016739; LS:13.253347338338541.
+ Center:33; Real:182; Fake:1640; FID:80.673095695988; LS:13.588501812583518.
+ Center:34; Real:183; Fake:1640; FID:80.8281404444825; LS:13.931067100510274.
+ Center:35; Real:182; Fake:1640; FID:84.19904815305756; LS:14.193831493796372.
+ Center:36; Real:181; Fake:1640; FID:80.79933467591319; LS:14.630776663994553.
+ Center:37; Real:181; Fake:1640; FID:80.49859222655834; LS:15.049237337488137.
+ Center:38; Real:183; Fake:1640; FID:79.9042816676708; LS:15.502958694804551.
+ Center:39; Real:181; Fake:1640; FID:82.78618933657027; LS:16.107136592437037.
+ Center:40; Real:180; Fake:1640; FID:82.31026645554229; LS:16.6504601389942.
+ Center:41; Real:177; Fake:1640; FID:82.43568203495826; LS:17.276048345679826.
+ Center:42; Real:171; Fake:1640; FID:84.91028851764267; LS:17.89471174667067.
+ Center:43; Real:168; Fake:1640; FID:87.11103779847475; LS:18.675395855030455.
+ Center:44; Real:167; Fake:1640; FID:89.73281840439462; LS:19.479934229263353.
+ Center:45; Real:165; Fake:1640; FID:91.21172204089403; LS:20.413451791715968.
+Center:46; Real:161; Fake:1640; FID:92.91453404432912; LS:21.302731598175427.
+Center:47; Real:160; Fake:1640; FID:93.4365643911024; LS:22.27075573493522.
+Center:48; Real:160; Fake:1640; FID:93.89176768003952; LS:23.074582045697948.
+Center:49; Real:156; Fake:1640; FID:96.41838803330634; LS:23.94714270066697.
+Center:50; Real:147; Fake:1640; FID:99.75548193705404; LS:24.94667987745119.
+Center:51; Real:144; Fake:1640; FID:100.79380025076446; LS:25.93088491644892.
+Center:52; Real:142; Fake:1640; FID:100.11931060692639; LS:26.89223256842574.
+Center:53; Real:140; Fake:1640; FID:100.27456037581169; LS:27.909616790405224.
+ Center:54; Real:131; Fake:1640; FID:103.99387434732472; LS:28.982419658638538.
+ Center:55; Real:127; Fake:1640; FID:105.1400983782271; LS:30.036507240074073.
+ Center:56; Real:124; Fake:1640; FID:107.9104701438204; LS:31.090169553944797.
+ Center:57; Real:119; Fake:1640; FID:109.4629643595059; LS:32.15552768130764.
+ Center:58; Real:115; Fake:1640; FID:112.51960102905106; LS:33.25984130648033.
+Center:59; Real:109; Fake:1640; FID:114.45848698032478; LS:34.31876140939208.
+ Center:60; Real:111; Fake:1640; FID:113.49505928986989; LS:35.413018584285474.
+Center:61; Real:103; Fake:1640; FID:113.2258279641105; LS:36.438865048951676.
+Center:62; Real:99; Fake:1640; FID:114.13588336873244; LS:37.54663103098595.
+ Center:63; Real:94; Fake:1640; FID:110.0891038492142; LS:38.58637906615963.
+ Center:64; Real:93; Fake:1640; FID:109.04069992878146; LS:39.616234881866994.
+ Center:65; Real:92; Fake:1640; FID:108.959291714043; LS:40.6421778492675.
+ Center:66; Real:87; Fake:1640; FID:112.99582546871753; LS:41.66934149252115.
+Center:67; Real:82; Fake:1640; FID:122.8308249803151; LS:42.748657697973.
+Center:68; Real:79; Fake:1640; FID:121.03582063374995; LS:43.7942756554339.
+Center:69; Real:79; Fake:1640; FID:121.10174947597325; LS:44.79039658451589.
+Center:70; Real:78; Fake:1640; FID:122.6515387813439; LS:45.707707747658034.
+Center:71; Real:73; Fake:1640; FID:121.14176316870714; LS:46.777919790730245.
+ Center:72; Real:70; Fake:1640; FID:120.96480736934902; LS:47.73868087459946.
+ Center:73; Real:69; Fake:1640; FID:118.96398927819408; LS:48.762387142846045.
+ Center:74; Real:68; Fake:1640; FID:121.06300894955109; LS:49.71647089400624.
+Center:75; Real:64; Fake:1640; FID:117.35856316204806; LS:50.65588070554432.
+Center:76; Real:62; Fake:1640; FID:117.21408880407188; LS:51.67076325157612.
+Center:77; Real:60; Fake:1640; FID:119.35912481034615; LS:52.6563813863095.
+ Center:78; Real:58; Fake:1640; FID:124.10111670822428; LS:53.72877567635122.
+Center:79; Real:51; Fake:1640; FID:130.41289859635165; LS:54.659846757958846.
+ Center:80; Real:48; Fake:1640; FID:132.64001335202803; LS:55.6388533799114.
+Center:81; Real:46; Fake:1640; FID:134.7299915639528; LS:56.765402525345365.
+Center:82; Real:43; Fake:1640; FID:136.42285885263087; LS:57.5799505938208.
+ epoch
+ Center:83; Real:44; Fake:1640; FID:135.81384797873915; LS:58.60181327961476.
+Center:84; Real:41; Fake:1640; FID:134.20029690378794; LS:59.57385680679141.
+Center:85; Real:37; Fake:1640; FID:129.32228092098393; LS:60.54674954837324.
+Center:86; Real:37; Fake:1640; FID:127.64929345848411; LS:61.538863667684446.
+Center:87; Real:40; Fake:1640; FID:128.58446070839574; LS:62.374574443314046.
+Center:88; Real:39; Fake:1640; FID:134.8739041267393; LS:63.29533892588281.
+Center:89; Real:37; Fake:1640; FID:137.0074872122401; LS:64.42941228867078.
+Center:90; Real:36; Fake:1640; FID:135.72808360408703; LS:65.45049374963997.
+Center:91; Real:37; Fake:1640; FID:135.11922154489298; LS:66.31203794989327.
+Center:92; Real:37; Fake:1640; FID:133.22224912431724; LS:67.22973685127842.
+Center:93; Real:36; Fake:1640; FID:133.19947738064886; LS:68.14946282096207.
+Center:94; Real:34; Fake:1640; FID:135.23053809654016; LS:68.98834137793449.
+Center:95; Real:34; Fake:1640; FID:135.0177644049132; LS:69.94806353667205.
+Center:96; Real:33; Fake:1640; FID:135.2200258308223; LS:70.72884117202015.
+Center:97; Real:33; Fake:1640; FID:135.2725148959184; LS:71.71209835574577.
+Center:98; Real:32; Fake:1640; FID:137.96293660316124; LS:72.52206676658925.
+Center:99; Real:33; Fake:1640; FID:137.04938227686512; LS:73.49254137802323.
+Center:100; Real:33; Fake:1640; FID:137.62570938761183; LS:74.39107961412066.
+Center:101; Real:29; Fake:1640; FID:145.11627880454512; LS:75.28208218619409.
+Center:102; Real:29; Fake:1640; FID:144.5145211551938; LS:76.24207388482442.
+Center:103; Real:27; Fake:1640; FID:148.51298451426; LS:77.18571321171049.
+Center:104; Real:27; Fake:1640; FID:148.34020381582337; LS:78.18677898917755.
+Center:105; Real:26; Fake:1640; FID:151.45664867700165; LS:79.12941290266676.
+Center:106; Real:26; Fake:1640; FID:160.538509251736; LS:79.98328174573437.
+Center:107; Real:26; Fake:1640; FID:160.24805065041826; LS:80.90214319494213.
+Center:108; Real:25; Fake:1640; FID:143.68102180539705; LS:81.75257243239889.
+Center:109; Real:24; Fake:1640; FID:146.90870162005672; LS:82.59666471998776.
+Center:110; Real:22; Fake:1640; FID:148.86309676883744; LS:83.48092988440085.
+Center:111; Real:21; Fake:1640; FID:151.56917962637934; LS:84.3537997655207.
+Center:112; Real:21; Fake:1640; FID:151.5886092221615; LS:85.03370477213728.
+Center:113; Real:19; Fake:1640; FID:157.6224320097748; LS:85.97512821467002.
+Center:114; Real:20; Fake:1640; FID:154.84506607622808; LS:86.7547893523602.
+Center:115; Real:19; Fake:1640; FID:156.4417439267716; LS:87.60874632625591.
+Center:116; Real:19; Fake:1640; FID:156.47495897492308; LS:88.46715330309803.
+Center:117; Real:18; Fake:1640; FID:159.77545191995821; LS:89.2690942099704.
+Center:118; Real:18; Fake:1640; FID:159.81537095502915; LS:90.0353918334401.
+Center:119; Real:17; Fake:1640; FID:154.5477147971858; LS:90.89332959472725.
+Center:120; Real:17; Fake:1640; FID:154.34899546937174; LS:91.74863362933577.
+Center:121; Real:17; Fake:1640; FID:154.44793434509273; LS:92.45633619761367.
+Center:122; Real:17; Fake:1640; FID:154.8891807325382; LS:93.17082899447712.
+Center:123; Real:16; Fake:1640; FID:158.49354300373642; LS:94.04086065867052.
+Center:124; Real:15; Fake:1640; FID:160.29061969481987; LS:94.71024892095295.
+Center:125; Real:15; Fake:1640; FID:160.2429567865908; LS:95.41741793464142.
+Center:126; Real:13; Fake:1640; FID:169.15449562743032; LS:96.17508196181095.
+Center:127; Real:12; Fake:1640; FID:172.57311314267602; LS:96.76309556824087.
+Center:128; Real:8; Fake:1640; FID:203.76409909207524; LS:97.53027340823148.
+Center:129; Real:7; Fake:1640; FID:188.2623360922754; LS:98.15115469512416.
+Center:130; Real:6; Fake:1640; FID:208.10040382588124; LS:98.7635205836467.
+Center:131; Real:6; Fake:1640; FID:208.11709928689015; LS:99.32623343503603.
+Center:132; Real:5; Fake:1640; FID:226.61683184999956; LS:99.97823489523243.
+Center:133; Real:4; Fake:1640; FID:257.7718973088001; LS:100.64130139521255.
+Center:134; Real:4; Fake:1640; FID:257.91439286950094; LS:101.47579421515282.
+Center:135; Real:4; Fake:1640; FID:257.99488207046363; LS:102.1669855005244.
+Center:136; Real:4; Fake:1640; FID:257.95734459033565; LS:102.77300666154521.
+Center:137; Real:5; Fake:1640; FID:246.73106740047643; LS:103.44554090148928.
+Center:138; Real:5; Fake:1640; FID:246.670394250072; LS:104.03665010787819.
+Center:139; Real:5; Fake:1640; FID:246.83600537311506; LS:104.70994510235856.
+Center:140; Real:4; Fake:1640; FID:272.85351294674757; LS:105.31265736429202.
+Center:141; Real:3; Fake:1640; FID:366.7499574950824; LS:105.89784708997325.
+Center:142; Real:3; Fake:1640; FID:366.60182780030914; LS:106.33279620754963.
+Center:143; Real:3; Fake:1640; FID:366.724895961747; LS:107.03709714942634.
+Center:144; Real:3; Fake:1640; FID:366.2019688477728; LS:107.48829959956475.
+Center:145; Real:3; Fake:1640; FID:366.6331246033642; LS:108.05823609226088.
+Center:146; Real:4; Fake:1640; FID:333.4058903796341; LS:108.43716222336289.
+Center:147; Real:3; Fake:1640; FID:284.58923375376787; LS:108.9807763317509.
+Center:148; Real:3; Fake:1640; FID:285.8274721891408; LS:109.31140308237703.
+Center:149; Real:3; Fake:1640; FID:287.2192730305731; LS:109.89681390961405.
+Center:150; Real:3; Fake:1640; FID:288.2871830693795; LS:110.41220755359475.
+Center:151; Real:3; Fake:1640; FID:289.58400642906514; LS:110.89197623624081.
+Center:152; Real:3; Fake:1640; FID:290.7855836193555; LS:111.3744920024353.
+Center:153; Real:3; Fake:1640; FID:291.977444634835; LS:112.10241333206707.
+Center:154; Real:3; Fake:1640; FID:294.053214547926; LS:112.50711629361415.
+Center:155; Real:2; Fake:1640; FID:351.87491605128383; LS:113.02425768596643.
+Center:156; Real:2; Fake:1640; FID:353.27247735864637; LS:113.33826195134031.
+Center:157; Real:2; Fake:1640; FID:353.8268412604382; LS:113.8324518005091.
+Center:158; Real:2; Fake:1640; FID:354.86579038010586; LS:114.25410215934829.
+Center:159; Real:2; Fake:1640; FID:355.7891996440719; LS:114.802627386707.
+Center:160; Real:2; Fake:1640; FID:357.10713091803603; LS:115.2611735419075.
+Center:161; Real:2; Fake:1640; FID:357.961409264728; LS:115.73616504074052.
+Center:162; Real:2; Fake:1640; FID:359.27243963212516; LS:115.95209911795016.
+Center:163; Real:2; Fake:1640; FID:360.3494148735726; LS:116.26639827910992.
+Center:164; Real:2; Fake:1640; FID:361.9691541006191; LS:116.81412340234965.
+Center:165; Real:3; Fake:1640; FID:417.1952729378953; LS:117.27540598194138.
+ CcGAN SFID: 168.00677321080013(89.51766304045397); min/max: 75.35452697127943/417.1952729378953.
+ CcGAN LS over centers: 65.37378439035868(35.06915783006179); min/max: 12.553465686584028/117.27540598194138.
+ epoch
+ CcGAN: FID of 7400 fake images: 77.78243390257313.
+epoch
+ CcGAN: overall LS of 7400 fake images: 65.41225126648523(41.51545266707863).
+ Displayed 20 cell counts are: [np.int64(10), np.int64(18), np.int64(26), np.int64(34), np.int64(42), np.int64(50), np.int64(58), np.int64(66), np.int64(74), np.int64(82), np.int64(90), np.int64(98), np.int64(106), np.int64(114), np.int64(122), np.int64(130), np.int64(138), np.int64(146), np.int64(154), np.int64(162)]
+Continuous ys:  [  9  28  48  67  87 106 126 145 165 185]
+-------------------------------------------------------------------------------------------------
+CcGAN: Soft
+===================================================================================================
+Number of images: 139
+ Use rule-of-thumb formula to compute kernel_sigma >>>
+ The std of 139 cell counts is 0.1620625899926293 so the kernel sigma is 0.06403032121124996
+CcGAN start
+ net_embed ckpt already exists
+ Loading...
+ net_y2h ckpt already exists
+ Loading...
+ counts vs reconstructed counts
+[[0.61687887 0.6141137 ]
+ [0.3292067  0.32767045]
+ [0.36427817 0.36528993]
+ [0.13635136 0.13591446]
+ [0.3474102  0.34739706]
+ [0.452949   0.4541527 ]
+ [0.14099139 0.14070916]
+ [0.2997536  0.29909104]
+ [0.6416666  0.6389649 ]
+ [0.4089164  0.40819716]]
+soft, Sigma is 0.06403032121124996, Kappa is 5.925380886426591
+ Begin Training CcGAN:
+./output/saved_models/ckpt_CcGAN_niters_2000_seed_2026_soft_0.06403032121124996_5.925380886426591.pth
+[0.07027027 0.07027027 0.07027027 0.07027027 0.07027027 0.07027027
+ 0.07027027 0.07027027 0.07027027 0.07027027 0.12672673 0.12672673
+ 0.12672673 0.12672673 0.12672673 0.12672673 0.12672673 0.12672673
+ 0.12672673 0.12672673 0.18318318 0.18318318 0.18318318 0.18318318
+ 0.18318318 0.18318318 0.18318318 0.18318318 0.18318318 0.18318318
+ 0.23963964 0.23963964 0.23963964 0.23963964 0.23963964 0.23963964
+ 0.23963964 0.23963964 0.23963964 0.23963964 0.2960961  0.2960961
+ 0.2960961  0.2960961  0.2960961  0.2960961  0.2960961  0.2960961
+ 0.2960961  0.2960961  0.35255255 0.35255255 0.35255255 0.35255255
+ 0.35255255 0.35255255 0.35255255 0.35255255 0.35255255 0.35255255
+ 0.40900901 0.40900901 0.40900901 0.40900901 0.40900901 0.40900901
+ 0.40900901 0.40900901 0.40900901 0.40900901 0.46546547 0.46546547
+ 0.46546547 0.46546547 0.46546547 0.46546547 0.46546547 0.46546547
+ 0.46546547 0.46546547 0.52192192 0.52192192 0.52192192 0.52192192
+ 0.52192192 0.52192192 0.52192192 0.52192192 0.52192192 0.52192192
+ 0.57837838 0.57837838 0.57837838 0.57837838 0.57837838 0.57837838
+ 0.57837838 0.57837838 0.57837838 0.57837838]
+CcGAN: [Iter 20/2000] [D loss: 1.0679e+00] [G loss: 2.3824e+00] [real prob: 0.570] [fake prob: 0.651] [Time: 169.6682]
+CcGAN: [Iter 40/2000] [D loss: 9.9134e-01] [G loss: 2.3348e+00] [real prob: 0.574] [fake prob: 0.663] [Time: 339.3329]
+CcGAN: [Iter 60/2000] [D loss: 7.6222e-01] [G loss: 2.4858e+00] [real prob: 0.619] [fake prob: 0.510] [Time: 508.7163]
+CcGAN: [Iter 80/2000] [D loss: 5.7960e-01] [G loss: 2.1924e+00] [real prob: 0.748] [fake prob: 0.563] [Time: 678.1059]
+CcGAN: [Iter 100/2000] [D loss: 4.0425e-01] [G loss: 3.0765e+00] [real prob: 0.796] [fake prob: 0.391] [Time: 847.7249]
+CcGAN: [Iter 120/2000] [D loss: 1.0597e+00] [G loss: 2.8043e+00] [real prob: 0.372] [fake prob: 0.318] [Time: 1017.9429]
+CcGAN: [Iter 140/2000] [D loss: 4.2327e-01] [G loss: 1.7325e+00] [real prob: 0.809] [fake prob: 0.457] [Time: 1187.3643]
+CcGAN: [Iter 160/2000] [D loss: 5.2809e-01] [G loss: 1.6478e+00] [real prob: 0.639] [fake prob: 0.414] [Time: 1356.7249]
+CcGAN: [Iter 180/2000] [D loss: 4.7983e-01] [G loss: 2.6909e+00] [real prob: 0.708] [fake prob: 0.364] [Time: 1526.3563]
+CcGAN: [Iter 200/2000] [D loss: 6.7123e-01] [G loss: 1.4238e+00] [real prob: 0.591] [fake prob: 0.264] [Time: 1695.9218]
+CcGAN: [Iter 220/2000] [D loss: 5.1042e-01] [G loss: 1.5965e+00] [real prob: 0.704] [fake prob: 0.384] [Time: 1866.2543]
+CcGAN: [Iter 240/2000] [D loss: 8.2276e-01] [G loss: 1.6807e+00] [real prob: 0.775] [fake prob: 0.685] [Time: 2035.8970]
+CcGAN: [Iter 260/2000] [D loss: 8.3022e-01] [G loss: 2.4165e+00] [real prob: 0.612] [fake prob: 0.442] [Time: 2205.4280]
+CcGAN: [Iter 280/2000] [D loss: 4.8981e-01] [G loss: 2.3521e+00] [real prob: 0.766] [fake prob: 0.394] [Time: 2375.0423]
+CcGAN: [Iter 300/2000] [D loss: 9.0881e-01] [G loss: 2.9441e+00] [real prob: 0.609] [fake prob: 0.582] [Time: 2544.7462]
+CcGAN: [Iter 320/2000] [D loss: 5.7718e-01] [G loss: 2.1575e+00] [real prob: 0.806] [fake prob: 0.548] [Time: 2715.0211]
+CcGAN: [Iter 340/2000] [D loss: 7.3411e-01] [G loss: 2.1479e+00] [real prob: 0.692] [fake prob: 0.512] [Time: 2884.7246]
+CcGAN: [Iter 360/2000] [D loss: 7.5016e-01] [G loss: 1.8460e+00] [real prob: 0.614] [fake prob: 0.504] [Time: 3054.3695]
+CcGAN: [Iter 380/2000] [D loss: 9.2618e-01] [G loss: 2.3148e+00] [real prob: 0.685] [fake prob: 0.591] [Time: 3224.2408]
+CcGAN: [Iter 400/2000] [D loss: 9.9179e-01] [G loss: 2.2360e+00] [real prob: 0.450] [fake prob: 0.278] [Time: 3393.9123]
+CcGAN: [Iter 420/2000] [D loss: 5.1912e-01] [G loss: 1.9504e+00] [real prob: 0.726] [fake prob: 0.424] [Time: 3563.7035]
+CcGAN: [Iter 440/2000] [D loss: 7.1804e-01] [G loss: 2.1432e+00] [real prob: 0.666] [fake prob: 0.461] [Time: 3733.3909]
+CcGAN: [Iter 460/2000] [D loss: 6.6930e-01] [G loss: 2.1787e+00] [real prob: 0.676] [fake prob: 0.449] [Time: 3903.0084]
+CcGAN: [Iter 480/2000] [D loss: 4.9393e-01] [G loss: 3.2677e+00] [real prob: 0.657] [fake prob: 0.249] [Time: 4072.5074]
+CcGAN: [Iter 500/2000] [D loss: 4.0371e-01] [G loss: 2.5595e+00] [real prob: 0.743] [fake prob: 0.398] [Time: 4242.0385]
+CcGAN: [Iter 520/2000] [D loss: 4.1034e-01] [G loss: 3.1602e+00] [real prob: 0.743] [fake prob: 0.314] [Time: 4411.7145]
+CcGAN: [Iter 540/2000] [D loss: 3.5594e-01] [G loss: 3.9670e+00] [real prob: 0.816] [fake prob: 0.247] [Time: 4581.4474]
+CcGAN: [Iter 560/2000] [D loss: 5.5961e-01] [G loss: 2.7485e+00] [real prob: 0.669] [fake prob: 0.340] [Time: 4751.2944]
+CcGAN: [Iter 580/2000] [D loss: 5.7461e-01] [G loss: 3.7218e+00] [real prob: 0.853] [fake prob: 0.515] [Time: 4921.1651]
+CcGAN: [Iter 600/2000] [D loss: 3.0065e-01] [G loss: 1.4960e+00] [real prob: 0.722] [fake prob: 0.167] [Time: 5090.8641]
+CcGAN: [Iter 620/2000] [D loss: 6.6538e-01] [G loss: 4.6051e+00] [real prob: 0.744] [fake prob: 0.495] [Time: 5261.2871]
+CcGAN: [Iter 640/2000] [D loss: 3.4176e-01] [G loss: 3.6540e+00] [real prob: 0.891] [fake prob: 0.276] [Time: 5431.1525]
+CcGAN: [Iter 660/2000] [D loss: 4.4401e-01] [G loss: 3.7534e+00] [real prob: 0.867] [fake prob: 0.368] [Time: 5601.3232]
+CcGAN: [Iter 680/2000] [D loss: 4.6584e-01] [G loss: 3.9368e+00] [real prob: 0.802] [fake prob: 0.392] [Time: 5771.1555]
+CcGAN: [Iter 700/2000] [D loss: 4.7199e-01] [G loss: 3.8412e+00] [real prob: 0.860] [fake prob: 0.455] [Time: 5940.8878]
+CcGAN: [Iter 720/2000] [D loss: 4.3274e-01] [G loss: 3.4355e+00] [real prob: 0.714] [fake prob: 0.202] [Time: 6111.3715]
+CcGAN: [Iter 740/2000] [D loss: 5.2139e-01] [G loss: 5.3334e+00] [real prob: 0.610] [fake prob: 0.170] [Time: 6281.2286]
+CcGAN: [Iter 760/2000] [D loss: 6.5979e-01] [G loss: 2.2808e+00] [real prob: 0.521] [fake prob: 0.101] [Time: 6450.8159]
+CcGAN: [Iter 780/2000] [D loss: 6.0877e-01] [G loss: 3.1548e+00] [real prob: 0.637] [fake prob: 0.243] [Time: 6620.6132]
+CcGAN: [Iter 800/2000] [D loss: 4.0488e-01] [G loss: 2.9069e+00] [real prob: 0.766] [fake prob: 0.288] [Time: 6790.2825]
+CcGAN: [Iter 820/2000] [D loss: 4.1817e-01] [G loss: 3.1144e+00] [real prob: 0.837] [fake prob: 0.404] [Time: 6960.6449]
+CcGAN: [Iter 840/2000] [D loss: 3.0327e-01] [G loss: 2.2394e+00] [real prob: 0.802] [fake prob: 0.318] [Time: 7130.3063]
+CcGAN: [Iter 860/2000] [D loss: 5.9338e-01] [G loss: 4.7914e+00] [real prob: 0.838] [fake prob: 0.531] [Time: 7299.9918]
+CcGAN: [Iter 880/2000] [D loss: 3.4653e-01] [G loss: 3.4108e+00] [real prob: 0.826] [fake prob: 0.284] [Time: 7469.7763]
+CcGAN: [Iter 900/2000] [D loss: 6.5064e-01] [G loss: 5.8665e+00] [real prob: 0.866] [fake prob: 0.551] [Time: 7639.4803]
+CcGAN: [Iter 920/2000] [D loss: 4.2665e-01] [G loss: 3.1872e+00] [real prob: 0.781] [fake prob: 0.221] [Time: 7809.6757]
+CcGAN: [Iter 940/2000] [D loss: 4.0236e-01] [G loss: 3.5789e+00] [real prob: 0.755] [fake prob: 0.242] [Time: 7979.3245]
+CcGAN: [Iter 960/2000] [D loss: 5.0899e-01] [G loss: 3.9755e+00] [real prob: 0.739] [fake prob: 0.364] [Time: 8148.9859]
+CcGAN: [Iter 980/2000] [D loss: 3.7196e-01] [G loss: 2.8772e+00] [real prob: 0.736] [fake prob: 0.275] [Time: 8322.3460]
+CcGAN: [Iter 1000/2000] [D loss: 5.6623e-01] [G loss: 2.0828e+00] [real prob: 0.596] [fake prob: 0.203] [Time: 8491.7356]
+CcGAN: [Iter 1020/2000] [D loss: 5.2895e-01] [G loss: 3.5214e+00] [real prob: 0.849] [fake prob: 0.455] [Time: 8661.8775]
+CcGAN: [Iter 1040/2000] [D loss: 4.0198e-01] [G loss: 4.4730e+00] [real prob: 0.711] [fake prob: 0.192] [Time: 8831.7103]
+CcGAN: [Iter 1060/2000] [D loss: 1.9177e-01] [G loss: 3.3632e+00] [real prob: 0.793] [fake prob: 0.178] [Time: 9001.6043]
+CcGAN: [Iter 1080/2000] [D loss: 5.3550e-01] [G loss: 3.6185e+00] [real prob: 0.680] [fake prob: 0.292] [Time: 9171.5050]
+CcGAN: [Iter 1100/2000] [D loss: 2.9219e-01] [G loss: 3.4173e+00] [real prob: 0.762] [fake prob: 0.121] [Time: 9341.2750]
+CcGAN: [Iter 1120/2000] [D loss: 2.9100e-01] [G loss: 2.8894e+00] [real prob: 0.778] [fake prob: 0.235] [Time: 9511.2496]
+CcGAN: [Iter 1140/2000] [D loss: 2.6938e-01] [G loss: 5.2025e+00] [real prob: 0.723] [fake prob: 0.082] [Time: 9680.8673]
+CcGAN: [Iter 1160/2000] [D loss: 3.4782e-01] [G loss: 3.7181e+00] [real prob: 0.893] [fake prob: 0.315] [Time: 9850.6531]
+CcGAN: [Iter 1180/2000] [D loss: 2.6159e-01] [G loss: 2.9706e+00] [real prob: 0.832] [fake prob: 0.239] [Time: 10020.3342]
+CcGAN: [Iter 1200/2000] [D loss: 6.0924e-01] [G loss: 4.9275e+00] [real prob: 0.867] [fake prob: 0.484] [Time: 10189.8526]
+CcGAN: [Iter 1220/2000] [D loss: 2.3987e-01] [G loss: 2.4072e+00] [real prob: 0.907] [fake prob: 0.382] [Time: 10360.1805]
+CcGAN: [Iter 1240/2000] [D loss: 2.2449e-01] [G loss: 3.3822e+00] [real prob: 0.832] [fake prob: 0.204] [Time: 10530.2886]
+CcGAN: [Iter 1260/2000] [D loss: 3.5042e-01] [G loss: 3.5521e+00] [real prob: 0.856] [fake prob: 0.350] [Time: 10700.2279]
+CcGAN: [Iter 1280/2000] [D loss: 2.4876e-01] [G loss: 2.1713e+00] [real prob: 0.847] [fake prob: 0.204] [Time: 10870.2435]
+CcGAN: [Iter 1300/2000] [D loss: 4.5690e-01] [G loss: 2.5951e+00] [real prob: 0.700] [fake prob: 0.204] [Time: 11039.7916]
+CcGAN: [Iter 1320/2000] [D loss: 7.4015e-01] [G loss: 5.2719e+00] [real prob: 0.832] [fake prob: 0.546] [Time: 11209.7136]
+CcGAN: [Iter 1340/2000] [D loss: 3.0042e-01] [G loss: 3.5605e+00] [real prob: 0.712] [fake prob: 0.139] [Time: 11379.1286]
+CcGAN: [Iter 1360/2000] [D loss: 4.8325e-01] [G loss: 3.8922e+00] [real prob: 0.634] [fake prob: 0.247] [Time: 11548.5788]
+CcGAN: [Iter 1380/2000] [D loss: 2.6903e-01] [G loss: 2.5093e+00] [real prob: 0.734] [fake prob: 0.215] [Time: 11718.0322]
+CcGAN: [Iter 1400/2000] [D loss: 4.5902e-01] [G loss: 4.0291e+00] [real prob: 0.673] [fake prob: 0.112] [Time: 11887.8293]
+CcGAN: [Iter 1420/2000] [D loss: 2.4057e-01] [G loss: 2.5256e+00] [real prob: 0.877] [fake prob: 0.269] [Time: 12058.0329]
+CcGAN: [Iter 1440/2000] [D loss: 3.3429e-01] [G loss: 2.9140e+00] [real prob: 0.718] [fake prob: 0.159] [Time: 12227.7819]
+CcGAN: [Iter 1460/2000] [D loss: 3.1222e-01] [G loss: 3.2569e+00] [real prob: 0.825] [fake prob: 0.257] [Time: 12397.2809]
+CcGAN: [Iter 1480/2000] [D loss: 5.0139e-01] [G loss: 4.1729e+00] [real prob: 0.878] [fake prob: 0.432] [Time: 12566.7465]
+CcGAN: [Iter 1500/2000] [D loss: 2.9769e-01] [G loss: 4.0090e+00] [real prob: 0.747] [fake prob: 0.076] [Time: 12736.2225]
+CcGAN: [Iter 1520/2000] [D loss: 4.9590e-01] [G loss: 2.8992e+00] [real prob: 0.763] [fake prob: 0.357] [Time: 12906.4362]
+CcGAN: [Iter 1540/2000] [D loss: 1.8471e-01] [G loss: 2.7811e+00] [real prob: 0.876] [fake prob: 0.187] [Time: 13075.9323]
+CcGAN: [Iter 1560/2000] [D loss: 3.8136e-01] [G loss: 4.0205e+00] [real prob: 0.641] [fake prob: 0.023] [Time: 13245.5323]
+CcGAN: [Iter 1580/2000] [D loss: 3.2595e-01] [G loss: 4.4855e+00] [real prob: 0.899] [fake prob: 0.333] [Time: 13415.1434]
+CcGAN: [Iter 1600/2000] [D loss: 5.2143e-01] [G loss: 3.9224e+00] [real prob: 0.763] [fake prob: 0.345] [Time: 13584.7348]
+CcGAN: [Iter 1620/2000] [D loss: 2.1412e-01] [G loss: 3.2307e+00] [real prob: 0.793] [fake prob: 0.106] [Time: 13755.0070]
+CcGAN: [Iter 1640/2000] [D loss: 3.3648e-01] [G loss: 3.6584e+00] [real prob: 0.806] [fake prob: 0.223] [Time: 13924.4115]
+CcGAN: [Iter 1660/2000] [D loss: 3.0646e-01] [G loss: 3.7526e+00] [real prob: 0.829] [fake prob: 0.262] [Time: 14094.4453]
+CcGAN: [Iter 1680/2000] [D loss: 2.6849e-01] [G loss: 4.1113e+00] [real prob: 0.826] [fake prob: 0.210] [Time: 14264.1563]
+CcGAN: [Iter 1700/2000] [D loss: 3.3932e-01] [G loss: 3.8502e+00] [real prob: 0.859] [fake prob: 0.295] [Time: 14433.8075]
+CcGAN: [Iter 1720/2000] [D loss: 3.9089e-01] [G loss: 4.2186e+00] [real prob: 0.798] [fake prob: 0.289] [Time: 14603.9456]
+CcGAN: [Iter 1740/2000] [D loss: 2.3247e-01] [G loss: 2.0217e+00] [real prob: 0.789] [fake prob: 0.165] [Time: 14773.4334]
+CcGAN: [Iter 1760/2000] [D loss: 2.4029e-01] [G loss: 4.3917e+00] [real prob: 0.712] [fake prob: 0.067] [Time: 14943.3125]
+CcGAN: [Iter 1780/2000] [D loss: 1.1102e+00] [G loss: 9.6948e-01] [real prob: 0.405] [fake prob: 0.094] [Time: 15113.3732]
+CcGAN: [Iter 1800/2000] [D loss: 2.1609e-01] [G loss: 3.5018e+00] [real prob: 0.874] [fake prob: 0.218] [Time: 15283.1786]
+CcGAN: [Iter 1820/2000] [D loss: 1.9830e-01] [G loss: 2.7114e+00] [real prob: 0.848] [fake prob: 0.157] [Time: 15453.6672]
+CcGAN: [Iter 1840/2000] [D loss: 2.2947e-01] [G loss: 2.7971e+00] [real prob: 0.871] [fake prob: 0.248] [Time: 15623.3136]
+CcGAN: [Iter 1860/2000] [D loss: 2.4555e-01] [G loss: 3.7402e+00] [real prob: 0.718] [fake prob: 0.070] [Time: 15792.9158]
+CcGAN: [Iter 1880/2000] [D loss: 3.0046e-01] [G loss: 3.8950e+00] [real prob: 0.836] [fake prob: 0.270] [Time: 15962.3823]
+CcGAN: [Iter 1900/2000] [D loss: 1.8959e-01] [G loss: 3.6549e+00] [real prob: 0.770] [fake prob: 0.070] [Time: 16132.1157]
+CcGAN: [Iter 1920/2000] [D loss: 2.4816e-01] [G loss: 3.4170e+00] [real prob: 0.825] [fake prob: 0.165] [Time: 16302.1237]
+CcGAN: [Iter 1940/2000] [D loss: 3.7343e-01] [G loss: 2.3415e+00] [real prob: 0.701] [fake prob: 0.174] [Time: 16471.8459]
+CcGAN: [Iter 1960/2000] [D loss: 3.3054e-01] [G loss: 4.1540e+00] [real prob: 0.819] [fake prob: 0.278] [Time: 16641.3456]
+CcGAN: [Iter 1980/2000] [D loss: 2.2808e-01] [G loss: 2.9553e+00] [real prob: 0.763] [fake prob: 0.080] [Time: 16810.7162]
+CcGAN: [Iter 2000/2000] [D loss: 2.8944e-01] [G loss: 3.7601e+00] [real prob: 0.797] [fake prob: 0.176] [Time: 16980.2467]
+GAN training finished; Time elapses: 16981.071543176004s
+Start evalulation
+Start sampling 40 fake images per label from GAN >>>
+End sampling!
+ We got 7400 fake images.
+End sampling 40 fake images per label from GAN >>>
+Center:21; Real:154; Fake:1640; FID:73.37160938916468; LS:18.263642164978496.
+Center:22; Real:158; Fake:1640; FID:76.15167232121134; LS:18.04598406493982.
+Center:23; Real:159; Fake:1640; FID:77.0576501915257; LS:17.775518234762387.
+Center:24; Real:161; Fake:1640; FID:78.21816930082602; LS:17.214643091833356.
+ Center:25; Real:165; Fake:1640; FID:71.82150194461019; LS:16.97145773080155.
+ Center:26; Real:171; Fake:1640; FID:73.60805622784561; LS:16.604640691348056.
+ Center:27; Real:173; Fake:1640; FID:74.60548759205348; LS:16.434137056075127.
+ Center:28; Real:174; Fake:1640; FID:74.38786691596242; LS:16.210176707856448.
+ Center:29; Real:176; Fake:1640; FID:74.38776285349597; LS:15.937521500796898.
+ Center:30; Real:178; Fake:1640; FID:74.80184489474065; LS:15.735822886962263.
+ Center:31; Real:180; Fake:1640; FID:77.0646309054811; LS:15.775188061349638.
+ Center:32; Real:180; Fake:1640; FID:77.85410802284518; LS:15.88401027729553.
+ Center:33; Real:182; Fake:1640; FID:77.87853344269926; LS:15.580584742537722.
+ Center:34; Real:183; Fake:1640; FID:72.51760830467006; LS:15.402299914820256.
+ Center:35; Real:182; Fake:1640; FID:78.3369168142879; LS:15.444483266184788.
+ Center:36; Real:181; Fake:1640; FID:77.67069278436048; LS:15.556020158595155.
+ Center:37; Real:181; Fake:1640; FID:76.31721943193573; LS:15.696751294364562.
+ Center:38; Real:183; Fake:1640; FID:71.55091508643049; LS:15.91851778563748.
+ Center:39; Real:181; Fake:1640; FID:75.7298433125718; LS:16.198959137947956.
+ Center:40; Real:180; Fake:1640; FID:74.82462447871404; LS:16.45916984743757.
+ Center:41; Real:177; Fake:1640; FID:74.27589884416543; LS:16.855308393785368.
+ Center:42; Real:171; Fake:1640; FID:73.81203064604223; LS:17.316812989687.
+ Center:43; Real:168; Fake:1640; FID:75.3767575231603; LS:17.7648728609369.
+ Center:44; Real:167; Fake:1640; FID:77.0304696499904; LS:18.306276728613756.
+ Center:45; Real:165; Fake:1640; FID:77.43156788496339; LS:18.824847239320643.
+Center:46; Real:161; Fake:1640; FID:79.23444610923097; LS:19.44731797484295.
+Center:47; Real:160; Fake:1640; FID:78.89829751889555; LS:19.96310553628974.
+Center:48; Real:160; Fake:1640; FID:78.92490654015361; LS:20.64987916009523.
+Center:49; Real:156; Fake:1640; FID:80.76956209419946; LS:21.177039580806955.
+Center:50; Real:147; Fake:1640; FID:83.14594950512593; LS:21.776289058568683.
+Center:51; Real:144; Fake:1640; FID:83.98431423215476; LS:22.655913634860614.
+Center:52; Real:142; Fake:1640; FID:82.97438362295823; LS:23.417924064891867.
+Center:53; Real:140; Fake:1640; FID:84.51370642177518; LS:24.123652302154635.
+ Center:54; Real:131; Fake:1640; FID:87.85927341608726; LS:24.96770105240753.
+ Center:55; Real:127; Fake:1640; FID:91.33564111302117; LS:25.75196513855807.
+ Center:56; Real:124; Fake:1640; FID:93.61130081084977; LS:26.631646890144385.
+ Center:57; Real:119; Fake:1640; FID:95.67176612328036; LS:27.580199062155287.
+ Center:58; Real:115; Fake:1640; FID:99.34192202713582; LS:28.37820657678289.
+Center:59; Real:109; Fake:1640; FID:103.16119454366338; LS:29.45696550288192.
+ Center:60; Real:111; Fake:1640; FID:105.27512213506404; LS:30.418568534641413.
+Center:61; Real:103; Fake:1640; FID:103.05039269426406; LS:31.295754973512008.
+Center:62; Real:99; Fake:1640; FID:104.592327958587; LS:32.330404500532666.
+ Center:63; Real:94; Fake:1640; FID:93.72758668764477; LS:33.39993225455443.
+ Center:64; Real:93; Fake:1640; FID:94.74994145392135; LS:34.318027474441585.
+ Center:65; Real:92; Fake:1640; FID:96.00724443846576; LS:35.28122095721774.
+ Center:66; Real:87; Fake:1640; FID:98.00824234520512; LS:36.317685329281474.
+Center:67; Real:82; Fake:1640; FID:111.62738255458231; LS:37.29794597383475.
+Center:68; Real:79; Fake:1640; FID:113.1959615603614; LS:38.25130108620676.
+Center:69; Real:79; Fake:1640; FID:115.23922414852275; LS:39.34224134118342.
+Center:70; Real:78; Fake:1640; FID:116.1163129261459; LS:40.463126939336384.
+Center:71; Real:73; Fake:1640; FID:116.34250201118932; LS:41.54025182737742.
+ Center:72; Real:70; Fake:1640; FID:114.50869478381163; LS:42.51938823078441.
+ Center:73; Real:69; Fake:1640; FID:111.5297128470012; LS:43.44882029368451.
+ Center:74; Real:68; Fake:1640; FID:113.4239586054996; LS:44.561592990449604.
+Center:75; Real:64; Fake:1640; FID:112.32557632008464; LS:45.71651650248436.
+Center:76; Real:62; Fake:1640; FID:111.2994978040061; LS:46.76044102862546.
+Center:77; Real:60; Fake:1640; FID:113.91957851546047; LS:47.73199741871369.
+ Center:78; Real:58; Fake:1640; FID:119.81496451313186; LS:49.09158823540457.
+Center:79; Real:51; Fake:1640; FID:117.98384539870271; LS:49.98109474488443.
+ Center:80; Real:48; Fake:1640; FID:122.66791524144863; LS:50.91121411605216.
+Center:81; Real:46; Fake:1640; FID:126.74430456147154; LS:52.025129903466784.
+Center:82; Real:43; Fake:1640; FID:125.76718781191808; LS:52.91016794148515.
+ epoch
+ Center:83; Real:44; Fake:1640; FID:124.73211988247655; LS:53.92646692127171.
+Center:84; Real:41; Fake:1640; FID:116.83975238988644; LS:54.86724537478124.
+Center:85; Real:37; Fake:1640; FID:107.23046341792494; LS:55.92928351089586.
+Center:86; Real:37; Fake:1640; FID:107.90592026297422; LS:56.90184002566356.
+Center:87; Real:40; Fake:1640; FID:106.69566068689291; LS:57.897953132147016.
+Center:88; Real:39; Fake:1640; FID:115.38146441837695; LS:58.825531123376386.
+Center:89; Real:37; Fake:1640; FID:119.46666129841236; LS:59.808844094437255.
+Center:90; Real:36; Fake:1640; FID:118.43194441107721; LS:60.837614915526764.
+Center:91; Real:37; Fake:1640; FID:117.58532006648957; LS:61.855968077689774.
+Center:92; Real:37; Fake:1640; FID:117.85436190322997; LS:62.726320950012294.
+Center:93; Real:36; Fake:1640; FID:118.05818695367978; LS:63.725862378066.
+Center:94; Real:34; Fake:1640; FID:120.22398473746965; LS:64.76614143631717.
+Center:95; Real:34; Fake:1640; FID:120.03213299937785; LS:65.66882664634187.
+Center:96; Real:33; Fake:1640; FID:120.930447356804; LS:66.46651367371811.
+Center:97; Real:33; Fake:1640; FID:120.79832131739029; LS:67.56034763376569.
+Center:98; Real:32; Fake:1640; FID:123.58780460528388; LS:68.50634278484235.
+Center:99; Real:33; Fake:1640; FID:123.10669006894312; LS:69.25372118123512.
+Center:100; Real:33; Fake:1640; FID:124.18542777759754; LS:70.09772320070145.
+Center:101; Real:29; Fake:1640; FID:133.35715099317576; LS:71.14455094426961.
+Center:102; Real:29; Fake:1640; FID:133.46651824235664; LS:72.09575852324686.
+Center:103; Real:27; Fake:1640; FID:138.8324622592451; LS:72.97829178199399.
+Center:104; Real:27; Fake:1640; FID:138.69180802005786; LS:73.9233032657833.
+Center:105; Real:26; Fake:1640; FID:141.84262655564774; LS:74.8239056719467.
+Center:106; Real:26; Fake:1640; FID:158.90768961313032; LS:75.68283691627497.
+Center:107; Real:26; Fake:1640; FID:158.7239826532601; LS:76.60741807975829.
+Center:108; Real:25; Fake:1640; FID:124.8883846037698; LS:77.71150477028384.
+Center:109; Real:24; Fake:1640; FID:128.222836538816; LS:78.7556552621763.
+Center:110; Real:22; Fake:1640; FID:131.24040853327685; LS:79.38969117280368.
+Center:111; Real:21; Fake:1640; FID:134.6661022932288; LS:80.38439335524127.
+Center:112; Real:21; Fake:1640; FID:134.61193920191153; LS:81.38367730697117.
+Center:113; Real:19; Fake:1640; FID:140.8090517450979; LS:82.38990958404113.
+Center:114; Real:20; Fake:1640; FID:136.54356896098093; LS:83.38487898417544.
+Center:115; Real:19; Fake:1640; FID:139.02349873320452; LS:84.34906468822098.
+Center:116; Real:19; Fake:1640; FID:139.06140303176124; LS:85.26028560940176.
+Center:117; Real:18; Fake:1640; FID:143.81917567650206; LS:86.4134683898968.
+Center:118; Real:18; Fake:1640; FID:143.80859539207114; LS:87.26000144547305.
+Center:119; Real:17; Fake:1640; FID:140.0880998303869; LS:88.16295629885138.
+Center:120; Real:17; Fake:1640; FID:140.25891371018656; LS:89.27362979426071.
+Center:121; Real:17; Fake:1640; FID:140.302422466155; LS:90.3348056001407.
+Center:122; Real:17; Fake:1640; FID:140.37859761310594; LS:91.27888574547748.
+Center:123; Real:16; Fake:1640; FID:145.43124632437093; LS:92.05882865640267.
+Center:124; Real:15; Fake:1640; FID:149.48148307136265; LS:93.10445543589843.
+Center:125; Real:15; Fake:1640; FID:149.57492473926908; LS:94.16011495246529.
+Center:126; Real:13; Fake:1640; FID:160.56350794449844; LS:95.07463404297738.
+Center:127; Real:12; Fake:1640; FID:164.10594125231046; LS:96.19585474694102.
+Center:128; Real:8; Fake:1640; FID:208.82885559607965; LS:97.07009740942726.
+Center:129; Real:7; Fake:1640; FID:191.0635362609618; LS:97.88355483453175.
+Center:130; Real:6; Fake:1640; FID:214.01924171357447; LS:99.02920653782331.
+Center:131; Real:6; Fake:1640; FID:213.82700726277938; LS:99.85302388086552.
+Center:132; Real:5; Fake:1640; FID:237.7179732586693; LS:100.96557113677036.
+Center:133; Real:4; Fake:1640; FID:265.10634964693975; LS:101.95846340103392.
+Center:134; Real:4; Fake:1640; FID:265.08730490034225; LS:102.93162682889847.
+Center:135; Real:4; Fake:1640; FID:265.0262954244456; LS:104.0562984868089.
+Center:136; Real:4; Fake:1640; FID:265.10410511707755; LS:104.79793988104637.
+Center:137; Real:5; Fake:1640; FID:246.8437699190952; LS:105.88948303839283.
+Center:138; Real:5; Fake:1640; FID:246.65870777402733; LS:106.74097050891099.
+Center:139; Real:5; Fake:1640; FID:246.38075344178193; LS:107.62844042616283.
+Center:140; Real:4; Fake:1640; FID:280.8309810333581; LS:109.0614894951194.
+Center:141; Real:3; Fake:1640; FID:386.27244220219507; LS:109.9276343574066.
+Center:142; Real:3; Fake:1640; FID:386.01414137018475; LS:110.9011432302139.
+Center:143; Real:3; Fake:1640; FID:385.91818419796294; LS:111.74215490033669.
+Center:144; Real:3; Fake:1640; FID:385.86172007446874; LS:112.94218597411201.
+Center:145; Real:3; Fake:1640; FID:385.6087711095604; LS:113.78462016791468.
+Center:146; Real:4; Fake:1640; FID:352.1999797194834; LS:114.92608461932211.
+Center:147; Real:3; Fake:1640; FID:258.3738507301362; LS:116.07230433823949.
+Center:148; Real:3; Fake:1640; FID:258.55550774314554; LS:117.00566299643549.
+Center:149; Real:3; Fake:1640; FID:258.30767912287274; LS:117.99645371361432.
+Center:150; Real:3; Fake:1640; FID:258.37001828643514; LS:119.06801989744986.
+Center:151; Real:3; Fake:1640; FID:258.415161531089; LS:119.9793549819236.
+Center:152; Real:3; Fake:1640; FID:258.30144854868064; LS:120.94557245118861.
+Center:153; Real:3; Fake:1640; FID:258.1833503024141; LS:121.840164757629.
+Center:154; Real:3; Fake:1640; FID:258.18127624346727; LS:122.87143591107665.
+Center:155; Real:2; Fake:1640; FID:350.65084785116574; LS:123.9097275674661.
+Center:156; Real:2; Fake:1640; FID:350.6683306263846; LS:124.99657868440603.
+Center:157; Real:2; Fake:1640; FID:350.8425179627206; LS:126.15237959008664.
+Center:158; Real:2; Fake:1640; FID:351.0614939541638; LS:127.01945494322061.
+Center:159; Real:2; Fake:1640; FID:351.00108362738956; LS:128.07053287833838.
+Center:160; Real:2; Fake:1640; FID:350.9146873116947; LS:129.02829255112562.
+Center:161; Real:2; Fake:1640; FID:350.81376851775184; LS:129.90778714531987.
+Center:162; Real:2; Fake:1640; FID:350.8311861894073; LS:130.85256882793294.
+Center:163; Real:2; Fake:1640; FID:350.78682252903053; LS:131.8195156596442.
+ Center:164; Real:2; Fake:1640; FID:350.5190837893706; LS:132.8017807672618.
+ Center:165; Real:3; Fake:1640; FID:568.7012400352573; LS:133.64123040754575.
+ CcGAN SFID: 159.95190385957082(96.52518223643007); min/max: 71.55091508643049/568.7012400352573.
+ CcGAN LS over centers: 65.2920274498871(37.90634900277942); min/max: 15.402299914820256/133.64123040754575.
+ CcGAN: FID of 7400 fake images: 59.24402525916568.
+ CcGAN: overall LS of 7400 fake images: 68.11671320761504(47.05689704533054).
+ Displayed 20 cell counts are: [np.int64(10), np.int64(18), np.int64(26), np.int64(34), np.int64(42), np.int64(50), np.int64(58), np.int64(66), np.int64(74), np.int64(82), np.int64(90), np.int64(98), np.int64(106), np.int64(114), np.int64(122), np.int64(130), np.int64(138), np.int64(146), np.int64(154), np.int64(162)]
+Continuous ys:  [  9  28  48  67  87 106 126 145 165 185]
