@@ -33,7 +33,6 @@ class ImagePathDataset(Dataset):
         return len(self.image_paths)
 
     def _get_train_transform(self):
-        # TODO MOVE ME SOMEWHERE ELSE!
         """
         When training across epochs,
         images are randomly flipped, either vertically, horizontally, or both
@@ -149,9 +148,10 @@ def extract_features(
             f"Feature array shape {feats.shape} inconsistent with {len(keys)} image keys."
         )
 
-    order = np.argsort(np.array(keys))
-    feats = feats[order]
-    keys = [keys[i] for i in order]
+    # we do not sort, we want feats in the mulitplied order they came in
+    # order = np.argsort(np.array(keys))
+    # feats = feats[order]
+    # keys = [keys[i] for i in order]
 
     np.save(out_npy, feats)
     out_npy.with_suffix(".paths.txt").write_text("\n".join(keys))
