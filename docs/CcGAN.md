@@ -132,9 +132,9 @@ Below is a table of model and FiD score over each 7400 fake images created by th
 
 | Model | Global FID  | Overall LS  | SFID  |
 | :--- | :--- | :--- | :--- |
-| **cGAN** | 156.838 | 71.882 | 242.699 |
-| **CcGAN (Hard Vicinial)** | 88.829 | 66.451 | 180.015 |
-| **CcGAN (Soft Vicinial)** | 61.366 | 63.695 | 170.953 |
+| **cGAN** | 147.377 | 72.823 | 231.225 |
+| **CcGAN (Hard Vicinial)** | 77.782 | 65.412 | 168.006 |
+| **CcGAN (Soft Vicinial)** | 59.244 | 65.292 | 159.951 |
 
 Based on the above table, the CcGAN model outperforms all the other models, but the CcGAN method outperforms the cGAN method.
 
