@@ -7,7 +7,7 @@ data/
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
-*.ipynb
+# *.ipynb <- why was this ignored?
 
 # Python
 .venv/
