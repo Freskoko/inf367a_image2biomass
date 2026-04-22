@@ -54,6 +54,15 @@ def load_data(path_cfg: DatasetPaths, train_cfg: TrainConfig):
     )
     Xtr_meta = pd.concat([meta, Xtr_meta], axis=1)
 
+    # --- THE MULTIPLIER ---
+    AUG_MULTIPLIER = 3
+    train_wide = pd.concat([train_wide] * AUG_MULTIPLIER).reset_index(drop=True)
+    Xtr_meta = pd.concat([Xtr_meta] * AUG_MULTIPLIER).reset_index(drop=True)
+    y = pd.concat([y] * AUG_MULTIPLIER).reset_index(drop=True)
+
+    train_wide["instance_id"] = train_wide.index.astype(str)
+    Xtr_meta["instance_id"] = Xtr_meta.index.astype(str)
+
     test_df_raw = pd.read_csv(path_cfg.test_csv)
     test_df = dedupe_test(test_df_raw)
 

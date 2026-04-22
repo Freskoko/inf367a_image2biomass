@@ -10,14 +10,15 @@ def extract_vision_data(
     test_df: pd.DataFrame,
     backbone: str = "dino",
 ):
-    train_imgs = train_df["image_path"].astype(str).unique().tolist()
+    # 1. No .unique() here! We want the duplicated paths from load_data
+    train_imgs = train_df["image_path"].astype(str).tolist()
     test_imgs = test_df["image_path"].astype(str).unique().tolist()
 
     ds_train = ImagePathDataset(
         path_cfg.root,
         train_imgs,
         vision_cfg=vision_cfg,
-        mode=DataType.VAL,
+        mode=DataType.TRAIN,
     )
     ds_test = ImagePathDataset(
         path_cfg.root,
