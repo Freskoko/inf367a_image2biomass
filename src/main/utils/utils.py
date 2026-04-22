@@ -41,6 +41,7 @@ class ModelType(Enum):
             )
         return mapping[key]
 
+
 class VisionBackbone(str, Enum):
     DINO = "dino"
     RESNET = "resnet"
@@ -93,6 +94,7 @@ class TrainConfig:
         if self.model_type == ModelType.TABPFN:
             # lazy import so runs with --model extra_trees dont pay tabpfn import cost.
             from tabpfn import TabPFNRegressor
+
             return TabPFNRegressor(random_state=self.random_state)
 
         return ExtraTreesRegressor(

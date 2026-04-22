@@ -101,6 +101,7 @@ def build_feature_extractor(
 
     raise ValueError(f"Unknown backbone: {backbone}")
 
+
 @torch.inference_mode()
 def extract_features(
     out_npy: Path,

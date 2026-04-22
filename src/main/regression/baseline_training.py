@@ -33,7 +33,10 @@ def _build_preprocessor(X: pd.DataFrame, train_cfg: TrainConfig) -> ColumnTransf
     num_pipeline = Pipeline(
         [
             ("scale", StandardScaler()),
-            ("pca", PCA(n_components=n_components, random_state=train_cfg.random_state)),
+            (
+                "pca",
+                PCA(n_components=n_components, random_state=train_cfg.random_state),
+            ),
         ]
     )
 
@@ -63,7 +66,10 @@ TARGET_WEIGHTS = {
     "Dry_Total_g": 0.5,
 }
 
-def weighted_r2_global(y_true_df: pd.DataFrame, y_pred_df: pd.DataFrame, target_cols: list[str]) -> float:
+
+def weighted_r2_global(
+    y_true_df: pd.DataFrame, y_pred_df: pd.DataFrame, target_cols: list[str]
+) -> float:
     # stack to long vectors
     y_true = np.concatenate([y_true_df[c].to_numpy() for c in target_cols], axis=0)
     y_pred = np.concatenate([y_pred_df[c].to_numpy() for c in target_cols], axis=0)
@@ -130,8 +136,12 @@ def cv_mean_r2(
         oof_pred_parts.append(y_pred[target_cols])
 
         fold_r2 = weighted_r2_global(y_true, y_pred, target_cols)
-        fold_per_target = np.array([r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float)
-        print(f"fold {fold}: global_weighted_r2={fold_r2:.4f} targets={np.round(fold_per_target, 4)}")
+        fold_per_target = np.array(
+            [r2_score(y_true[c], y_pred[c]) for c in target_cols], dtype=float
+        )
+        print(
+            f"fold {fold}: global_weighted_r2={fold_r2:.4f} targets={np.round(fold_per_target, 4)}"
+        )
 
     oof_true = pd.concat(oof_true_parts, axis=0)
     oof_pred = pd.concat(oof_pred_parts, axis=0)

@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def merge_features(X_meta: pd.DataFrame, feature_df: pd.DataFrame) -> pd.DataFrame:
     X = X_meta.copy()
 

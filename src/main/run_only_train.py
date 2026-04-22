@@ -12,6 +12,7 @@ from main.regression.baseline_training import (
     load_feature_store,
 )
 
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run 5-fold GroupKFold CV evaluation.")
     parser.add_argument(
