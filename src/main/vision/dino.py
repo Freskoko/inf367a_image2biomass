@@ -148,7 +148,8 @@ def extract_features(
             f"Feature array shape {feats.shape} inconsistent with {len(keys)} image keys."
         )
 
-    # we do not sort, we want feats in the mulitplied order they came in
+    # we do not sort, we want feats in the mulitplied order they came in!
+    # used to do this:
     # order = np.argsort(np.array(keys))
     # feats = feats[order]
     # keys = [keys[i] for i in order]

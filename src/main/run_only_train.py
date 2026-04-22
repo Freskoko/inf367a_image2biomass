@@ -46,7 +46,7 @@ def main():
     )
     logger.info("Tabular data loaded")
 
-    # Run the vision model feature extractor only if we don't already have cached features.
+    # run the vision model feature extractor only if we don't already have cached features.
     train_feat_path = path_cfg.vision_feats_train_path(
         args.vision_backbone, image_size=vision_cfg.image_size
     )
@@ -75,7 +75,7 @@ def main():
     logger.info("Device setup: {}".format(train_cfg.device))
 
     # When lower_resources is on, CV runs on a random subset of image groups
-    #to keep TabPFN runs reasonable in wall clock time.
+    # to keep TabPFN runs reasonable
     if train_cfg.lower_resources:
         rng = np.random.default_rng(train_cfg.random_state)
         keep_groups = rng.choice(

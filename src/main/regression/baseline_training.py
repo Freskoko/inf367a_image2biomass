@@ -29,9 +29,6 @@ def _build_preprocessor(X: pd.DataFrame, train_cfg: TrainConfig) -> ColumnTransf
     cat_cols = [c for c in X.columns if X[c].dtype == "object"]
     num_cols = [c for c in X.columns if c not in cat_cols]
 
-    # StandardScaler + PCA live inside the numeric branch so they refit on each
-    # CV fold's train portion only. This avoids leaking validation-fold
-    # statistics into the PCA basis or scaler.
     n_components = min(train_cfg.pca_n_components, len(num_cols))
     num_pipeline = Pipeline(
         [
@@ -160,5 +157,5 @@ def fit_full(train_cfg: TrainConfig, X: pd.DataFrame, y: pd.DataFrame) -> Pipeli
 def predict(pipe: Pipeline, X: pd.DataFrame) -> np.ndarray:
     X = X.drop(columns=["image_path"], errors="ignore")
     preds = np.asarray(pipe.predict(X))
-    # Biomass is non-negative; clip near-zero negatives produced by the regressor.
+    # biomass is non-negative, clip to 0
     return np.clip(preds, 0.0, None)

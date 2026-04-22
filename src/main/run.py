@@ -60,7 +60,7 @@ def main():
     train_wide, test_df, _, _, y = load_data(path_cfg=path_cfg, train_cfg=train_cfg)
     logger.info("Tabular data loaded")
 
-    # Run the vision model feature extractor only if we don't already have cached features.
+    # run the vision model feature extractor only if we don't already have cached features.
     train_feat_path, test_feat_path = get_vision_feature_paths(
         path_cfg, args.vision_backbone, image_size=vision_cfg.image_size
     )

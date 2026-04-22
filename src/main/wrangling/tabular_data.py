@@ -54,7 +54,7 @@ def load_data(path_cfg: DatasetPaths, train_cfg: TrainConfig):
     )
     Xtr_meta = pd.concat([meta, Xtr_meta], axis=1)
 
-    # --- THE MULTIPLIER ---
+    # duplicates training data, (img data is agumented through ImagePathDataset class)
     AUG_MULTIPLIER = 3
     train_wide = pd.concat([train_wide] * AUG_MULTIPLIER).reset_index(drop=True)
     Xtr_meta = pd.concat([Xtr_meta] * AUG_MULTIPLIER).reset_index(drop=True)

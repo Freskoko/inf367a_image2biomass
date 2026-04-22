@@ -91,7 +91,7 @@ class TrainConfig:
 
     def get_model(self):
         if self.model_type == ModelType.TABPFN:
-            # Lazy import so runs with --model extra_trees don't pay the tabpfn import cost.
+            # lazy import so runs with --model extra_trees dont pay tabpfn import cost.
             from tabpfn import TabPFNRegressor
             return TabPFNRegressor(random_state=self.random_state)
 
