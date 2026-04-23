@@ -6,15 +6,41 @@ TabPFN (Tabular Prior-Fitted Network) is a foundation model for tabular data fro
 
 ## How it works
 
-During pre training, TabPFN learned to approximate Bayesian inference across a wide range of data generating processes sampled from its prior. When you call `.fit()` on a new dataset, the model mostly just stores and preprocesses the training data. When you call `.predict()`, the training set and the test inputs are fed through the transformer together, and attention produces predictions that marginalize by themselves over most likely models. You can kind of think of it as doing model selection and hyperparameter tuning "inside" the forward pass, using the knowledge the authors gave it during pre training.
+### The high level idea: swap the training loop for a forward pass
 
-Compared to the original v1 (classification only, up to around 1,000 samples), TabPFN v2 adds regression support and scales to roughly 10,000 samples and 500 features because of the improved architecture. It also ensembles multiple forward passes with different feature orderings and preprocessings (controlled by `n_estimators`) to stabilize predictions.
+Every classical ML model (ExtraTrees, linear regression, MLP, etc.) follows the same shape: given a new dataset you initialise weights, run an optimisation loop, get back a fitted model, then predict. TabPFN does something different, the "training" has already happened once, offline, on millions of synthetic datasets. At inference it is handed your real dataset and produces predictions in a single transformer forward pass, without ever running an optimiser on your data.
 
-Main practical properties of TABPFN:
+![TabPFN vs traditional ML](images/tabpfn_overview.png)
 
-- No hyperparameter search needed. The prior already encodes what a good model looks like.
-- Works well on small and medium tabular datasets, which matches what we have in this exercise.
-- "Training" is basically free, the cost is at prediction time, because every prediction is a transformer forward pass over the full training set. So the prediction is slower than a typical ML model, but there is no training involved.
+The left panel in the figure above shows the classical loop (dataset to training to model to predictions). The right panel shows TabPFN: the pretrained network is already in place, and at inference it takes the labelled training rows and the unlabelled test rows as its input and returns predictions directly. There is no per task optimiser, no hyperparameter search, no fitted weights specific to your data.
+
+### Pretraining: a prior over structural causal models
+
+The pretraining step is where the real cost lives. Hollmann et al. generate synthetic datasets by sampling from a prior over **structural causal models (SCMs)** , graphs of variables with noise terms and functional relationships, and then asking the transformer to predict held out labels from in context training rows of those synthetic datasets. Doing this on millions of such datasets teaches the transformer to approximate Bayesian inference across a very broad family of data generating processes. Intuitively, the weights encode: if the data looks roughly like it came from one of these plausible generative processes, this is the posteriorish prediction you should make.
+
+### Inference: what the transformer is approximating
+
+Formally, for a labelled training set `D_train = {(x_i, y_i)}` and a test input `x_test`, the ideal predictor under the prior is the posterior predictive
+
+![TabPFN inference formula](images/tabpfn_computing.png)
+
+this means integrate over all plausible models `θ` weighted by how likely they are given `D_train`. That integral is intractable in general, it is what classical ML approximates via a single point estimate of `θ` (the trained model). TabPFN's trick is that the transformer, having been pretrained to minimise prediction loss across the SCM prior, has effectively learned to compute this integral implicitly inside its forward pass. When the training set and the test input are fed through attention layers together, the output distribution over `y_test` is an approximation of the posterior predictive, model selection and (implicit) hyperparameter marginalisation happen inside the forward pass.
+
+### Architecture and the attention pattern
+
+![TabPFN architecture](images/tabpfn_architecture.png)
+
+Architecturally, TabPFN v2 is a transformer with a custom attention pattern. Each row of the dataset (both training and test) is turned into a token, and within each dataset the training tokens carry their label while test tokens do not. Attention is restricted so that test rows can attend to training rows (to look up what the labels are for similar x values) and training rows attend to each other (to form a dataset-level summary), but test rows do not attend to each other — so a prediction for one test row does not depend on the ordering or presence of other test rows. This is also why the same model handles any number of test rows in one forward pass.
+
+### v2 and the `n_estimators` ensemble
+
+Compared to the original v1 (classification only, up to around 1,000 samples), TabPFN v2 adds regression support and scales to roughly 10,000 samples and 500 features thanks to an improved architecture and positional scheme. It also runs the forward pass multiple times with different feature orderings and preprocessings and averages the predictions — this is the `n_estimators` argument exposed on `TabPFNRegressor` — which smooths out the sensitivity to input ordering and stabilises the final prediction.
+
+### Practical properties that follow
+
+- **No hyperparameter search needed.** The prior already encodes what a good model looks like, so there is no per-task grid/random search to run — a big simplification on small datasets where CV-based tuning is itself noisy.
+- **Works well on small and medium tabular datasets.** The pretraining prior is specifically designed around that regime, which is exactly where our task sits (~357 rows, 128 features).
+- **"Training" is effectively free, inference is where the cost is.** Each prediction is a transformer forward pass over the *full* training set used as context, so prediction time scales with training-set size rather than being amortised away as in a tree or linear model. That trade-off drove the `lower_resources` decision in the CV loop (see Evaluation).
 
 ## Why does it fit this task
 
@@ -34,6 +60,9 @@ Getting TabPFN running took more work than I thought it would. Here are the main
 
 **Making CV fast enough.** TabPFN's prediction time scales with the size of the training set, because every prediction is a transformer forward pass over all the training rows. Running a full 5 fold CV over the whole dataset was too slow to iterate on, so I used the `lower_resources` flag that was already in the code. It samples 160 image groups and runs CV on those. That's enough to compare models, and a full CV with TabPFN takes about 2 minutes on CPU instead of way longer.
 
+
+
+
 ## How the data reaches TabPFN
 
 Once all of that is in place, I never call TabPFN's API directly. Everything goes through the sklearn `Pipeline` that `model_wrapper_creator` builds, so the same code path handles both ExtraTrees and TabPFN.
@@ -45,6 +74,10 @@ When `pipe.fit(X, y)` is called (either in `fit_full` for the full run, or insid
 3. At `pipe.predict(X_test)`, each clone runs a forward pass over its training context plus the test rows and returns predictions for its target. `MultiOutputRegressor` stacks the three columns back together. The two composite targets (`GDM_g`, `Dry_Total_g`) are then computed from those three predictions.
 
 The rest of the pipeline (loading data, vision features, CV, metrics) is shared with the ExtraTrees path.
+
+## Integration into the main pipeline/project
+
+TabPFN is wired into both top level entry points — `src/main/run.py` (full pipeline that writes `submission.csv`) and `src/main/run_only_train.py` (5-fold CV evaluation), and is selected via a `--model {tabpfn, extra_trees}` CLI flag on each, with `tabpfn` as the default. The rest of the group can therefore compare regressors or swap vision backbones (`--vision-backbone {dino, resnet, convnext}`) without touching any code. Because the TabPFN and ExtraTrees paths share the exact same sklearn `Pipeline`, `ColumnTransformer`, in pipeline `StandardScaler → PCA(128)` stage, `MultiOutputRegressor` wrapping, `GroupKFold` CV loop, and metric code, the only thing that differs between any TabPFN row and the matching ExtraTrees row in the results table is the single-output estimator inside `MultiOutputRegressor`. That's what keeps the comparison fair and makes the numbers below attributable to the regressor choice rather than to pipeline differences.
 
 ## Files I changed (individual work)
 
