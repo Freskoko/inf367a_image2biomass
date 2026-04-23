@@ -7,7 +7,6 @@ data/
 
 # Jupyter Notebooks
 .ipynb_checkpoints/
-*.ipynb
 
 # Python
 .venv/

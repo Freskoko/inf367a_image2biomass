@@ -125,7 +125,7 @@ assert len(labels) == len(images)
 
 # define training and validation sets
 if args.CVMode:
-    # 90% Training; 10% valdation
+    # 90% training 10% valdation
     valid_prop = 0.1  # proportion of the validation samples
     indx_all = np.arange(len(images))
     np.random.shuffle(indx_all)

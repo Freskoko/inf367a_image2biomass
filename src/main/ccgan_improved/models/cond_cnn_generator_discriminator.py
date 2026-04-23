@@ -99,7 +99,6 @@ class cond_cnn_discriminator(nn.Module):
 
         self.linear = nn.Sequential(
             nn.Linear(ndf * 8 * 4 * 4 + num_classes, 1),
-            # nn.Sigmoid()
         )
 
         self.label_emb = nn.Embedding(num_classes, num_classes)

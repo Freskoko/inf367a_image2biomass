@@ -190,7 +190,7 @@ class model_y2h(nn.Module):
         )
 
     def forward(self, y):
-        y = y.view(-1, 1)  # +1e-8
+        y = y.view(-1, 1)
         return self.main(y)
 
 

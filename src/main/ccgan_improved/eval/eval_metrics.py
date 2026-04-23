@@ -163,7 +163,6 @@ def cal_labelscore(
     PreNet: pre-trained CNN
     images: fake images
     labels_assi: assigned labels
-    resize: if None, do not resize; if resize = (H,W), resize images to 3 x H x W
 
     Calculate difference between assigned label and predicted label
     """
