@@ -2,6 +2,28 @@
 
 Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
 
+## Files included in submission
+
+1. This file
+2. A zip folder including the repo for our CcGAN project (inf367a_image2biomass.zip)
+3. A PDF report
+4. A data exploration notebook, which can be found here: `src/exploration/explore.ipynb`
+
+
+## Individual work vs group work
+
+In /docs at the base of this repo, there are readmes describing each of the induvidual work done.
+
+docs/CcGAN.md
+
+| Person | Project  | Folder  | Corresponding code
+| :--- | :--- | :--- | :--- |
+| **Henrik Brøgger** | CcGAN | docs/CcGAN.md | src/main/ccgan_improved |
+| **Kristofers Gulbis** | TabPFN | docs/TabPFN.md | |
+# TODO: WRITE YOUR NAMES HERE!!!
+
+The pdf report that we submit with the code is group work.
+
 ## Task
 
 Using a dataset for precision agriculture, the task is to predict pasture biomass from top-view images and some tabular metadata. Pasture biomass is defined as dry weight including:
