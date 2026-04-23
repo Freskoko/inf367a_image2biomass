@@ -10,7 +10,7 @@ dependencies = [
     "loguru>=0.7.3",
     "opencv-python>=4.13.0.90",
     "pandas>=3.0.0",
-    "scikit-learn>=1.8.0",
+    "scikit-learn<1.6.0",
     "tabpfn>=2.0.0",
     "torch>=2.11.0",
     "torchaudio>=2.11.0",
