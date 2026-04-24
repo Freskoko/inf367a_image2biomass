@@ -33,7 +33,6 @@ class ImagePathDataset(Dataset):
         return len(self.image_paths)
 
     def _get_train_transform(self):
-        # TODO MOVE ME SOMEWHERE ELSE!
         """
         When training across epochs,
         images are randomly flipped, either vertically, horizontally, or both
