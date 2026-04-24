@@ -46,7 +46,7 @@ v1 of TabPFN only did classification and only up to around 1,000 samples. v2 add
 
 ## Why does it fit this task
 
-Our dataset is small (aprox. 357 images after the long to wide pivot, 128 PCA reduced vision features). That's well within the range TabPFN was designed for (up to ~10k samples and ~500 features). Tree ensembles like ExtraTrees work fine but need some hyperparameter tuning to not overfit on small data; TabPFN's "no tuning" operating mode is a natural fit here.
+Our dataset is small (around 357 images after the long to wide pivot, 128 PCA reduced vision features). That's well within the range TabPFN was designed for (up to ~10k samples and ~500 features). Tree ensembles like ExtraTrees work fine but need some hyperparameter tuning to not overfit on small data; TabPFN's "no tuning" operating mode is a natural fit here.
 
 ## Implementation
 
@@ -72,7 +72,7 @@ When `pipe.fit(X, y)` is called (either in `fit_full` for the full run, or insid
 2. `MultiOutputRegressor` clones the `TabPFNRegressor` once per target column (`Dry_Green_g`, `Dry_Dead_g`, `Dry_Clover_g`) and calls `.fit(X_processed, y_col)` on each clone. TabPFN's "fit" mostly just preprocesses and stores the training rows as context.
 3. At `pipe.predict(X_test)`, each clone runs a forward pass over its training context plus the test rows and returns predictions for its target. `MultiOutputRegressor` stacks the three columns back together. The two composite targets (`GDM_g`, `Dry_Total_g`) are then computed from those three predictions.
 
-The rest of the pipeline (loading data, vision features, CV, metrics) is shared with the ExtraTrees path, whichs implementation was also done by me, so i was already familiar with all the code.
+The rest of the pipeline (loading data, vision features, CV, metrics) is shared with the ExtraTrees path, whose implementation was also done by me, so I was already familiar with all the code.
 
 ## Integration into the main pipeline/project
 
@@ -80,7 +80,7 @@ TabPFN is wired into both top level entry points, `src/main/run.py` (full pipeli
 
 ## Files I changed (individual work)
 
-None of the changes is huge in line count, but a lot of them came out of debugging instead of just writing code, so I want to be clear about what was done.
+None of the changes are huge in line count, but a lot of them came out of debugging instead of just writing code, so I want to be clear about what was done.
 
 **`pyproject.toml`**: added `tabpfn>=2.0.0` to `dependencies`. The v2 pin matters because v1 is classification only, v2 is the one with regression. `uv sync` pulls in tabpfn and its transitive stuff (torch, huggingface-hub, and a couple of Prior Labs telemetry/auth packages).
 
@@ -95,7 +95,7 @@ None of the changes is huge in line count, but a lot of them came out of debuggi
 
 **`src/main/run.py` and `src/main/run_only_train.py`**: both entry point scripts now take a `--model` argument via `argparse`, with choices `tabpfn` / `extra_trees` and default `tabpfn`. The string goes through `ModelType.from_string(args.model)` into `TrainConfig(model_type=...)`. Everything else in those scripts is unchanged. So picking a model is really just a CLI flag, no edits.
 
-**On purpose left alone in the TabPFN work itself:** the `MultiOutputRegressor` wrapping, the CV loop (`cv_mean_r2`) and the metric code (`weighted_r2_global`). Those were already in the project before i implemengted TabPFN, and I kept them untouched so the ExtraTrees vs TabPFN comparison would be same. The preprocessor stack was later cleaned up aswell, so that `StandardScaler` and `PCA(128)` now refit per fold inside the sklearn `Pipeline` rather than once before CV. The results table below reflects the current fixed code. The only thing that actually differs between a TabPFN row and an ExtraTrees row is the single output estimator inside `MultiOutputRegressor`.
+**On purpose left alone in the TabPFN work itself:** the `MultiOutputRegressor` wrapping, the CV loop (`cv_mean_r2`) and the metric code (`weighted_r2_global`). Those were already in the project before I implemented TabPFN, and I kept them untouched so the ExtraTrees vs TabPFN comparison would be the same. The preprocessor stack was later cleaned up as well, so `StandardScaler` and `PCA(128)` now refit per fold inside the sklearn `Pipeline` rather than once before CV. The results table below reflects the current fixed code. The only thing that actually differs between a TabPFN row and an ExtraTrees row is the single output estimator inside `MultiOutputRegressor`.
 
 ## Evaluation
 
@@ -193,10 +193,11 @@ uv run python -m main.run --model tabpfn      --vision-backbone convnext
 ```
 
 ## Extra notes
-I used TabPFN discord for finding info about some issues i expierenced while implementing it. Aswell as i used AI to help with debuggind the code, fixing some parts of it and proof reading and structuring this Markdown.
+
+I used the TabPFN Discord to find info on some issues I ran into while implementing it. I also used AI to help debug the code, fix some parts of it, and proofread and structure this writeup.
 
 
 ## References
-References
-Hollmann, N., Müller, S., Eggensperger, K., and Hutter, F. (2023). TabPFN: A Transformer That Solves Small Tabular Classification Problems in a Second. International Conference on Learning Representations (ICLR). https://arxiv.org/abs/2207.01848
-Hollmann, N., Müller, S., Purucker, L., Krishnakumar, A., Körfer, M., Hoo, S. B., Schirrmeister, R. T., and Hutter, F. (2025). Accurate predictions on small data with a tabular foundation model. Nature.
+
+- Hollmann, N., Müller, S., Eggensperger, K., and Hutter, F. (2023). TabPFN: A Transformer That Solves Small Tabular Classification Problems in a Second. International Conference on Learning Representations (ICLR). https://arxiv.org/abs/2207.01848
+- Hollmann, N., Müller, S., Purucker, L., Krishnakumar, A., Körfer, M., Hoo, S. B., Schirrmeister, R. T., and Hutter, F. (2025). Accurate predictions on small data with a tabular foundation model. Nature.

@@ -5,9 +5,9 @@ Kaggle: [Image2Biomass](https://www.kaggle.com/competitions/csiro-biomass)
 ## Files included in submission
 
 1. This file
-2. A zip folder including the repo for our CcGAN project (inf367a_image2biomass.zip)
+2. A zip of the full project repo (`inf367a_image2biomass.zip`), which contains both the TabPFN and CcGAN work
 3. A PDF report
-4. A data exploration notebook, which can be found here: `src/exploration/explore.ipynb`
+4. A data exploration notebook at `src/exploration/explore.ipynb` (inside the zip)
 
 
 ## Individual work vs group work
