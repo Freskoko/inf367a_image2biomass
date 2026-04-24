@@ -55,7 +55,13 @@ def model_wrapper_creator(train_cfg: TrainConfig, X_example):
     pre = _build_preprocessor(X_example, train_cfg)
     n_jobs = 1 if train_cfg.model_type == ModelType.TABPFN else train_cfg.n_jobs
     model = MultiOutputRegressor(train_cfg.get_model(), n_jobs=n_jobs)
+    pause = 10 if train_cfg.model_type == ModelType.TABPFN else 0
+    
+
     return Pipeline([("pre", pre), ("model", model)])
+
+
+
 
 
 TARGET_WEIGHTS = {
