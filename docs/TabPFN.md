@@ -1,4 +1,5 @@
 # Novel Method: TabPFN
+Author: Kristofers Gulbis
 
 ## What it is
 
@@ -168,7 +169,8 @@ A few plausible reasons for the CV to Kaggle gap:
 3. **Distribution shift.** The Kaggle test set might come from a slightly different distribution than what GroupKFold on the training set is sampling. If the vision feature distribution is even a bit different, a flexible model like TabPFN that was pretrained on synthetic tabular priors could be relying on structure that doesn't generalise as well as a more "average all of these trees" model like ExtraTrees.
 4. **ExtraTrees is more conservative by default.** On small noisy data, ExtraTrees tends to regress towards the mean more than a transformer based regressor. When the test set is small and noisy, that conservative bias can look like a better fit even if CV on the same held out distribution would say otherwise.
 
-The honest takeaway is that TabPFN is clearly competitive in this setting, particularly in CV, but for this specific small data biomass task the tree ensemble generalises better to the Kaggle test split. ConvNeXt Tiny was the single strongest vision backbone across both regressors on the public leaderboard, which agrees with CV, so the vision backbone ranking is more stable than the regressor ranking.
+
+The honest conclusion is that TabPFN is clearly competitive in this setting, particularly in CV, but for this specific small data biomass task the tree ensemble generalises better to the Kaggle test split. ConvNeXt Tiny was the single strongest vision backbone across both regressors on the public leaderboard, which agrees with CV, so the vision backbone ranking is more stable than the regressor ranking.
 
 ### Reproducing
 
