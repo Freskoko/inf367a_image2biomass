@@ -3,7 +3,7 @@ Author: Kristofers Gulbis
 
 ## What it is
 
-TabPFN (Tabular Prior Fitted Network) is a foundation model for tabular data. The original classification only version was published as Hollmann et al. (2023); for this implementation I used TabPFN v2 (Hollmann et al. 2025), which adds regression support (course staff confirmed this is allowed). My in class presentation covered v1. Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
+TabPFN (Tabular Prior Fitted Network) is a foundation model for tabular data. The original classification only version was published as Hollmann et al. (2023); for this implementation I used TabPFN v2 (Hollmann et al. 2025), which adds regression support (this was allowed, for me to switch to v2 forthe implementation even though,my in class presentation covered v1. Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
 
 ## How it works
 
@@ -21,7 +21,7 @@ All the compute for TabPFN happens in pretraining, and we never do that ourselve
 
 ### Inference: what the transformer is approximating
 
-The "right" thing to predict, given a training set `D_train = {(x_i, y_i)}` and a test input `x_test`, is the posterior predictive:
+The correct thing to predict, given a training set `D_train = {(x_i, y_i)}` and a test input `x_test`, is the posterior predictive:
 
 ![TabPFN inference formula](images/tabpfn_computing.png)
 
@@ -31,9 +31,9 @@ Which just means: look at every plausible model, weight it by how well it explai
 
 ![TabPFN architecture](images/tabpfn_architecture.png)
 
-*Figure from Hollmann et al. (2023), Figure 2(b).*
+*Figure from Hollmann et al. (2023)*
 
-TabPFN v2 is a transformer with a slightly custom attention pattern. Each row of the dataset (training rows and test rows) becomes one token, and the training tokens carry their label while the test tokens don't. The attention is set up so that test rows can look at training rows (so they can find similar x values and copy over the label info), training rows can look at each other (so they build up a summary of the dataset), but test rows don't look at each other. So the prediction for one test row doesn't depend on what other test rows are in the batch, or their order. That's also why the same model can handle any number of test rows in one go.
+TabPFN is a transformer with a slightly custom attention pattern. Each row of the dataset (training rows and test rows) becomes one token, and the training tokens carry their label while the test tokens don't. The attention is set up so that test rows can look at training rows (so they can find similar x values and copy over the label info), training rows can look at each other (so they build up a summary of the dataset), but test rows don't look at each other. So the prediction for one test row doesn't depend on what other test rows are in the batch, or their order. That's also why the same model can handle any number of test rows in one go.
 
 ### v2 and the `n_estimators` ensemble
 
