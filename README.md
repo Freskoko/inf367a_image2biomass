@@ -156,3 +156,8 @@ We use [ruff](https://docs.astral.sh/ruff/) to format the code.
 ## Faster CV runs (default)
 
 By default `TrainConfig.lower_resources = True`, which subsamples CV to 160 image groups so TabPFN runs finish in a couple of minutes on CPU. If you want a full CV on all images, set it to `False` in [src/main/utils/utils.py](src/main/utils/utils.py) (the `TrainConfig` dataclass) or construct `TrainConfig(lower_resources=False)` from the call site.
+
+
+## Extra notes
+
+Some of us used AI to help with coding, debbuging code, structuring readmes and some other issues.
