@@ -18,6 +18,8 @@ In `/docs` at the root of this repo there are readmes describing the individual 
 | :--- | :--- | :--- | :--- |
 | Henrik Brøgger | CcGAN | `docs/CcGAN.md` | `src/main/ccgan_improved/` |
 | Kristofers Gulbis | TabPFN | `docs/TabPFN.md` | `src/main/utils/utils.py`, `src/main/regression/baseline_training.py`, `src/main/run.py`, `src/main/run_only_train.py` |
+| Ole Straumland | ConvNeXt | `docs/ConvNeXt.md` | `src/main/vision/ConvNeXt/convnext.py` |
+| Lan Ngoc Nguyen | DinoV2 | `docs/Dino.md` | `src/main/dino.py` |
 
 The PDF report that we submit with the code is group work.
 
