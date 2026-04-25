@@ -45,6 +45,28 @@ The competition score is a weighted R², where Dry_Total_g is weighted 0.5, GDM_
 3. Inside the sklearn `Pipeline`, fit `StandardScaler` and then `PCA(n_components=128)` on the training split. Under CV both refit per fold, so no validation fold statistics leak into the PCA basis or the scaler.
 4. Fit a multi output regressor on the three direct targets (`Dry_Clover_g`, `Dry_Dead_g`, `Dry_Green_g`). The two composite targets (`GDM_g`, `Dry_Total_g`) are computed from those predictions afterwards.
 
+## Novel methods:
+
+
+Our baseline is ExtraTrees on top of pretrained ResNet18 features. It's a tree ensemble on standard ImageNet representations, deliberately conventional so we have a sensible reference point to measure improvements against. From there each group member contributed one novel method, and each method targets a specific weakness of the baseline.
+
+### DINOv2 (Lang), replaces the vision backbone
+
+ImageNet-pretrained ResNet18 was trained to discriminate between object categories like cats, cars, and chairs. Our task is the opposite. Every image contains the same kind of object (grass), and the relevant signal is fine-grained texture composition: how much of the image is green vegetation, how much is dead matter, how much is clover. Classification-trained CNNs are known to discard texture detail in favour of shape and object identity, which is the wrong inductive bias here. DINOv2 [Oquab et al., 2023] is trained without labels using self-distillation on a curated 142M-image dataset, and it preserves fine-grained spatial and textural structure that supervised pretraining tends to throw away. It also has roughly two orders of magnitude more pretraining data than the original ResNet18 ImageNet weights, so we expected it to transfer better to a domain (top-down pasture imagery) that is quite far from ImageNet.
+
+### ConvNeXt-Tiny (Ole), replaces the vision backbone
+ConvNeXt [Liu et al., 2022] is a 2022 redesign of convolutional architectures that incorporates several ideas from vision transformers: a patchify stem, depthwise separable convolutions, larger kernel sizes, inverted bottlenecks, and LayerNorm in place of BatchNorm. The combination closes most of the gap to ViTs on ImageNet while keeping convolutional inductive biases (translation equivariance, locality), which we expected to matter on a small dataset where transformers can struggle. We chose it as a counterpoint to DINOv2. If a stronger supervised CNN matches or beats DINOv2 here, it suggests the data scaling matters more than the self-supervision objective. If DINOv2 wins, it suggests the opposite. Either way the comparison tells us something.
+
+### TabPFN (Kristofers), replaces the regression head
+The baseline tree ensemble has a known weakness on small data. It benefits from per-dataset hyperparameter tuning (n_estimators, depth, leaf size), but cross-validation-based tuning is itself noisy when the dataset is small, so the search becomes a source of overfitting on its own. TabPFN [Hollmann et al., 2025] avoids this entirely. It is a transformer pretrained once on millions of synthetic tabular datasets sampled from a prior over structural causal models, so its forward pass approximates a posterior predictive distribution under that prior. Model selection and hyperparameter marginalisation happen inside the network rather than before it. The operating regime it was designed for (up to 10k samples, 500 features) covers our task (~357 images, 128 PCA features) with room to spare. The no-tuning property is exactly what we want here, since the CV signal we would otherwise tune against is itself noisy at this sample size.
+
+### CcGAN (Henrik), expands the dataset
+The first three methods all assume a fixed dataset and try to extract more signal from it. CcGAN [Ding et al., 2021] takes the orthogonal approach. It generates new training images conditioned on a continuous biomass target, which in principle could fill in underrepresented regions of the label distribution. Standard class-conditional GANs only handle discrete labels. CcGAN's contribution is a vicinal discriminator loss that lets the model condition on a continuous scalar (for us, total biomass in grams). If it had worked, it would have addressed data scarcity at the source rather than working around it downstream. It did not work well at the resolution our compute budget allowed (see docs/CcGAN.md), which is itself a useful negative result.
+
+### How they fit together
+
+The three pipeline-replacement methods (DINOv2, ConvNeXt-Tiny, TabPFN) plug into a modular sklearn pipeline through the --vision-backbone and --model CLI flags, so every combination of backbone and regressor can be evaluated under the same CV protocol. That means any improvement we report is attributable to the specific component we swapped, not to incidental pipeline differences. The CcGAN branch is self-contained because it operates on the data itself rather than on the pipeline.
+
 ## Regressors
 
 We have two regressors to choose from: `ExtraTreesRegressor` as the baseline and `TabPFN` as the new method.
