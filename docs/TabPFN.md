@@ -3,7 +3,7 @@ Author: Kristofers Gulbis
 
 ## What it is
 
-TabPFN (Tabular Prior Fitted Network) is a foundation model for tabular data. The original classification only version was published as Hollmann et al. (2023); for this implementation I used TabPFN v2 (Hollmann et al. 2025), which adds regression support (this was allowed, for me to switch to v2 forthe implementation even though,my in class presentation covered v1. Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
+TabPFN (Tabular Prior Fitted Network) is a foundation model for tabular data. The original classification only version was published as Hollmann et al. (2023); for this implementation I used TabPFN v2 (Hollmann et al. 2025), which adds regression support (this was allowed, for me to switch to v2 forthe implementation even though,my in class presentation covered v1). Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
 
 ## How it works
 
@@ -158,7 +158,7 @@ All six trained models were also submitted to the Kaggle competition. The scores
 
 The Kaggle rankings look very different from the CV rankings, and that is worth being honest about in the writeup.
 
-- **CV said TabPFN wins, Kaggle says ExtraTrees wins.** The top two entries on the private leaderboard are both ExtraTrees (DINO at `0.260`, ConvNeXt at `0.255`). TabPFN's best Kaggle result is `0.232` (ConvNeXt), third from the top. On CV the ordering was essentially the opposite, with all three TabPFN rows beating their ExtraTrees counterparts.
+- **CV shows TabPFN wins, Kaggle says ExtraTrees wins.** The top two entries on the private leaderboard are both ExtraTrees (DINO at `0.260`, ConvNeXt at `0.255`). TabPFN's best Kaggle result is `0.232` (ConvNeXt), third from the top. On CV the ordering was essentially the opposite, with all three TabPFN rows beating their ExtraTrees counterparts.
 - **Absolute numbers drop a lot.** Best CV global weighted R² was `0.662` (TabPFN + ConvNeXt). Best private leaderboard number is `0.260` (ExtraTrees + DINO). That's a big gap in absolute terms even for the winning row.
 - **Public vs private is itself noisy.** The same model can move a lot between the two splits. TabPFN + DINO goes from `-0.174` public to `0.118` private. ExtraTrees + DINO goes from `0.173` public to `0.260` private. That variance suggests the test sets are small enough that a single submission is a noisy estimate of underlying model quality.
 
