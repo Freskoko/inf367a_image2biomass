@@ -6,7 +6,7 @@ from sklearn.ensemble import ExtraTreesRegressor
 import torch
 
 # TabPFN needs a token for the one time model download + license check.
-# This one is read only (inference only), so fine to keep in the repo, dont need to hide behind env vars.
+# This one is read only (inference only), so fine to keep in the repo, don't need to hide behind env vars.
 # And it makes it easier for graders/users to run the code without needing to set up an account and get their own token.
 TABPFN_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYzk1YTBjNGMtNDZjYS00MjhiLTgyNDQtNWRlMWNhNGJkZTdkIiwiZXhwIjoxODA3NjM3MzMyfQ.4V6VuHGT9OEHg1lzLr8lEM411T6IHMCuEg1j1yWfo10"
 os.environ.setdefault("TABPFN_TOKEN", TABPFN_TOKEN)
@@ -89,8 +89,13 @@ class TrainConfig:
     MANUAL_TARGETS = ["Dry_Total_g", "GDM_g"]
 
     def get_model(self):
+        """Return the single output regressor selected by ``self.model_type``.
+
+        TabPFN is imported lazily so ExtraTrees runs don't pay the tabpfn/torch
+        import cost, and ``random_state`` is passed in explicitly so that
+        TabPFN's internal ensembling is deterministic across CV runs.
+        """
         if self.model_type == ModelType.TABPFN:
-            # Lazy import so runs with --model extra_trees don't pay the tabpfn import cost.
             from tabpfn import TabPFNRegressor
             return TabPFNRegressor(random_state=self.random_state)
 
