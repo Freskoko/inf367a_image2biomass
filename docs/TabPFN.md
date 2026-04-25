@@ -3,13 +3,13 @@ Author: Kristofers Gulbis
 
 ## What it is
 
-TabPFN (Tabular Prior Fitted Network) is a foundation model for tabular data. The original classification only version was published as Hollmann et al. (2023); for this implementation I used TabPFN v2 (Hollmann et al. 2025), which adds regression support (this was allowed, for me to switch to v2 forthe implementation even though,my in class presentation covered v1). Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
+TabPFN (Tabular Prior Fitted Network) is a foundation model for tabular data. The original classification only version was published as Hollmann et al. (2023) https://openreview.net/pdf?id=cp5PvcI6w8_, for this implementation I used TabPFN v2 (Hollmann et al. 2025) https://www.nature.com/articles/s41586-024-08328-6, which adds regression support (this was allowed, for me to switch to v2 for the implementation even though, my in class presentation covered v1). Instead of training from scratch on our dataset, TabPFN is a transformer that has already been pretrained on millions of synthetic tabular datasets generated from a prior over structural causal models. At inference it takes the training set as in context examples (similar to how LLMs use context) and outputs predictions for the test rows in a forward pass.
 
 ## How it works
 
 ### The high level idea: swap the training loop for a forward pass
 
-Normal ML models like ExtraTrees or a small neural net all work the same way. You give them a dataset, they train on it, you get a fitted model back, and then you use it to predict. TabPFN works differently. The training has already happened once, offline, on millions of synthetic datasets that the authors generated. When you use it, you just hand it your real dataset and it gives back predictions in a single forward pass through the transformer, without ever actually fitting anything to your data.
+Normal ML models like ExtraTrees or a small neural nets all work the same way. You give them a dataset, they train on it, you get a fitted model back, and then you use it to predict. TabPFN works differently. The training has already happened once, offline, on millions of synthetic datasets that the authors generated. When you use it, you just hand it your real dataset and it gives back predictions in a single forward pass through the transformer, without ever actually fitting/training anything to your data.
 
 ![TabPFN vs traditional ML](images/tabpfn_overview.png)
 
@@ -81,7 +81,7 @@ TabPFN is wired into both top level entry points, `src/main/run.py` (full pipeli
 
 ## Files I changed (individual work)
 
-None of the changes are huge in line count, but a lot of them came out of debugging instead of just writing code, so I want to be clear about what was done.
+None of the changes are huge in line count, but a lot of them came out of debugging instead of just writing code.
 
 **`pyproject.toml`**: added `tabpfn>=2.0.0` to `dependencies`. The v2 pin matters because v1 is classification only, v2 is the one with regression. `uv sync` pulls in tabpfn and its transitive stuff (torch, huggingface-hub, and a couple of Prior Labs telemetry/auth packages).
 
@@ -196,10 +196,15 @@ uv run python -m main.run --model tabpfn      --vision-backbone convnext
 
 ## Extra notes
 
-I used the TabPFN Discord to find info on some issues I ran into while implementing it. I also used AI to help debug the code, fix some parts of it, and proofread and structure this writeup.
+I used the TabPFN Discord to find info on some issues I ran into while implementing it. I also used AI to help debug the code, fix some parts of it, proof read and structure this readme.
 
 
 ## References
 
-- Hollmann, N., Müller, S., Eggensperger, K., and Hutter, F. (2023). TabPFN: A Transformer That Solves Small Tabular Classification Problems in a Second. International Conference on Learning Representations (ICLR). https://arxiv.org/abs/2207.01848
+- Hollmann, N., Müller, S., Eggensperger, K., and Hutter, F. (2023). TabPFN: A Transformer That Solves Small Tabular Classification Problems in a Second. International Conference on Learning Representations (ICLR). https://openreview.net/pdf?id=cp5PvcI6w8_
 - Hollmann, N., Müller, S., Purucker, L., Krishnakumar, A., Körfer, M., Hoo, S. B., Schirrmeister, R. T., and Hutter, F. (2025). Accurate predictions on small data with a tabular foundation model. Nature.
+https://www.nature.com/articles/s41586-024-08328-6,
+
+
+
+
