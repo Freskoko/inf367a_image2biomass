@@ -21,6 +21,34 @@ In `/docs` at the root of this repo there are readmes describing the individual 
 
 The PDF report that we submit with the code is group work.
 
+## Repository structure
+
+```
+docs/
+  TabPFN.md            Writeup for the TabPFN novel method (Kristofers)
+  CcGAN.md             Writeup for the CcGAN novel method (Henrik)
+  images/              Figures used in the writeups
+src/
+  data/                train.csv, test.csv, sample_submission.csv, train/ and test/ image folders
+  exploration/
+    explore.ipynb      Data exploration notebook (target distributions, image checks, sanity plots)
+  main/
+    run.py             Full pipeline entry point: trains and writes submission.csv
+    run_only_train.py  CV-only entry point: 5 fold GroupKFold evaluation
+    utils/             TrainConfig, VisionModelConfig, DatasetPaths, ModelType enum, TABPFN_TOKEN
+    wrangling/         CSV loading, long to wide pivot, vision feature extraction driver
+    preprocessing/     Pivot helpers, date features, composite target sanity checks
+    vision/            DINOv2, ResNet18 and ConvNeXt Tiny feature extractors
+    regression/        Pipeline builder, CV loop, weighted R2 metrics, fit/predict
+    ccgan_improved/    Henrik's CcGAN code (separate from the main pipeline)
+pyproject.toml         Dependencies and uv config
+README.md              This file
+```
+
+## Data exploration
+
+Before any modelling we ran some basic exploration in [src/exploration/explore.ipynb](src/exploration/explore.ipynb): target distributions, sampling date coverage, per State and per Species splits, a few sample images per target range, and sanity checks that `Dry_Total_g = Dry_Green_g + Dry_Dead_g + Dry_Clover_g` actually holds in the data (one row off by 0.31 g, the rest fine). This is what informed a few choices like keeping the pipeline vision only (since `test.csv` doesn't have the tabular columns) and recomputing composite targets from base predictions.
+
 ## Task
 
 Using a dataset for precision agriculture, the task is to predict pasture biomass from top view images and some tabular metadata. Pasture biomass is defined as dry weight including:
@@ -58,7 +86,7 @@ ImageNet-pretrained ResNet18 was trained to discriminate between object categori
 ConvNeXt [Liu et al., 2022] is a 2022 redesign of convolutional architectures that incorporates several ideas from vision transformers: a patchify stem, depthwise separable convolutions, larger kernel sizes, inverted bottlenecks, and LayerNorm in place of BatchNorm. The combination closes most of the gap to ViTs on ImageNet while keeping convolutional inductive biases (translation equivariance, locality), which we expected to matter on a small dataset where transformers can struggle. We chose it as a counterpoint to DINOv2. If a stronger supervised CNN matches or beats DINOv2 here, it suggests the data scaling matters more than the self-supervision objective. If DINOv2 wins, it suggests the opposite. Either way the comparison tells us something.
 
 ### TabPFN (Kristofers), replaces the regression head
-The baseline tree ensemble has a known weakness on small data. It benefits from per-dataset hyperparameter tuning (n_estimators, depth, leaf size), but cross-validation-based tuning is itself noisy when the dataset is small, so the search becomes a source of overfitting on its own. TabPFN [Hollmann et al., 2025] avoids this entirely. It is a transformer pretrained once on millions of synthetic tabular datasets sampled from a prior over structural causal models, so its forward pass approximates a posterior predictive distribution under that prior. Model selection and hyperparameter marginalisation happen inside the network rather than before it. The operating regime it was designed for (up to 10k samples, 500 features) covers our task (~357 images, 128 PCA features) with room to spare. The no-tuning property is exactly what we want here, since the CV signal we would otherwise tune against is itself noisy at this sample size.
+The baseline tree ensemble has a known weakness on small data. It benefits wfrom per-dataset hyperparameter tuning (n_estimators, depth, leaf size), but cross-validation-based tuning is itself noisy when the dataset is small, so the search becomes a source of overfitting on its own. TabPFN [Hollmann et al., 2025] avoids this entirely. It is a transformer pretrained once on millions of synthetic tabular datasets sampled from a prior over structural causal models, so its forward pass approximates a posterior predictive distribution under that prior. Model selection and hyperparameter marginalisation happen inside the network rather than before it. The operating regime it was designed for (up to 10k samples, 500 features) covers our task (~357 images, 128 PCA features) with room to spare. The no-tuning property is exactly what we want here, since the CV signal we would otherwise tune against is itself noisy at this sample size.
 
 ### CcGAN (Henrik), expands the dataset
 The first three methods all assume a fixed dataset and try to extract more signal from it. CcGAN [Ding et al., 2021] takes the orthogonal approach. It generates new training images conditioned on a continuous biomass target, which in principle could fill in underrepresented regions of the label distribution. Standard class-conditional GANs only handle discrete labels. CcGAN's contribution is a vicinal discriminator loss that lets the model condition on a continuous scalar (for us, total biomass in grams). If it had worked, it would have addressed data scarcity at the source rather than working around it downstream. It did not work well at the resolution our compute budget allowed (see docs/CcGAN.md), which is itself a useful negative result.
