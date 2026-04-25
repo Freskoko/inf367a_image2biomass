@@ -24,6 +24,7 @@ All the compute for TabPFN happens in pretraining, and we never do that ourselve
 The correct thing to predict, given a training set `D_train = {(x_i, y_i)}` and a test input `x_test`, is the posterior predictive:
 
 ![TabPFN inference formula](images/tabpfn_computing.png)
+*Figure reconstructed from Hollmann et al. (2023)*
 
 Which just means: look at every plausible model, weight it by how well it explains the training data, and average their predictions. That integral is almost never something you can actually compute, and normal ML gets around it by just training one model and using that. TabPFN's trick is that because it was pretrained on loss across that big family of synthetic datasets, the forward pass is basically doing that integral implicitly. When you feed it the training rows plus the test input, the output ends up being an approximation of the posterior predictive, so the "pick a model and tune its hyperparameters" step happens inside the network instead of before it.
 
@@ -96,7 +97,7 @@ None of the changes are huge in line count, but a lot of them came out of debugg
 
 **`src/main/run.py` and `src/main/run_only_train.py`**: both entry point scripts now take a `--model` argument via `argparse`, with choices `tabpfn` / `extra_trees` and default `tabpfn`. The string goes through `ModelType.from_string(args.model)` into `TrainConfig(model_type=...)`. Everything else in those scripts is unchanged. So picking a model is really just a CLI flag, no edits.
 
-**On purpose left alone in the TabPFN work itself:** the `MultiOutputRegressor` wrapping, the CV loop (`cv_mean_r2`) and the metric code (`weighted_r2_global`). Those were already in the project before I implemented TabPFN, and I kept them untouched so the ExtraTrees vs TabPFN comparison would be the same. The preprocessor stack was later cleaned up as well, so `StandardScaler` and `PCA(128)` now refit per fold inside the sklearn `Pipeline` rather than once before CV. The results table below reflects the current fixed code. The only thing that actually differs between a TabPFN row and an ExtraTrees row is the single output estimator inside `MultiOutputRegressor`.
+**On purpose left alone in the TabPFN work itself:** the `MultiOutputRegressor` wrapping, the CV loop (`cv_mean_r2`) and the metric code (`weighted_r2_global`). Those i had implemented earlier when working with the baseline before i implemented TabPFN, and I kept them untouched so the ExtraTrees vs TabPFN comparison would be the same. The preprocessor stack was later cleaned up as well, so `StandardScaler` and `PCA(128)` now refit per fold inside the sklearn `Pipeline` rather than once before CV. The results table below reflects the current fixed code. The only thing that actually differs between a TabPFN row and an ExtraTrees row is the single output estimator inside `MultiOutputRegressor`.
 
 ## Evaluation
 
@@ -108,7 +109,7 @@ Setup:
 - `StandardScaler` and then `PCA(n_components=128)` inside the sklearn `Pipeline`, so they refit on each fold's train portion (no leakage of validation fold statistics into the PCA basis or the scaler)
 - No tabular features, because `test.csv` doesn't ship `State`/`Species`/`Pre_GSHH_NDVI`/`Height_Ave_cm`/date fields. The pipeline is vision only to keep CV honest against the production path.
 - 5 folds `GroupKFold(groups=image_path)`, seed 42
-- **CV subsampled to 160 image groups** via `TrainConfig.lower_resources=True` (the default). TabPFN's prediction time scales with training set size, so we subsample to keep iteration times under a couple of minutes on CPU. All six rows below use the same 160 group subset, so the model/backbone comparison is consistent; absolute numbers would likely improve somewhat on a full data run over the remaining ~200 groups.
+- **CV subsampled to 160 image groups** via `TrainConfig.lower_resources=True` (the default). TabPFN's prediction time scales with training set size, so we subsample to keep iteration times lower to be able to run on CPU. All six rows below use the same 160 group subset, so the model/backbone comparison is consistent; absolute numbers would likely improve somewhat on a full data run over the remaining ~200 groups.
 - Metrics reported on out of fold predictions pooled across the 5 folds:
   - **Global weighted R²**: flattened per row weighting (`0.5` on Dry_Total_g, `0.2` on GDM_g, `0.1` on the rest)
   - **Per target weighted R²**: `Σ w_t · R²_t`, closer to the typical "weighted mean of per target scores" formulation
@@ -164,7 +165,7 @@ The Kaggle rankings look very different from the CV rankings, and that is worth 
 
 A few plausible reasons for the CV to Kaggle gap:
 
-1. **CV used a 160 group subsample.** `lower_resources=True` was the default to keep TabPFN CV wall clock manageable. Subsampled CV is a less robust estimator of held out performance than full CV, and small subsamples tend to be more optimistic on small datasets like this one.
+1. **CV used a 160 group subsample.** `lower_resources=True` was the default to keep TabPFN CV wall clock time manageable. Subsampled CV is a less robust estimator of held out performance than full CV, and small subsamples tend to be more optimistic on small datasets like this one.
 2. **Metric definition.** CV reports two weighted R² variants (flattened global, and per target weighted). Neither is guaranteed to be exactly the formula Kaggle uses, even though both use the same weight vector `{0.5, 0.2, 0.1, 0.1, 0.1}`. A small formula mismatch can shift absolute scores without necessarily flipping the ranking, but it makes a clean comparison harder.
 3. **Distribution shift.** The Kaggle test set might come from a slightly different distribution than what GroupKFold on the training set is sampling. If the vision feature distribution is even a bit different, a flexible model like TabPFN that was pretrained on synthetic tabular priors could be relying on structure that doesn't generalise as well as a more "average all of these trees" model like ExtraTrees.
 4. **ExtraTrees is more conservative by default.** On small noisy data, ExtraTrees tends to regress towards the mean more than a transformer based regressor. When the test set is small and noisy, that conservative bias can look like a better fit even if CV on the same held out distribution would say otherwise.
